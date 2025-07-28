@@ -1,4 +1,3 @@
-
 import OpenAI from 'openai';
 import path from 'path';
 import fs from 'fs';
@@ -13,32 +12,33 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt } = req.body;
+    const { messages } = req.body;
 
-    if (!prompt || prompt.trim().length === 0) {
-      return res.status(400).json({ error: 'Prompt is required' });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Messages array is required' });
     }
 
+    // Load system instructions from file
     const filePath = path.join(process.cwd(), 'public', 'gpt-instructions.txt');
     const systemPrompt = fs.readFileSync(filePath, 'utf8');
 
-    console.log('Sending to OpenAI:', prompt);
+    // Prepend system message
+    const finalMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages.filter(m => m.role !== 'system') // prevent duplicate system messages
+    ];
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt }
-      ],
+      messages: finalMessages,
       temperature: 0.7
     });
 
-    console.log('OpenAI response:', completion);
-
     const answer = completion.choices[0].message.content;
-    return res.status(200).json({ answer });
+    res.status(200).json({ result: answer });
+
   } catch (err) {
-    console.error('GPT API error:', err);
-    return res.status(500).json({ error: 'Something went wrong', details: err.message });
+    console.error('GPT API Error:', err);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 }
