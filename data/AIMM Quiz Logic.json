@@ -1,0 +1,73 @@
+{
+  "input_example": {
+    "quizAnswers": {},
+    "tags": []
+  },
+  "expected_output": {
+    "marketingstrengths": [],
+    "marketingweaknesses": [],
+    "nextsteps": [],
+    "offermatches": []
+  },
+  "quiz_flow": [
+    {
+      "category_name": "Branding",
+      "questions": []
+    },
+    {
+      "category_name": "Local Visibility",
+      "questions": []
+    },
+    {
+      "category_name": "Lead Capture & Nurture",
+      "questions": []
+    },
+    {
+      "category_name": "Past Client Nurture & Referrals",
+      "questions": []
+    },
+    {
+      "category_name": "Website Presence",
+      "questions": [
+        {
+          "question": "How would you describe your current website setup?",
+          "options": {
+            "A": {
+              "text": "I don\u2019t have a website yet",
+              "score": 1,
+              "tags": [
+                "website:none"
+              ]
+            },
+            "B": {
+              "text": "I have a website, but it\u2019s outdated or basic",
+              "score": 2,
+              "tags": [
+                "website:needs_work"
+              ]
+            },
+            "C": {
+              "text": "I have a clean, professional site that works well",
+              "score": 3,
+              "tags": [
+                "website:basic_ok"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "category_name": "Reviews & Reputation",
+      "questions": []
+    },
+    {
+      "category_name": "Social Media & Content",
+      "questions": []
+    },
+    {
+      "category_name": "Systems, Team & Tools",
+      "questions": []
+    }
+  ]
+}
