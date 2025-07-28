@@ -69,21 +69,27 @@ export default function Home() {
         </p>
       </div>
 
-      <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 400 }}>
-        {messages.map((msg, i) => (
-          <div key={i} style={{
-            background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
-            margin: '10px 0',
-            padding: '10px 15px',
-            borderRadius: '10px',
-            whiteSpace: 'pre-wrap'
-          }}>
-            {msg.content}
-          </div>
-        ))}
-        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
-        <div ref={chatEndRef} />
-      </div>
+  <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 400 }}>
+  {messages.map((msg, i) => (
+    <div
+      key={i}
+      style={{
+        background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
+        margin: '10px 0',
+        padding: '10px 15px',
+        borderRadius: '10px',
+      }}
+    >
+      <div
+        dangerouslySetInnerHTML={{ __html: msg.content }}
+        style={{ whiteSpace: 'pre-wrap' }}
+      />
+    </div>
+  ))}
+  {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
+  <div ref={chatEndRef} />
+</div>
+
 
       <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
         <input
