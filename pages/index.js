@@ -9,15 +9,28 @@ export default function Home() {
 
   const fetchGPTResponse = async (newMessages) => {
     setLoading(true);
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: newMessages }),
-    });
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages }),
+      });
 
-    const data = await res.json();
-    setLoading(false);
-    return data.reply;
+      const data = await res.json();
+      if (!data.reply || !data.reply.content) {
+        throw new Error('GPT returned no reply.');
+      }
+
+      return data.reply;
+    } catch (err) {
+      console.error('GPT fetch error:', err);
+      return {
+        role: 'assistant',
+        content: "Sorry, I couldn't get a response from the assistant. Please try again.",
+      };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -64,30 +77,43 @@ export default function Home() {
   };
 
   return (
-    <main className="p-6 max-w-2xl mx-auto min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        ClickPrimer AI Marketing Map
-      </h1>
+    <div className="min-h-screen bg-[#e8eeff] flex flex-col items-center px-4 py-6">
+      {/* Header */}
+      <header className="w-full max-w-4xl text-center mb-6">
+        <img
+          src="https://clickprimer.com/wp-content/uploads/clickprimer-logo-1.png"
+          alt="ClickPrimer Logo"
+          className="mx-auto mb-4 w-52"
+        />
+        <h1 className="text-3xl font-bold text-[#002654] mb-1">AI Marketing Map for Contractors</h1>
+        <p className="text-[#002654] text-lg">Get your personalized growth plan in minutes</p>
+      </header>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-4 h-[500px] overflow-y-auto shadow mb-4">
+      {/* Chat Window */}
+      <div className="bg-white shadow-md rounded-lg border border-gray-300 w-full max-w-3xl h-[500px] overflow-y-auto p-4 mb-4">
         {messages.map((msg, idx) => (
           <div key={idx} className={`mb-3 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
             <div
-              className={`inline-block px-4 py-2 rounded-lg max-w-[90%] ${
-                msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'
+              className={`inline-block px-4 py-2 rounded-lg max-w-[85%] ${
+                msg.role === 'user'
+                  ? 'bg-[#0068ff] text-white'
+                  : 'bg-[#f0f4ff] text-[#002654]'
               }`}
             >
               {msg.content}
             </div>
           </div>
         ))}
-        {loading && <div className="italic text-gray-500">Thinking...</div>}
+        {loading && (
+          <div className="text-[#666] italic text-sm">Thinking…</div>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      {/* Input */}
+      <form onSubmit={handleSubmit} className="w-full max-w-3xl flex gap-2">
         <input
-          className="flex-1 border border-gray-300 rounded px-3 py-2"
           type="text"
+          className="flex-1 border border-gray-300 rounded px-4 py-2 text-black"
           placeholder={isAskingName ? 'What’s your name?' : 'Type A, B, or C...'}
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -95,12 +121,12 @@ export default function Home() {
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="bg-[#30d64f] text-white font-semibold px-6 py-2 rounded disabled:opacity-50"
           disabled={loading || !input.trim()}
         >
           Send
         </button>
       </form>
-    </main>
+    </div>
   );
 }
