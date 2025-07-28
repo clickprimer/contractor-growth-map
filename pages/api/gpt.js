@@ -18,7 +18,7 @@ const QUIZ_LOGIC = JSON.parse(
 
 export const runtime = 'edge';
 
-export async function POST(req: NextRequest) {
+export async function POST(req) {
   const { messages } = await req.json();
 
   try {
