@@ -5,7 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `<strong>Hello and welcome to your AI consultation!</strong><br><br><strong>First, what’s your name and what kind of work do you do?</strong><br><br>⬇️ Type below to answer.`
+      content: `Hello and welcome to your AI consultation!<br><br><strong>First, what’s your name and what kind of work do you do?</strong><br><br>⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
