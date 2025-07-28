@@ -12,7 +12,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const chatEndRef = useRef(null);
-
   const [leadInfo, setLeadInfo] = useState({ name: '' });
 
   const scrollToBottom = () => {
@@ -33,23 +32,23 @@ export default function Home() {
     setLoading(true);
 
     if (!leadInfo.name) {
-      const nameOnly = input.trim().replace(/[^a-zA-Z]/g, '').split(' ')[0];
+      const nameOnly = input.replace(/[^a-zA-Z\s]/g, '').split(' ')[0];
       setLeadInfo({ name: nameOnly });
 
       const greeting = `Hey ${nameOnly || 'there'}! Here's your first question.`;
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
-
       const res = await fetch('/api/gpt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [
-          { role: 'system', content: 'Use the uploaded JSON logic to return the first real Category 1 quiz question. Respond in markdown format.' },
-        ] })
+        body: JSON.stringify({ prompt: greeting })
       });
 
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: greeting },
+        { role: 'assistant', content: data.answer }
+      ]);
       setLoading(false);
       return;
     }
@@ -57,13 +56,13 @@ export default function Home() {
     const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages })
+      body: JSON.stringify({ prompt: input })
     });
 
     const data = await res.json();
-    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }] );
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
 
-    if (data.reply.content.includes('Your personalized recommendations:')) {
+    if (data.answer.includes('Your personalized recommendations:')) {
       setShowActions(true);
     }
 
@@ -105,10 +104,16 @@ export default function Home() {
               borderRadius: '10px'
             }}
           >
-            <div
-              dangerouslySetInnerHTML={{ __html: msg.content }}
-              style={{ whiteSpace: 'pre-wrap' }}
-            />
+            {typeof msg.content === 'string' ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: msg.content }}
+                style={{ whiteSpace: 'pre-wrap' }}
+              />
+            ) : (
+              <pre style={{ color: 'red', whiteSpace: 'pre-wrap' }}>
+                {JSON.stringify(msg.content, null, 2)}
+              </pre>
+            )}
           </div>
         ))}
         {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
