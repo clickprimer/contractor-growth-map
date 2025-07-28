@@ -32,6 +32,7 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
+    // If it's the first message (user name), trigger quiz greeting and first real question
     if (!leadInfo.name) {
       const nameOnly = input.trim().split(' ')[0];
       setLeadInfo({ name: nameOnly });
@@ -45,8 +46,15 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: 'system', content: greeting },
-            { role: 'user', content: greeting }
+            {
+              role: 'system',
+              content:
+                'You are the ClickPrimer AI Marketing Map assistant. Begin the quiz now by asking the official Category 1 screening question. Use the uploaded JSON file to determine question wording and order. Do not make up your own questions.',
+            },
+            {
+              role: 'user',
+              content: 'Please begin the AI Marketing Map quiz.',
+            }
           ]
         })
       });
@@ -57,14 +65,12 @@ export default function Home() {
       return;
     }
 
+    // Normal message flow for later quiz questions
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [
-          ...messages,
-          userMessage
-        ]
+        messages: [...messages, userMessage]
       })
     });
 
