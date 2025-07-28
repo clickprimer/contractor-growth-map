@@ -12,7 +12,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const chatEndRef = useRef(null);
-
   const [leadInfo, setLeadInfo] = useState({ name: '' });
 
   const scrollToBottom = () => {
@@ -32,13 +31,13 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
-    // If it's the first message (user name), trigger quiz greeting and first real question
+    // If name hasn't been set yet, parse and greet
     if (!leadInfo.name) {
-      const nameOnly = input.trim().split(' ')[0];
+      const nameMatch = input.match(/(?:i['’]m|my name is|this is)?\s*([A-Z][a-z]+)/i);
+      const nameOnly = nameMatch ? nameMatch[1] : input.trim().split(' ').pop();
       setLeadInfo({ name: nameOnly });
 
       const greeting = `Hey ${nameOnly || 'there'}! Here's your first question.`;
-
       setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
 
       const res = await fetch('/api/chat', {
@@ -49,35 +48,34 @@ export default function Home() {
             {
               role: 'system',
               content:
-                'You are the ClickPrimer AI Marketing Map assistant. Begin the quiz now by asking the official Category 1 screening question. Use the uploaded JSON file to determine question wording and order. Do not make up your own questions.',
+                'You are the ClickPrimer AI Marketing Map assistant. Begin the quiz now by asking the official Category 1 screening question. Use the uploaded JSON file to determine question wording and order. Do not make up your own questions.'
             },
             {
               role: 'user',
-              content: 'Please begin the AI Marketing Map quiz.',
+              content:
+                'Please begin the ClickPrimer AI Marketing Map quiz by asking the official screening question for Category 1: Branding, using the wording from the uploaded logic file. Do not make up a question.'
             }
           ]
         })
       });
 
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
       setLoading(false);
       return;
     }
 
-    // Normal message flow for later quiz questions
+    // Continue regular quiz
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [...messages, userMessage]
-      })
+      body: JSON.stringify({ messages: [...messages, userMessage] })
     });
 
     const data = await res.json();
-    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }]);
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
 
-    if (data.reply.content.includes('Your personalized recommendations:')) {
+    if (data.reply.includes('Your personalized recommendations:')) {
       setShowActions(true);
     }
 
@@ -119,10 +117,7 @@ export default function Home() {
               borderRadius: '10px'
             }}
           >
-            <div
-              dangerouslySetInnerHTML={{ __html: msg.content }}
-              style={{ whiteSpace: 'pre-wrap' }}
-            />
+            <div dangerouslySetInnerHTML={{ __html: msg.content }} style={{ whiteSpace: 'pre-wrap' }} />
           </div>
         ))}
         {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
