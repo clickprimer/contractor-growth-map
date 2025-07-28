@@ -5,7 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!<br><br>This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.<br><br><strong>You’ll get a personalized AI Marketing Map with:</strong><br><br>✅ Your strengths<br>🚧 Missed opportunities<br>🧰 Clear action steps<br>💡 Tools and services that match your goals<br><br>It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!<br><br><strong>First, what’s your name and what kind of work do you do?</strong><br><br>⬇️ Type below to answer.`
+      content: `Hello and welcome!<br><br>This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.<br><br><strong>You’ll get a personalized AI Marketing Map with:</strong><br><br>✅ Your strengths<br>🚧 Missed opportunities<br>🛠️ Clear action steps<br>💡 Tools and services that match your goals<br><br>It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!<br><br><strong>First, what’s your name?</strong><br><br>⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -13,10 +13,7 @@ export default function Home() {
   const [showActions, setShowActions] = useState(false);
   const chatEndRef = useRef(null);
 
-  const [leadInfo, setLeadInfo] = useState({
-    name: '',
-    businessType: ''
-  });
+  const [leadInfo, setLeadInfo] = useState({ name: '' });
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,17 +32,12 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
-    // Capture name and business type from the first message
-    if (!leadInfo.name || !leadInfo.businessType) {
-      const nameMatch = input.match(/([A-Z][a-z]+)/);
-      const bizMatch = input.match(/(?:I am a|I'm a|I do|I work in|My business is)?\s?(.*)/i);
-      const name = nameMatch ? nameMatch[0] : 'there';
-      const businessType = bizMatch ? bizMatch[1] : 'contractor';
+    if (!leadInfo.name) {
+      const nameOnly = input.trim().split(' ')[0];
+      setLeadInfo({ name: nameOnly });
 
-      setLeadInfo({ name, businessType });
+      const greeting = `Hey ${nameOnly || 'there'}! Here's your first question.`;
 
-      // Acknowledge name, then send next question via GPT
-      const greeting = `Hey ${name}! Here's your first question.`;
       setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
 
       const res = await fetch('/api/gpt', {
@@ -60,7 +52,6 @@ export default function Home() {
       return;
     }
 
-    // Continue normal flow after intro
     const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
