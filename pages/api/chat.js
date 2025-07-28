@@ -1,5 +1,3 @@
-// pages/api/chat.js
-
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -15,15 +13,22 @@ export default async function handler(req, res) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o', // You can also use 'gpt-4-1106-preview'
+      model: 'gpt-4o',
       messages,
       temperature: 0.7,
     });
 
-    const reply = response.choices[0].message;
+    console.log('GPT response:', response);
+
+    const reply = response.choices?.[0]?.message;
+    if (!reply) {
+      console.error('No message returned from GPT');
+      return res.status(500).json({ error: 'No response from GPT' });
+    }
+
     res.status(200).json({ reply });
   } catch (err) {
-    console.error(err);
+    console.error('OpenAI API error:', err);
     res.status(500).json({ error: 'OpenAI request failed' });
   }
 }
