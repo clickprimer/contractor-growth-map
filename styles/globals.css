@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@700&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #e8eeff;
+  font-family: 'Open Sans', sans-serif;
+  color: #002654;
+}
+
+input[type="text"],
+input[type="email"] {
+  padding: 10px;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
