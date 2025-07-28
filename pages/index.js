@@ -5,7 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome to your AI consultation to help grow your trade business!\n\n<strong>First, can I get your name and what you do for work?</strong>\n\n⬇️ Type below to answer.`
+      content: `Hello and welcome to your AI consultation!\n\nTogether, we'll figure out where your trade business is doing well and where it needs work. You'll get a quick, personalized, + practical plan for the next steps recommended to accelerate growth in your business.\n\n<strong>First, can I get your name and what you do for work?</strong>\n\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -31,22 +31,21 @@ export default function Home() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = { role: 'user', content: input };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    const newMessages = [...messages, { role: 'user', content: input }];
+    setMessages(newMessages);
     setInput('');
     setLoading(true);
 
     const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ latestUserMessage: input })
+      body: JSON.stringify({ prompt: input })
     });
 
     const data = await res.json();
-    setMessages([...updatedMessages, { role: 'assistant', content: data.result }]);
+    setMessages([...newMessages, { role: 'assistant', content: data.answer }]);
 
-    if (data.result.includes('Your personalized recommendations:')) {
+    if (data.answer.includes('Your personalized recommendations:')) {
       setShowActions(true);
     }
 
@@ -70,7 +69,14 @@ export default function Home() {
         </p>
       </div>
 
-      <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 400 }}>
+      <div style={{
+        background: 'white',
+        padding: 20,
+        borderRadius: 8,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        height: 400,
+        overflowY: 'auto'
+      }}>
         {messages.map((msg, i) => (
           <div
             key={i}
