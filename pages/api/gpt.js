@@ -1,4 +1,4 @@
-import { OpenAI } from 'openai';
+import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -11,33 +11,30 @@ export default async function handler(req, res) {
 
   const { prompt } = req.body;
 
-  if (!prompt) {
-    return res.status(400).json({ error: 'Missing prompt' });
-  }
-
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
-          content:
-            `You're an expert marketing advisor helping home service contractors improve their visibility, lead generation, and client retention. 
-Only ask **one** clear, easy-to-understand question at a time.
-Always explain why the question matters for business growth.
-After the user answers, share a Gold Nugget: ✨**one helpful insight or pro tip** that fits their response.
-Then move on to the next question.
-After 8 categories, summarize key strengths, missed opportunities, and a list of suggested systems and actions with emoji bullets.`
+          content: 'You are an expert marketing advisor for home service contractors. Ask only one question at a time, based on the ClickPrimer quiz logic.'
         },
-        { role: 'user', content: prompt }
+        {
+          role: 'user',
+          content: prompt
+        }
       ],
       temperature: 0.7
     });
 
-    const response = completion.choices[0].message.content;
-    return res.status(200).json({ answer: response });
-  } catch (error) {
-    console.error('GPT API error:', error);
-    return res.status(500).json({ error: 'Something went wrong' });
+    const reply = response.choices?.[0]?.message?.content;
+    if (!reply) {
+      return res.status(500).json({ error: 'No valid response from OpenAI' });
+    }
+
+    res.status(200).json({ answer: reply });
+  } catch (err) {
+    console.error('OpenAI API error:', err);
+    res.status(500).json({ error: 'OpenAI request failed' });
   }
 }
