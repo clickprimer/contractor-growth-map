@@ -3,8 +3,12 @@ import { generatePDF } from '../utils/generatePDF';
 
 export default function Home() {
   const [messages, setMessages] = useState([
-    { role: 'system', content: 'Welcome to the Contractor\'s AI Marketing Map from ClickPrimer. I’ll guide you through 8 quick questions to help you uncover blind spots and growth opportunities. Ready?' }
-  ]);
+  {
+    role: 'system',
+    content: `🚧 This is an interactive consultation for contractors by ClickPrimer.\n\nWe'll figure out where your trade business is doing well and where it needs work. You'll get a quick, personalized, + practical plan for the next steps recommended to accelerate growth in your business.\n\nFirst, can I get your name and what you do for work?`
+  }
+]);
+
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -59,8 +63,11 @@ export default function Home() {
       minHeight: '100vh',
       padding: '2rem'
     }}>
-      <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 20 }} />
-      <h1 style={{ color: '#0068ff' }}>The Contractor’s AI Marketing Map</h1>
+      <div style={{ textAlign: 'center' }}>
+  <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
+  <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
+  <i>Customized for you by ClickPrimer</i>
+</div>
 
       <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 400 }}>
         {messages.map((msg, i) => (
@@ -126,6 +133,12 @@ export default function Home() {
           </a>
         </div>
       )}
+        )}
+
+<div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
+  © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
+</div>
+
     </div>
   );
 }
