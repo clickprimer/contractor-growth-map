@@ -1,132 +1,183 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { generatePDF } from '../utils/generatePDF';
 
 export default function Home() {
-  const [name, setName] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      role: 'system',
+      content: `Hello and welcome!<br><br>This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.<br><br><strong>You’ll get a personalized AI Marketing Map with:</strong><br><br>✅ Your strengths<br>🚧 Missed opportunities<br>🛠️ Clear action steps<br>💡 Tools and services that match your goals<br><br>It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!<br><br><strong>First, what’s your name?</strong><br><br>⬇️ Type below to answer.`
+    }
+  ]);
   const [input, setInput] = useState('');
-  const [isAskingName, setIsAskingName] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const chatEndRef = useRef(null);
 
-  const fetchGPTResponse = async (newMessages) => {
+  const [leadInfo, setLeadInfo] = useState({ name: '' });
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
     setLoading(true);
-    try {
-      const res = await fetch('/api/chat', {
+
+    if (!leadInfo.name) {
+      const nameOnly = input.trim().split(' ')[0];
+      setLeadInfo({ name: nameOnly });
+
+      const greeting = `Hey ${nameOnly || 'there'}! Here's your first question.`;
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
+
+      const res = await fetch('/api/gpt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ prompt: greeting })
       });
 
       const data = await res.json();
-      if (!data.reply || !data.reply.content) {
-        throw new Error('GPT returned no reply.');
-      }
-
-      return data.reply;
-    } catch (err) {
-      console.error('GPT fetch error:', err);
-      return {
-        role: 'assistant',
-        content: "Sorry, I couldn't get a response from the assistant. Please try again.",
-      };
-    } finally {
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
       setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const trimmedInput = input.trim();
-    if (!trimmedInput) return;
-
-    const userMessage = { role: 'user', content: trimmedInput };
-
-    if (isAskingName) {
-      const userName = trimmedInput;
-      setName(userName);
-
-      const initialMessages = [
-        userMessage,
-        {
-          role: 'assistant',
-          content: `Hey ${userName}! Here's your first question.`,
-        },
-      ];
-      setMessages(initialMessages);
-      setInput('');
-      setIsAskingName(false);
-
-      const gptResponse = await fetchGPTResponse([
-        {
-          role: 'system',
-          content:
-            'You are the ClickPrimer AI Marketing Map assistant. Use the uploaded files to run the quiz. Start by asking the official Category 1 screening question. Do not make up questions.',
-        },
-        userMessage,
-      ]);
-
-      setMessages((prev) => [...prev, gptResponse]);
       return;
     }
 
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setInput('');
+    const res = await fetch('/api/gpt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: input })
+    });
 
-    const gptResponse = await fetchGPTResponse(updatedMessages);
-    setMessages((prev) => [...prev, gptResponse]);
+    const data = await res.json();
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+
+    if (data.answer.includes('Your personalized recommendations:')) {
+      setShowActions(true);
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#e8eeff] flex flex-col items-center px-4 py-6">
-      {/* Header */}
-      <header className="w-full max-w-4xl text-center mb-6">
-        <img
-          src="https://clickprimer.com/wp-content/uploads/clickprimer-logo-1.png"
-          alt="ClickPrimer Logo"
-          className="mx-auto mb-4 w-52"
-        />
-        <h1 className="text-3xl font-bold text-[#002654] mb-1">AI Marketing Map for Contractors</h1>
-        <p className="text-[#002654] text-lg">Get your personalized growth plan in minutes</p>
-      </header>
-
-      {/* Chat Window */}
-      <div className="bg-white shadow-md rounded-lg border border-gray-300 w-full max-w-3xl h-[500px] overflow-y-auto p-4 mb-4">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`mb-3 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <div
-              className={`inline-block px-4 py-2 rounded-lg max-w-[85%] ${
-                msg.role === 'user'
-                  ? 'bg-[#0068ff] text-white'
-                  : 'bg-[#f0f4ff] text-[#002654]'
-              }`}
-            >
-              {msg.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="text-[#666] italic text-sm">Thinking…</div>
-        )}
+    <div style={{
+      fontFamily: 'Open Sans, sans-serif',
+      maxWidth: 700,
+      margin: '0 auto',
+      background: '#e8eeff',
+      minHeight: '100vh',
+      padding: '2rem'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
+        <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
+        <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 30 }}>
+          🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
+        </p>
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="w-full max-w-3xl flex gap-2">
+      <div style={{
+        background: 'white',
+        padding: 20,
+        borderRadius: 8,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        height: 500,
+        overflowY: 'scroll'
+      }}>
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            style={{
+              background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
+              margin: '10px 0',
+              padding: '10px 15px',
+              borderRadius: '10px'
+            }}
+          >
+            <div
+              dangerouslySetInnerHTML={{ __html: msg.content }}
+              style={{ whiteSpace: 'pre-wrap' }}
+            />
+          </div>
+        ))}
+        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
+        <div ref={chatEndRef} />
+      </div>
+
+      <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
         <input
           type="text"
-          className="flex-1 border border-gray-300 rounded px-4 py-2 text-black"
-          placeholder={isAskingName ? 'What’s your name?' : 'Type A, B, or C...'}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={loading}
+          placeholder="Type your answer..."
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            fontSize: 16
+          }}
         />
-        <button
-          type="submit"
-          className="bg-[#30d64f] text-white font-semibold px-6 py-2 rounded disabled:opacity-50"
-          disabled={loading || !input.trim()}
-        >
+        <button type="submit" style={{
+          background: '#30d64f',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          fontWeight: 'bold',
+          borderRadius: 4
+        }}>
           Send
         </button>
       </form>
+
+      {showActions && (
+        <div style={{ marginTop: 40 }}>
+          <h3>Let's Get Started:</h3>
+          <a href="https://www.map.clickprimer.com/aimm-setup-call" target="_blank">
+            <button style={buttonStyle('#0068ff', 'white')}>🚀 Book a Service Setup Call</button>
+          </a>
+          <button
+            onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })}
+            style={buttonStyle('#30d64f', 'white')}
+          >
+            📄 Download My AI Marketing Map PDF
+          </button>
+          <h3 style={{ marginTop: 30 }}>Have questions first? We're happy to help.</h3>
+          <a href="tel:12083144088">
+            <button style={buttonStyle('#00aaff', 'white')}>📞 Give Us A Call (We pick up!)</button>
+          </a>
+          <a href="https://www.clickprimer.com/contact" target="_blank">
+            <button style={buttonStyle('#e8cc00', '#002654')}>📩 Send Us A Message</button>
+          </a>
+        </div>
+      )}
+
+      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
+        © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
+      </div>
     </div>
   );
+}
+
+function buttonStyle(bg, color) {
+  return {
+    width: '100%',
+    marginBottom: 10,
+    padding: '12px',
+    background: bg,
+    color: color,
+    border: 'none',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    borderRadius: 4
+  };
 }
