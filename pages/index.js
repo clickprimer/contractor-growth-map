@@ -40,28 +40,38 @@ export default function Home() {
 
       setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
 
-      const res = await fetch('/api/gpt', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: greeting })
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: greeting },
+            { role: 'user', content: greeting }
+          ]
+        })
       });
 
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }]);
       setLoading(false);
       return;
     }
 
-    const res = await fetch('/api/gpt', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: input })
+      body: JSON.stringify({
+        messages: [
+          ...messages,
+          userMessage
+        ]
+      })
     });
 
     const data = await res.json();
-    setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }]);
 
-    if (data.answer.includes('Your personalized recommendations:')) {
+    if (data.reply.content.includes('Your personalized recommendations:')) {
       setShowActions(true);
     }
 
