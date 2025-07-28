@@ -35,31 +35,32 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
-    // Capture name and business type from the first answer
+    // Capture name and business type from the first message
     if (!leadInfo.name || !leadInfo.businessType) {
       const nameMatch = input.match(/([A-Z][a-z]+)/);
       const bizMatch = input.match(/(?:I am a|I'm a|I do|I work in|My business is)?\s?(.*)/i);
-      setLeadInfo({
-        name: nameMatch ? nameMatch[0] : '',
-        businessType: bizMatch ? bizMatch[1] : ''
+      const name = nameMatch ? nameMatch[0] : 'there';
+      const businessType = bizMatch ? bizMatch[1] : 'contractor';
+
+      setLeadInfo({ name, businessType });
+
+      // Acknowledge name, then send next question via GPT
+      const greeting = `Hey ${name}! Here's your first question.`;
+      setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
+
+      const res = await fetch('/api/gpt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: greeting })
       });
 
-      const greeting = `
-        Hello ${nameMatch ? nameMatch[0] : 'there'}! First question...<br><br>
-        Category 1: Branding<br>
-        <strong>Q1: Do you have a logo and consistent brand colors for your business?</strong><br>
-        Feel free to share details if you want—and then choose the option that best fits:<br>
-        <strong>A.</strong> Yes, I have a professional logo and consistent colors.
-        <strong>B.</strong> I have a logo but need help with consistent colors.<br><br>
-        <strong>C.</strong> I don't have a logo yet.
-      `.trim();
-
-      setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
+      const data = await res.json();
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
       setLoading(false);
       return;
     }
 
-    // Send input to API for assistant reply
+    // Continue normal flow after intro
     const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
