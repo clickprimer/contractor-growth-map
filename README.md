@@ -1,1 +1,1 @@
-# marketing-map-gpt-quiz
+# ai-marketing-map
