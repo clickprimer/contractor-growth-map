@@ -9,7 +9,6 @@ export default function Home() {
 
   const fetchGPTResponse = async (newMessages) => {
     setLoading(true);
-
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -18,7 +17,7 @@ export default function Home() {
 
     const data = await res.json();
     setLoading(false);
-    return data.reply; // { role, content }
+    return data.reply;
   };
 
   const handleSubmit = async (e) => {
@@ -28,12 +27,10 @@ export default function Home() {
 
     const userMessage = { role: 'user', content: trimmedInput };
 
-    // FIRST: Handle name input
     if (isAskingName) {
       const userName = trimmedInput;
       setName(userName);
 
-      // Show greeting in chat window
       const initialMessages = [
         userMessage,
         {
@@ -45,7 +42,6 @@ export default function Home() {
       setInput('');
       setIsAskingName(false);
 
-      // Send to GPT with system instructions to start quiz
       const gptResponse = await fetchGPTResponse([
         {
           role: 'system',
@@ -59,7 +55,6 @@ export default function Home() {
       return;
     }
 
-    // AFTER NAME: Handle quiz responses (A, B, C, etc.)
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput('');
