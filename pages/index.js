@@ -5,7 +5,13 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome to your AI consultation!<br><br><strong>First, what’s your name and what kind of work do you do?</strong><br><br>⬇️ Type below to answer.`
+      content: `Hello and welcome!<br><br>This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.<br><br><strong>You’ll get a personalized AI Marketing Map with:</strong><br>
+        ✅ Your strengths
+        🚧 Missed opportunities
+        🧰 Clear action steps
+        💡 Tools and services that match your goals and budget<br>
+        It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!<br><br>
+        <strong>First, what’s your name and what kind of work do you do?</strong><br><br>⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -45,20 +51,13 @@ export default function Home() {
       });
 
       const greeting = `
-        Hello ${nameMatch ? nameMatch[0] : 'there'}! This quick, interactive consultation will help you uncover where your {businessType} business may be leaking leads or leaving money on the table—and how to fix it.<br><br>
-        You’ll get a personalized AI Marketing Map with:<br><br>
-        ✅ Your strengths<br>
-        🚧 Missed opportunities<br>
-        🧰 Clear action steps<br>
-        💡 Tools and services that match your goals and budget<br><br>
-        It only takes a couple minutes, and you’re free to skip or expand on answers as you go. So let’s get started!<br><br>
-
-        Category 1: Branding<br><br>
-        <strong>Q1: Do you have a logo and consistent brand colors for your business?</strong><br><br>
-        Feel free to share details if you want—and then choose the option that best fits:<br><br>
-        A. Yes, I have a professional logo and consistent colors.<br><br>
-        B. I have a logo but need help with consistent colors.<br><br>
-        C. I don't have a logo yet.
+        Hello ${nameMatch ? nameMatch[0] : 'there'}! First question...<br><br>
+        Category 1: Branding<br>
+        <strong>Q1: Do you have a logo and consistent brand colors for your business?</strong><br>
+        Feel free to share details if you want—and then choose the option that best fits:<br>
+        <strong>A.</strong> Yes, I have a professional logo and consistent colors.
+        <strong>B.</strong> I have a logo but need help with consistent colors.<br><br>
+        <strong>C.</strong> I don't have a logo yet.
       `.trim();
 
       setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
