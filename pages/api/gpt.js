@@ -1,4 +1,3 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai';
 import OpenAI from 'openai';
 import path from 'path';
 import fs from 'fs';
@@ -7,40 +6,36 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-const GPT_INSTRUCTIONS = fs.readFileSync(
-  path.resolve(process.cwd(), 'public/gpt-instructions.txt'),
-  'utf8'
-);
-
-const QUIZ_LOGIC = JSON.parse(
-  fs.readFileSync(path.resolve(process.cwd(), 'public/aimm-quiz-logic.json'), 'utf8')
-);
-
-export const runtime = 'edge';
-
-export async function POST(req) {
-  const { messages } = await req.json();
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
-    const chatMessages = [
-      {
-        role: 'system',
-        content: GPT_INSTRUCTIONS.trim()
-      },
-      ...messages
-    ];
+    const { prompt } = req.body;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      stream: true,
-      messages: chatMessages,
-      temperature: 0.7,
+    if (!prompt || prompt.trim().length === 0) {
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    // Read system instructions from local file
+    const filePath = path.join(process.cwd(), 'public', 'gpt-instructions.txt');
+    const systemPrompt = fs.readFileSync(filePath, 'utf8');
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7
     });
 
-    const stream = OpenAIStream(response);
-    return new StreamingTextResponse(stream);
-  } catch (error) {
-    console.error('OpenAI API error:', error);
-    return new Response('Something went wrong with the AI request.', { status: 500 });
+    const answer = completion.choices[0].message.content;
+    res.status(200).json({ answer });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 }
