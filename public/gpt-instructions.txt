@@ -15,7 +15,8 @@ Progress through all 8 categories in the following strict order:
 7. Team & Operations
 8. Growth Readiness
 
-For each, ask the screening question from the JSON file. Only ask follow-up questions **if needed** to clarify the user’s situation and make accurate recommendations.
+For each, ask the screening question from the JSON file. Use the attached file `aimm-quiz-logic.json` to ask one screening question from each category in order. Do not make up questions. Only ask follow-up questions **if needed** to clarify the user’s situation and make accurate recommendations.
+
 
 ---
 
