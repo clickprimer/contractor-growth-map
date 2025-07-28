@@ -5,7 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `🚧 This is an interactive consultation for contractors by ClickPrimer.\n\nWe'll figure out where your trade business is doing well and where it needs work. You'll get a quick, personalized, + practical plan for the next steps recommended to accelerate growth in your business.\n\nFirst, can I get your name and what you do for work?`
+      content: `Hello and welcome to your AI consultation! Together, we'll figure out where your trade business is doing well and where it needs work. You'll get a quick, personalized, + practical plan for the next steps recommended to accelerate growth in your business.\n\nFirst, can I get your name and what you do for work?`
     }
   ]);
   const [input, setInput] = useState('');
@@ -64,7 +64,7 @@ export default function Home() {
       <div style={{ textAlign: 'center' }}>
         <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
         <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
-        <p style={{ fontStyle: 'italic', color: '#002654', marginBottom: 30 }}>Customized for you by ClickPrimer</p>
+        <p style={{ fontStyle: 'italic', color: '#002654', marginBottom: 30 }}>🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧</p>
       </div>
 
       <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 400 }}>
