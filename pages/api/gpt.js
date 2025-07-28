@@ -12,25 +12,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages } = req.body;
+    const { latestUserMessage } = req.body;
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: 'Messages array is required' });
+    if (!latestUserMessage || latestUserMessage.trim().length === 0) {
+      return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Load system instructions from file
     const filePath = path.join(process.cwd(), 'public', 'gpt-instructions.txt');
     const systemPrompt = fs.readFileSync(filePath, 'utf8');
 
-    // Prepend system message
-    const finalMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages.filter(m => m.role !== 'system') // prevent duplicate system messages
-    ];
-
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: finalMessages,
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: latestUserMessage }
+      ],
       temperature: 0.7
     });
 
@@ -38,7 +34,7 @@ export default async function handler(req, res) {
     res.status(200).json({ result: answer });
 
   } catch (err) {
-    console.error('GPT API Error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Something went wrong' });
   }
 }
