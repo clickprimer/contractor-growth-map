@@ -5,7 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome to your AI consultation!\n\nTogether, we'll figure out where your trade business is doing well and where it needs work. You'll get a quick, personalized, + practical plan for the next steps recommended to accelerate growth in your business.\n\nFirst, can I get your name and what you do for work?\n⬇️ Type below to answer.`
+      content: `Hello and welcome to your AI consultation!\n\nTogether, we'll figure out where your trade business is doing well and where it needs work. You'll get a quick, personalized, + practical plan for the next steps recommended to accelerate growth in your business.\n**First, can I get your name and what you do for work?**\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
