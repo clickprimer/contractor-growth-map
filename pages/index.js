@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const chatEndRef = useRef(null);
+
   const [leadInfo, setLeadInfo] = useState({ name: '' });
 
   const scrollToBottom = () => {
@@ -31,51 +32,38 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
-    // If name hasn't been set yet, parse and greet
     if (!leadInfo.name) {
-      const nameMatch = input.match(/(?:i['’]m|my name is|this is)?\s*([A-Z][a-z]+)/i);
-      const nameOnly = nameMatch ? nameMatch[1] : input.trim().split(' ').pop();
+      const nameOnly = input.trim().replace(/[^a-zA-Z]/g, '').split(' ')[0];
       setLeadInfo({ name: nameOnly });
 
       const greeting = `Hey ${nameOnly || 'there'}! Here's your first question.`;
+
       setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
 
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/api/gpt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content:
-                'You are the ClickPrimer AI Marketing Map assistant. Begin the quiz now by asking the official Category 1 screening question. Use the uploaded JSON file to determine question wording and order. Do not make up your own questions.'
-            },
-            {
-              role: 'user',
-              content:
-                'Please begin the ClickPrimer AI Marketing Map quiz by asking the official screening question for Category 1: Branding, using the wording from the uploaded logic file. Do not make up a question.'
-            }
-          ]
-        })
+        body: JSON.stringify({ messages: [
+          { role: 'system', content: 'Use the uploaded JSON logic to return the first real Category 1 quiz question. Respond in markdown format.' },
+        ] })
       });
 
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }]);
       setLoading(false);
       return;
     }
 
-    // Continue regular quiz
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [...messages, userMessage] })
+      body: JSON.stringify({ messages })
     });
 
     const data = await res.json();
-    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply.content }] );
 
-    if (data.reply.includes('Your personalized recommendations:')) {
+    if (data.reply.content.includes('Your personalized recommendations:')) {
       setShowActions(true);
     }
 
@@ -117,7 +105,10 @@ export default function Home() {
               borderRadius: '10px'
             }}
           >
-            <div dangerouslySetInnerHTML={{ __html: msg.content }} style={{ whiteSpace: 'pre-wrap' }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: msg.content }}
+              style={{ whiteSpace: 'pre-wrap' }}
+            />
           </div>
         ))}
         {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
