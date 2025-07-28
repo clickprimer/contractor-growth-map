@@ -14,11 +14,11 @@ export default async function handler(req, res) {
   try {
     const { prompt } = req.body;
 
-    if (!prompt || prompt.trim().length === 0) {
+    if (!prompt?.trim()) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Read system instructions from local file
+    // Read system instructions from /public folder
     const filePath = path.join(process.cwd(), 'public', 'gpt-instructions.txt');
     const systemPrompt = fs.readFileSync(filePath, 'utf8');
 
@@ -31,11 +31,16 @@ export default async function handler(req, res) {
       temperature: 0.7
     });
 
-    const answer = completion.choices[0].message.content;
-    res.status(200).json({ answer });
+    const reply = completion.choices?.[0]?.message?.content;
+
+    if (!reply) {
+      return res.status(500).json({ error: 'No response from OpenAI' });
+    }
+
+    res.status(200).json({ answer: reply });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Something went wrong' });
+    console.error('OpenAI API error:', err);
+    res.status(500).json({ error: 'Something went wrong with OpenAI' });
   }
 }
