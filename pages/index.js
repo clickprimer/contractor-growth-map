@@ -53,7 +53,7 @@ export default function Home() {
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 700, margin: 'auto' }}>
       <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 20 }} />
       <h1 style={{ color: '#0068ff' }}>The Contractor’s AI Marketing Map</h1>
-      <p style={{ marginBottom: 30 }}>Answer a few quick questions to get your personalized marketing game plan.</p>
+      <p style={{ marginBottom: 30 }}>Customized for you by ClickPrimer.</p>
 
       {!submitted && (
         <form onSubmit={handleSubmit}>
@@ -80,15 +80,47 @@ export default function Home() {
           ))}
 
           <button type="submit" disabled={loading} style={{ background: '#30d64f', color: 'white', padding: '10px 20px', border: 'none', fontWeight: 'bold' }}>
-            {loading ? 'Working...' : 'Generate My Marketing Plan'}
+            {loading ? 'Working...' : 'Generate My AI Marketing Map'}
           </button>
         </form>
       )}
 
       {submitted && (
         <div style={{ whiteSpace: 'pre-wrap', marginTop: 40 }}>
-          <h2 style={{ color: '#0068ff' }}>Your Results:</h2>
-          <p>{result}</p>
+          <h2 style={{ color: '#0068ff' }}>Your AI Marketing Map Results:</h2>
+         <p>{result}</p>
+
+<div style={{ marginTop: 40 }}>
+  <h3 style={{ marginBottom: 10 }}>Let's Get Started:</h3>
+
+  <a href="https://www.map.clickprimer.com/aimm-setup-call" target="_blank" rel="noopener noreferrer">
+    <button style={{ width: '100%', marginBottom: 10, padding: '12px', background: '#0068ff', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '16px' }}>
+      🚀 Book a Service Setup Call
+    </button>
+  </a>
+
+  <button
+    onClick={() => generatePDF({ ...formData, answers, result })}
+    style={{ width: '100%', marginBottom: 30, padding: '12px', background: '#30d64f', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '16px' }}
+  >
+    📄 Download My AI Marketing Map PDF
+  </button>
+
+  <h3 style={{ marginBottom: 10 }}>Have questions first? We're happy to help.</h3>
+
+  <a href="tel:12083144088">
+    <button style={{ width: '100%', marginBottom: 10, padding: '12px', background: '#00aaff', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '16px' }}>
+      📞 Give Us A Call (We pick up!)
+    </button>
+  </a>
+
+  <a href="https://www.clickprimer.com/contact" target="_blank" rel="noopener noreferrer">
+    <button style={{ width: '100%', marginBottom: 10, padding: '12px', background: '#e8cc00', color: '#002654', border: 'none', fontWeight: 'bold', fontSize: '16px' }}>
+      📩 Send Us A Message
+    </button>
+  </a>
+</div>
+
         </div>
       )}
     </div>
