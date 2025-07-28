@@ -1,128 +1,145 @@
-import { useState } from 'react';
-
+import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 
 export default function Home() {
-  const [formData, setFormData] = useState({
-    name: '',
-    businessType: '',
-    email: ''
-  });
-  const [answers, setAnswers] = useState({});
-  const [result, setResult] = useState('');
+  const [messages, setMessages] = useState([
+    { role: 'system', content: 'Welcome to the Contractor\'s AI Marketing Map from ClickPrimer. I’ll guide you through 8 quick questions to help you uncover blind spots and growth opportunities. Ready?' }
+  ]);
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const chatEndRef = useRef(null);
 
-  const questions = [
-    { id: 'branding', text: 'How strong is your branding (logo, colors, messaging)?', options: ['A', 'B', 'C'] },
-    { id: 'visibility', text: 'How visible are you online (Google, directories, social)?', options: ['A', 'B', 'C'] },
-    { id: 'leadCapture', text: 'Do you have a system to capture and follow up with leads?', options: ['A', 'B', 'C'] },
-    { id: 'pastClients', text: 'Do you stay in touch with past clients or ask for referrals?', options: ['A', 'B', 'C'] },
-    { id: 'website', text: 'How would you rate your website presence?', options: ['A', 'B', 'C'] },
-    { id: 'operations', text: 'Do you have systems in place for managing jobs or a team?', options: ['A', 'B', 'C'] },
-    { id: 'sales', text: 'How solid is your sales process (quotes, follow-ups, closing)?', options: ['A', 'B', 'C'] },
-    { id: 'growth', text: 'Are you trying to grow fast, or just get more consistent work?', options: ['A', 'B', 'C'] }
-  ];
+  const [leadInfo, setLeadInfo] = useState({
+    name: '',
+    email: '',
+    businessType: ''
+  });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (formData.hasOwnProperty(name)) {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setAnswers({ ...answers, [name]: value });
-    }
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const sendMessage = async (e) => {
     e.preventDefault();
+    if (!input.trim()) return;
+
+    const newMessages = [...messages, { role: 'user', content: input }];
+    setMessages(newMessages);
+    setInput('');
     setLoading(true);
 
-    const res = await fetch('/api/generate', {
+    const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ formData, answers })
+      body: JSON.stringify({ messages: newMessages })
     });
 
     const data = await res.json();
-    setResult(data.result);
+    setMessages([...newMessages, { role: 'assistant', content: data.result }]);
+
+    // If GPT reply ends the quiz, show final CTAs
+    if (data.result.includes('Your personalized recommendations:')) {
+      setShowActions(true);
+    }
+
     setLoading(false);
-    setSubmitted(true);
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 700, margin: 'auto' }}>
+    <div style={{
+      fontFamily: 'Open Sans, sans-serif',
+      maxWidth: 700,
+      margin: '0 auto',
+      background: '#e8eeff',
+      minHeight: '100vh',
+      padding: '2rem'
+    }}>
       <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 20 }} />
       <h1 style={{ color: '#0068ff' }}>The Contractor’s AI Marketing Map</h1>
-      <p style={{ marginBottom: 30 }}>Customized for you by ClickPrimer.</p>
 
-      {!submitted && (
-        <form onSubmit={handleSubmit}>
-          <h3>First, tell us a bit about yourself:</h3>
-          <input type="text" name="name" placeholder="Your Name" onChange={handleChange} required style={{ display: 'block', marginBottom: 10, width: '100%' }} />
-          <input type="text" name="businessType" placeholder="Your Business Type (e.g. plumber, painter)" onChange={handleChange} required style={{ display: 'block', marginBottom: 10, width: '100%' }} />
-          <input type="email" name="email" placeholder="Your Email" onChange={handleChange} required style={{ display: 'block', marginBottom: 20, width: '100%' }} />
+      <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', minHeight: 400 }}>
+        {messages.map((msg, i) => (
+          <div key={i} style={{
+            background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
+            margin: '10px 0',
+            padding: '10px 15px',
+            borderRadius: '10px',
+            alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+            whiteSpace: 'pre-wrap'
+          }}>
+            {msg.content}
+          </div>
+        ))}
+        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
+        <div ref={chatEndRef} />
+      </div>
 
-          {questions.map(q => (
-            <div key={q.id} style={{ marginBottom: 20 }}>
-              <label><strong>{q.text}</strong></label><br />
-              {q.options.map(opt => (
-                <label key={opt} style={{ marginRight: 10 }}>
-                  <input
-                    type="radio"
-                    name={q.id}
-                    value={opt}
-                    required
-                    onChange={handleChange}
-                  /> {opt}
-                </label>
-              ))}
-            </div>
-          ))}
+      <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your answer..."
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            fontSize: 16
+          }}
+        />
+        <button type="submit" style={{
+          background: '#30d64f',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          fontWeight: 'bold',
+          borderRadius: 4
+        }}>
+          Send
+        </button>
+      </form>
 
-          <button type="submit" disabled={loading} style={{ background: '#30d64f', color: 'white', padding: '10px 20px', border: 'none', fontWeight: 'bold' }}>
-            {loading ? 'Working...' : 'Generate My AI Marketing Map'}
+      {showActions && (
+        <div style={{ marginTop: 40 }}>
+          <h3>Let's Get Started:</h3>
+          <a href="https://www.map.clickprimer.com/aimm-setup-call" target="_blank">
+            <button style={buttonStyle('#0068ff', 'white')}>🚀 Book a Service Setup Call</button>
+          </a>
+          <button
+            onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })}
+            style={buttonStyle('#30d64f', 'white')}
+          >
+            📄 Download My AI Marketing Map PDF
           </button>
-        </form>
-      )}
-
-      {submitted && (
-        <div style={{ whiteSpace: 'pre-wrap', marginTop: 40 }}>
-          <h2 style={{ color: '#0068ff' }}>Your AI Marketing Map Results:</h2>
-         <p>{result}</p>
-
-<div style={{ marginTop: 40 }}>
-  <h3 style={{ marginBottom: 10 }}>Let's Get Started:</h3>
-
-  <a href="https://www.map.clickprimer.com/aimm-setup-call" target="_blank" rel="noopener noreferrer">
-    <button style={{ width: '100%', marginBottom: 10, padding: '12px', background: '#0068ff', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '16px' }}>
-      🚀 Book a Service Setup Call
-    </button>
-  </a>
-
-  <button
-    onClick={() => generatePDF({ ...formData, answers, result })}
-    style={{ width: '100%', marginBottom: 30, padding: '12px', background: '#30d64f', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '16px' }}
-  >
-    📄 Download My AI Marketing Map PDF
-  </button>
-
-  <h3 style={{ marginBottom: 10 }}>Have questions first? We're happy to help.</h3>
-
-  <a href="tel:12083144088">
-    <button style={{ width: '100%', marginBottom: 10, padding: '12px', background: '#00aaff', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '16px' }}>
-      📞 Give Us A Call (We pick up!)
-    </button>
-  </a>
-
-  <a href="https://www.clickprimer.com/contact" target="_blank" rel="noopener noreferrer">
-    <button style={{ width: '100%', marginBottom: 10, padding: '12px', background: '#e8cc00', color: '#002654', border: 'none', fontWeight: 'bold', fontSize: '16px' }}>
-      📩 Send Us A Message
-    </button>
-  </a>
-</div>
-
+          <h3 style={{ marginTop: 30 }}>Have questions first? We're happy to help.</h3>
+          <a href="tel:12083144088">
+            <button style={buttonStyle('#00aaff', 'white')}>📞 Give Us A Call (We pick up!)</button>
+          </a>
+          <a href="https://www.clickprimer.com/contact" target="_blank">
+            <button style={buttonStyle('#e8cc00', '#002654')}>📩 Send Us A Message</button>
+          </a>
         </div>
       )}
     </div>
   );
+}
+
+function buttonStyle(bg, color) {
+  return {
+    width: '100%',
+    marginBottom: 10,
+    padding: '12px',
+    background: bg,
+    color: color,
+    border: 'none',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    borderRadius: 4
+  };
 }
