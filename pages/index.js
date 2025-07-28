@@ -7,7 +7,6 @@ export default function Home() {
   const [isAskingName, setIsAskingName] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  // Call your GPT API route or OpenAI endpoint
   const fetchGPTResponse = async (newMessages) => {
     setLoading(true);
 
@@ -19,36 +18,39 @@ export default function Home() {
 
     const data = await res.json();
     setLoading(false);
-    return data.reply; // Expecting: { role: 'assistant', content: '...' }
+    return data.reply; // { role, content }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const trimmedInput = input.trim();
+    if (!trimmedInput) return;
 
-    const userMessage = {
-      role: 'user',
-      content: input.trim(),
-    };
+    const userMessage = { role: 'user', content: trimmedInput };
 
-    // Save name
+    // FIRST: Handle name input
     if (isAskingName) {
-      const userName = input.trim();
+      const userName = trimmedInput;
       setName(userName);
-      setMessages([
+
+      // Show greeting in chat window
+      const initialMessages = [
         userMessage,
         {
           role: 'assistant',
           content: `Hey ${userName}! Here's your first question.`,
         },
-      ]);
+      ];
+      setMessages(initialMessages);
       setInput('');
       setIsAskingName(false);
 
-      // Fetch GPT response to start quiz
+      // Send to GPT with system instructions to start quiz
       const gptResponse = await fetchGPTResponse([
         {
           role: 'system',
-          content: 'You are the ClickPrimer AI Marketing Map assistant. Use the uploaded files to ask the correct Category 1 question. Do not make up your own questions.',
+          content:
+            'You are the ClickPrimer AI Marketing Map assistant. Use the uploaded files to run the quiz. Start by asking the official Category 1 screening question. Do not make up questions.',
         },
         userMessage,
       ]);
@@ -57,32 +59,34 @@ export default function Home() {
       return;
     }
 
-    // Quiz answer (A, B, C, etc.)
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    // AFTER NAME: Handle quiz responses (A, B, C, etc.)
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput('');
 
-    const gptResponse = await fetchGPTResponse(newMessages);
+    const gptResponse = await fetchGPTResponse(updatedMessages);
     setMessages((prev) => [...prev, gptResponse]);
   };
 
   return (
-    <main className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">ClickPrimer AI Marketing Map</h1>
+    <main className="p-6 max-w-2xl mx-auto min-h-screen bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        ClickPrimer AI Marketing Map
+      </h1>
 
-      <div className="bg-gray-100 rounded-lg p-4 h-[500px] overflow-y-auto mb-4">
-        {messages.map((msg, i) => (
-          <div key={i} className={`mb-3 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+      <div className="bg-white border border-gray-200 rounded-lg p-4 h-[500px] overflow-y-auto shadow mb-4">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`mb-3 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
             <div
-              className={`inline-block px-4 py-2 rounded-lg ${
-                msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-white text-black'
+              className={`inline-block px-4 py-2 rounded-lg max-w-[90%] ${
+                msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'
               }`}
             >
               {msg.content}
             </div>
           </div>
         ))}
-        {loading && <div className="text-gray-500 italic">Thinking...</div>}
+        {loading && <div className="italic text-gray-500">Thinking...</div>}
       </div>
 
       <form onSubmit={handleSubmit} className="flex gap-2">
@@ -95,8 +99,8 @@ export default function Home() {
           disabled={loading}
         />
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
           type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
           disabled={loading || !input.trim()}
         >
           Send
