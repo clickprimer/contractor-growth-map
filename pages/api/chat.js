@@ -15,4 +15,15 @@ export default async function handler(req, res) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4-1106-preview', // or 'gpt-4o' if you want faster re
+      model: 'gpt-4o', // You can also use 'gpt-4-1106-preview'
+      messages,
+      temperature: 0.7,
+    });
+
+    const reply = response.choices[0].message;
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'OpenAI request failed' });
+  }
+}
