@@ -5,7 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome to your AI consultation to help grow your trade business!\n\n<strong>First, can I get your name and what you do for work?</strong>\n\n⬇️ Type below to answer.`
+      content: `<strong>Hello and welcome to your AI consultation!</strong><br><br><strong>First, what’s your name and what kind of work do you do?</strong><br><br>⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -15,7 +15,6 @@ export default function Home() {
 
   const [leadInfo, setLeadInfo] = useState({
     name: '',
-    email: '',
     businessType: ''
   });
 
@@ -31,11 +30,39 @@ export default function Home() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const newMessages = [...messages, { role: 'user', content: input }];
-    setMessages(newMessages);
+    const userMessage = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
 
+    // Capture name and business type from the first answer
+    if (!leadInfo.name || !leadInfo.businessType) {
+      const nameMatch = input.match(/([A-Z][a-z]+)/);
+      const bizMatch = input.match(/(?:I am a|I'm a|I do|I work in|My business is)?\s?(.*)/i);
+      setLeadInfo({
+        name: nameMatch ? nameMatch[0] : '',
+        businessType: bizMatch ? bizMatch[1] : ''
+      });
+
+      const greeting = `
+        <strong>Hello ${nameMatch ? nameMatch[0] : 'there'}!</strong><br><br>
+        This quick, interactive consultation will help you uncover where your ${
+          bizMatch ? bizMatch[1].toLowerCase() : 'business'
+        } may be leaking leads or leaving money on the table—and how to fix it.<br><br>
+        You’ll get a personalized AI Marketing Map with:<br><br>
+        ✅ Your strengths<br>
+        🚧 Missed opportunities<br>
+        🧰 Clear action steps<br>
+        💡 Tools and services that match your goals and budget<br><br>
+        It only takes a couple minutes, and you’re free to skip or expand on answers as you go. Let’s get started!
+      `.trim();
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: greeting }]);
+      setLoading(false);
+      return;
+    }
+
+    // Send input to API for assistant reply
     const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -43,7 +70,7 @@ export default function Home() {
     });
 
     const data = await res.json();
-    setMessages([...newMessages, { role: 'assistant', content: data.answer }]);
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
 
     if (data.answer.includes('Your personalized recommendations:')) {
       setShowActions(true);
@@ -74,8 +101,8 @@ export default function Home() {
         padding: 20,
         borderRadius: 8,
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        height: 400,
-        overflowY: 'auto'
+        height: 500,
+        overflowY: 'scroll'
       }}>
         {messages.map((msg, i) => (
           <div
@@ -84,7 +111,7 @@ export default function Home() {
               background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
               margin: '10px 0',
               padding: '10px 15px',
-              borderRadius: '10px',
+              borderRadius: '10px'
             }}
           >
             <div
