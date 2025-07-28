@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { generatePDF } from '../utils/generatePDF';
+
 export default function Home() {
   const [formData, setFormData] = useState({
     name: '',
