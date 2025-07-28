@@ -1,11 +1,11 @@
 export default async function handler(req, res) {
   const apiKey = process.env.OPENAI_API_KEY;
 
-  // Log the API key for debugging (optional - remove after confirming it's defined)
-  console.log("OPENAI_API_KEY:", apiKey);
+  // Optional: Debug log (remove this after confirming the key is being loaded)
+  console.log("OPENAI_API_KEY:", apiKey ? "Loaded" : "Not Found");
 
   if (!apiKey) {
-    return res.status(500).json({ error: "API key is missing." });
+    return res.status(500).json({ error: "API key is missing or undefined." });
   }
 
   const { messages } = req.body;
@@ -25,10 +25,15 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error("OpenAI API error:", error);
-      return res.status(500).json({ error: error.error.message });
+      const errorData = await response.json();
+      console.error("OpenAI API error:", errorData);
+      return res.status(500).json({ error: errorData?.error?.message || "OpenAI API error" });
     }
 
     const data = await response.json();
-    res.status(200).json(
+    res.status(200).json({ result: data.choices[0].message.content });
+  } catch (err) {
+    console.error("Request failed:", err);
+    res.status(500).json({ error: "Something went wrong during the request." });
+  }
+}
