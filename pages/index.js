@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
+import ReactMarkdown from 'react-markdown';
 
 export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!<br><br>This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.<br><br><strong>You’ll get a personalized AI Marketing Map with:</strong><br><br>✅ Your strengths<br>🚧 Missed opportunities<br>🛠️ Clear action steps<br>💡 Tools and services that match your goals<br><br>It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!<br><br><strong>First, what’s your name?</strong><br><br>⬇️ Type below to answer.`
+      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n**You’ll get a personalized AI Marketing Map with:**\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -32,13 +33,11 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
-    // Track lead name
     if (!leadInfo.name) {
       const nameOnly = input.replace(/[^a-zA-Z\s]/g, '').split(' ')[0];
       setLeadInfo({ name: nameOnly });
     }
 
-    // Talk to Assistant GPT via /api/ask
     const res = await fetch('/api/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -92,16 +91,7 @@ export default function Home() {
               borderRadius: '10px'
             }}
           >
-            {typeof msg.content === 'string' ? (
-              <div
-                dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, '<br>') }}
-                style={{ whiteSpace: 'pre-wrap' }}
-              />
-            ) : (
-              <pre style={{ color: 'red', whiteSpace: 'pre-wrap' }}>
-                {JSON.stringify(msg.content, null, 2)}
-              </pre>
-            )}
+            <ReactMarkdown>{msg.content}</ReactMarkdown>
           </div>
         ))}
         {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
