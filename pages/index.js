@@ -10,6 +10,7 @@ export default function Home() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [threadId, setThreadId] = useState(null);
   const [showActions, setShowActions] = useState(false);
   const chatEndRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
@@ -31,38 +32,25 @@ export default function Home() {
     setInput('');
     setLoading(true);
 
+    // Track lead name
     if (!leadInfo.name) {
       const nameOnly = input.replace(/[^a-zA-Z\s]/g, '').split(' ')[0];
       setLeadInfo({ name: nameOnly });
-
-      const greeting = `Hey ${nameOnly || 'there'}! Here's your first question.`;
-
-      const res = await fetch('/api/gpt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: greeting })
-      });
-
-      const data = await res.json();
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: greeting },
-        { role: 'assistant', content: data.answer }
-      ]);
-      setLoading(false);
-      return;
     }
 
-    const res = await fetch('/api/gpt', {
+    // Talk to Assistant GPT via /api/ask
+    const res = await fetch('/api/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: input })
+      body: JSON.stringify({ threadId, userMessage: input })
     });
 
     const data = await res.json();
-    setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+    setThreadId(data.threadId);
 
-    if (data.answer.includes('Your personalized recommendations:')) {
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+
+    if (data.reply.includes('Your ClickPrimer Matched Offers') || data.reply.includes('Let’s Get Started')) {
       setShowActions(true);
     }
 
@@ -106,7 +94,7 @@ export default function Home() {
           >
             {typeof msg.content === 'string' ? (
               <div
-                dangerouslySetInnerHTML={{ __html: msg.content }}
+                dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, '<br>') }}
                 style={{ whiteSpace: 'pre-wrap' }}
               />
             ) : (
