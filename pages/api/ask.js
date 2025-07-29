@@ -26,27 +26,19 @@ export default async function handler(req, res) {
 
     // 3. Run the Assistant
     const run = await openai.beta.threads.runs.create(thread, {
-      assistant_id: 'asst_maxNaHvWR6jWHgvZNHcQvtK0', // Your Assistant ID
+      assistant_id: 'asst_maxNaHvWR6jWHgvZNHcQvtK0', // Your Assistant ID here
     });
 
-    // 4. Poll until the run completes or errors
+    // 4. Poll until the run completes
     let runStatus;
-    let attempts = 0;
     do {
-      if (attempts > 40) throw new Error('Run timeout after 12s');
-      await new Promise(r => setTimeout(r, 300)); // wait 0.3s
       runStatus = await openai.beta.threads.runs.retrieve(thread, run.id);
-
-      if (runStatus.status === 'failed' || runStatus.status === 'cancelled') {
-        throw new Error(`Run ${runStatus.status}`);
-      }
-
-      attempts++;
+      await new Promise((r) => setTimeout(r, 300)); // check faster (was 1000ms)
     } while (runStatus.status !== 'completed');
 
-    // 5. Get latest message
-    const messages = await openai.beta.threads.messages.list(thread);
-    const lastMessage = messages.data.find(m => m.role === 'assistant');
+    // ✅ 5. Get *only* the latest message
+    const messages = await openai.beta.threads.messages.list(thread, { limit: 1 });
+    const lastMessage = messages.data[0];
 
     res.status(200).json({ threadId: thread, reply: lastMessage.content[0].text.value });
   } catch (err) {
