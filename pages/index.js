@@ -24,7 +24,7 @@ export default function Home() {
   useEffect(() => {
     if (scrollTargetIndex !== null) {
       latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setScrollTargetIndex(null); // reset after scroll
+      setScrollTargetIndex(null);
     }
   }, [messages, scrollTargetIndex]);
 
@@ -74,7 +74,8 @@ export default function Home() {
 ### ❓ Still have questions? We're happy to help:
 
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us (We pickup!)](tel:12083144088)`
+- [📱 Call Us (We pickup!)](tel:12083144088)
+      `
     };
 
     const updatedMessages = includesCTA
@@ -84,41 +85,40 @@ export default function Home() {
     const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setMessages(updatedMessages);
     setScrollTargetIndex(newIndex);
+
     setLoading(false);
   };
 
   return (
-    <div
-      style={{
-        fontFamily: 'Open Sans, sans-serif',
-        width: '95vw',
-        maxWidth: '700px',
-        margin: '0 auto',
-        background: '#e8eeff',
-        minHeight: '100vh',
-        padding: '1rem',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
-      <div style={{ textAlign: 'center' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100dvh',
+      width: '100vw',
+      margin: '0 auto',
+      background: '#e8eeff',
+      overflow: 'hidden'
+    }}>
+      <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
         <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
         <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
-        <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 30 }}>
+        <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 20 }}>
           🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
         </p>
       </div>
 
-      <div
-        style={{
-          background: 'white',
-          padding: 20,
-          borderRadius: 8,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          flexGrow: 1,
-          overflowY: 'auto'
-        }}
-      >
+      <div style={{
+        flexGrow: 1,
+        overflowY: 'auto',
+        minHeight: 0,
+        background: 'white',
+        padding: 20,
+        borderRadius: 8,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        width: '95%',
+        maxWidth: 700,
+        margin: '0 auto'
+      }}>
         {messages.map((msg, i) => {
           const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
           return (
@@ -129,7 +129,10 @@ export default function Home() {
                 background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
                 margin: '10px 0',
                 padding: '10px 15px',
-                borderRadius: '10px'
+                borderRadius: '10px',
+                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '80%',
+                textAlign: msg.role === 'user' ? 'right' : 'left'
               }}
             >
               <ReactMarkdown
@@ -141,12 +144,7 @@ export default function Home() {
                     if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
                     return href === '#download' ? (
-                      <button
-                        onClick={() =>
-                          generatePDF({ ...leadInfo, result: messages.map((m) => m.content).join('\n\n') })
-                        }
-                        style={style}
-                      >
+                      <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
                         {children}
                       </button>
                     ) : (
@@ -168,7 +166,7 @@ export default function Home() {
         <div ref={chatEndRef} />
       </div>
 
-      <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+      <form onSubmit={sendMessage} style={{ marginTop: 10, padding: '0 2.5%', display: 'flex', gap: 10 }}>
         <input
           type="text"
           value={input}
@@ -182,31 +180,20 @@ export default function Home() {
             fontSize: 16
           }}
         />
-        <button
-          type="submit"
-          style={{
-            background: '#30d64f',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            fontWeight: 'bold',
-            borderRadius: 4
-          }}
-        >
+        <button type="submit" style={{
+          background: '#30d64f',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          fontWeight: 'bold',
+          borderRadius: 4
+        }}>
           Send
         </button>
       </form>
 
-      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
-        © ClickPrimer 2025. All Rights Reserved.{' '}
-        <a
-          href="https://www.clickprimer.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: '#0068ff' }}
-        >
-          www.ClickPrimer.com
-        </a>
+      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, color: '#666' }}>
+        © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
       </div>
     </div>
   );
