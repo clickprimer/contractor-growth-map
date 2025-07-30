@@ -128,10 +128,10 @@ export default function Home() {
               <ReactMarkdown
                 components={{
                   a: ({ href, children }) => {
-                    let style = buttonStyle('#0068ff', 'white');
-                    if (href.includes('pdf') || href === '#download') style = buttonStyle('#30d64f', 'white');
-                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#00aaff', 'white');
-                    if (href.includes('contact')) style = buttonStyle('#e8cc00', '#002654');
+                    let style = buttonStyle('#30d64f', 'white');
+                    if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
+                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#0068ff', 'white');
+                    if (href.includes('contact')) style = buttonStyle('#002654', 'white');
 
                     return href === '#download' ? (
                       <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
