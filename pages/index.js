@@ -15,24 +15,21 @@ export default function Home() {
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
+  const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Scroll to top of latest assistant reply only
   useEffect(() => {
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'assistant') {
+    if (scrollTargetIndex !== null) {
       latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setScrollTargetIndex(null); // reset after scroll
     }
-  }, [messages]);
+  }, [messages, scrollTargetIndex]);
 
-  // Still scroll to bottom when user is typing
   useEffect(() => {
-    if (loading) {
-      scrollToBottom();
-    }
+    if (loading) scrollToBottom();
   }, [loading]);
 
   const sendMessage = async (e) => {
@@ -78,9 +75,14 @@ export default function Home() {
       `
     };
 
-    setMessages((prev) =>
-      includesCTA ? [...prev, finalReply, ctaMessage] : [...prev, finalReply]
-    );
+    const updatedMessages = includesCTA
+      ? [...messages, userMessage, finalReply, ctaMessage]
+      : [...messages, userMessage, finalReply];
+
+    setMessages(updatedMessages);
+
+    const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
+    setScrollTargetIndex(newIndex);
 
     setLoading(false);
   };
@@ -96,108 +98,4 @@ export default function Home() {
     }}>
       <div style={{ textAlign: 'center' }}>
         <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
-        <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
-        <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 30 }}>
-          🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
-        </p>
-      </div>
-
-      <div style={{
-        background: 'white',
-        padding: 20,
-        borderRadius: 8,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        height: 500,
-        overflowY: 'scroll'
-      }}>
-        {messages.map((msg, i) => {
-          const isLast = i === messages.length - 1;
-          const isAssistant = msg.role === 'assistant';
-          return (
-            <div
-              key={i}
-              ref={isAssistant && isLast ? latestAssistantRef : null}
-              style={{
-                background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
-                margin: '10px 0',
-                padding: '10px 15px',
-                borderRadius: '10px'
-              }}
-            >
-              <ReactMarkdown
-                components={{
-                  a: ({ href, children }) => {
-                    let style = buttonStyle('#0068ff', 'white');
-                    if (href.includes('pdf') || href === '#download') style = buttonStyle('#30d64f', 'white');
-                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#00aaff', 'white');
-                    if (href.includes('contact')) style = buttonStyle('#e8cc00', '#002654');
-
-                    return href === '#download' ? (
-                      <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
-                        {children}
-                      </button>
-                    ) : (
-                      <a href={href} target="_blank" rel="noopener noreferrer">
-                        <button style={style}>{children}</button>
-                      </a>
-                    );
-                  },
-                  h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
-                  li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
-                }}
-              >
-                {msg.content}
-              </ReactMarkdown>
-            </div>
-          );
-        })}
-        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
-        <div ref={chatEndRef} />
-      </div>
-
-      <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your answer..."
-          style={{
-            flex: 1,
-            padding: '10px',
-            borderRadius: 4,
-            border: '1px solid #ccc',
-            fontSize: 16
-          }}
-        />
-        <button type="submit" style={{
-          background: '#30d64f',
-          color: 'white',
-          border: 'none',
-          padding: '10px 20px',
-          fontWeight: 'bold',
-          borderRadius: 4
-        }}>
-          Send
-        </button>
-      </form>
-
-      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
-        © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
-      </div>
-    </div>
-  );
-}
-
-function buttonStyle(bg, color) {
-  return {
-    width: '100%',
-    marginBottom: 10,
-    padding: '12px',
-    background: bg,
-    color: color,
-    border: 'none',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    borderRadius: 4
-  };
-}
+        <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketin
