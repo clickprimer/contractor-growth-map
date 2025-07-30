@@ -162,3 +162,74 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                       <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
                         {children}
                       </button>
+                    ) : (
+                      <a href={href} target="_blank" rel="noopener noreferrer">
+                        <button style={style}>{children}</button>
+                      </a>
+                    );
+                  },
+                  h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
+                  li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
+                }}
+              >
+                {msg.content}
+              </ReactMarkdown>
+            </div>
+          );
+        })}
+        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
+        <div ref={chatEndRef} />
+      </div>
+
+      <form onSubmit={sendMessage} style={{
+        marginTop: 10,
+        display: 'flex',
+        gap: 10,
+        width: '95%',
+        maxWidth: 700
+      }}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your answer..."
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            fontSize: 16
+          }}
+        />
+        <button type="submit" style={{
+          background: '#30d64f',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          fontWeight: 'bold',
+          borderRadius: 4
+        }}>
+          Send
+        </button>
+      </form>
+
+      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, color: '#666', paddingBottom: 10 }}>
+        © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
+      </div>
+    </div>
+  );
+}
+
+function buttonStyle(bg, color) {
+  return {
+    width: '100%',
+    marginBottom: 10,
+    padding: '12px',
+    background: bg,
+    color: color,
+    border: 'none',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    borderRadius: 4
+  };
+}
