@@ -24,7 +24,7 @@ export default function Home() {
   useEffect(() => {
     if (scrollTargetIndex !== null) {
       latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setScrollTargetIndex(null);
+      setScrollTargetIndex(null); // reset after scroll
     }
   }, [messages, scrollTargetIndex]);
 
@@ -74,134 +74,139 @@ export default function Home() {
 ### ❓ Still have questions? We're happy to help:
 
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us - we pickup](tel:12083144088)
-      `
+- [📱 Call Us (We pickup!)](tel:12083144088)`
     };
 
     const updatedMessages = includesCTA
       ? [...messages, userMessage, finalReply, ctaMessage]
       : [...messages, userMessage, finalReply];
 
-    setMessages(updatedMessages);
-
     const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
+    setMessages(updatedMessages);
     setScrollTargetIndex(newIndex);
-
     setLoading(false);
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      width: '100%',
-      background: '#e8eeff',
-      fontFamily: 'Open Sans, sans-serif'
-    }}>
-      <div style={{
+    <div
+      style={{
+        fontFamily: 'Open Sans, sans-serif',
+        width: '95vw',
         maxWidth: '700px',
-        width: '95%',
         margin: '0 auto',
+        background: '#e8eeff',
+        minHeight: '100vh',
+        padding: '1rem',
         display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        minHeight: 0,
-        padding: '2rem'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
-          <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
-          <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 30 }}>
-            🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
-          </p>
-        </div>
+        flexDirection: 'column'
+      }}
+    >
+      <div style={{ textAlign: 'center' }}>
+        <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: 200, marginBottom: 10 }} />
+        <h1 style={{ color: '#0068ff', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
+        <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 30 }}>
+          🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
+        </p>
+      </div>
 
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'auto',
-          msOverflowStyle: 'auto',
+      <div
+        style={{
           background: 'white',
           padding: 20,
           borderRadius: 8,
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          marginBottom: 20
-        }}>
-          {messages.map((msg, i) => {
-            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
-            return (
-              <div
-                key={i}
-                ref={isScrollTarget ? latestAssistantRef : null}
-                style={{
-                  background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
-                  margin: '10px 0',
-                  padding: '10px 15px',
-                  borderRadius: '10px'
+          flexGrow: 1,
+          overflowY: 'auto'
+        }}
+      >
+        {messages.map((msg, i) => {
+          const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
+          return (
+            <div
+              key={i}
+              ref={isScrollTarget ? latestAssistantRef : null}
+              style={{
+                background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
+                margin: '10px 0',
+                padding: '10px 15px',
+                borderRadius: '10px'
+              }}
+            >
+              <ReactMarkdown
+                components={{
+                  a: ({ href, children }) => {
+                    let style = buttonStyle('#30d64f', 'white');
+                    if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
+                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
+                    if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
+
+                    return href === '#download' ? (
+                      <button
+                        onClick={() =>
+                          generatePDF({ ...leadInfo, result: messages.map((m) => m.content).join('\n\n') })
+                        }
+                        style={style}
+                      >
+                        {children}
+                      </button>
+                    ) : (
+                      <a href={href} target="_blank" rel="noopener noreferrer">
+                        <button style={style}>{children}</button>
+                      </a>
+                    );
+                  },
+                  h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
+                  li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
                 }}
               >
-                <ReactMarkdown
-                  components={{
-                    a: ({ href, children }) => {
-                      let style = buttonStyle('#30d64f', 'white');
-                      if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                      if (href.includes('tel:12083144088')) style = buttonStyle('#002654', 'white');
-                      if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
+                {msg.content}
+              </ReactMarkdown>
+            </div>
+          );
+        })}
+        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
+        <div ref={chatEndRef} />
+      </div>
 
-                      return href === '#download' ? (
-                        <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
-                          {children}
-                        </button>
-                      ) : (
-                        <a href={href} target="_blank" rel="noopener noreferrer">
-                          <button style={style}>{children}</button>
-                        </a>
-                      );
-                    },
-                    h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
-                    li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
-              </div>
-            );
-          })}
-          {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
-          <div ref={chatEndRef} />
-        </div>
-
-        <form onSubmit={sendMessage} style={{ display: 'flex', gap: 10 }}>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your answer..."
-            style={{
-              flex: 1,
-              padding: '10px',
-              borderRadius: 4,
-              border: '1px solid #ccc',
-              fontSize: 16
-            }}
-          />
-          <button type="submit" style={{
+      <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your answer..."
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            fontSize: 16
+          }}
+        />
+        <button
+          type="submit"
+          style={{
             background: '#30d64f',
             color: 'white',
             border: 'none',
             padding: '10px 20px',
             fontWeight: 'bold',
             borderRadius: 4
-          }}>
-            Send
-          </button>
-        </form>
+          }}
+        >
+          Send
+        </button>
+      </form>
 
-        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
-          © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
-        </div>
+      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
+        © ClickPrimer 2025. All Rights Reserved.{' '}
+        <a
+          href="https://www.clickprimer.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#0068ff' }}
+        >
+          www.ClickPrimer.com
+        </a>
       </div>
     </div>
   );
