@@ -12,7 +12,6 @@ export default function Home() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [threadId, setThreadId] = useState(null);
-  const [showActions, setShowActions] = useState(false);
   const chatEndRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
 
@@ -47,11 +46,29 @@ export default function Home() {
     const data = await res.json();
     setThreadId(data.threadId);
 
-    setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+    const finalReply = { role: 'assistant', content: data.reply };
 
-    if (data.reply.includes('Your ClickPrimer Matched Offers') || data.reply.includes('Let’s Get Started')) {
-      setShowActions(true);
-    }
+    const includesCTA =
+      data.reply.includes('Your ClickPrimer Matched Offers') ||
+      data.reply.includes('Let’s Get Started');
+
+    const ctaMessage = {
+      role: 'assistant',
+      content: `
+---
+
+### 🚀 Let's Get Started:
+
+- [📄 Download Your AI Marketing Map PDF](#download)
+- [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
+- [💬 Send Us a Message](https://www.clickprimer.com/contact)
+- [📱 Call Us Now: (208) 314-4088](tel:12083144088)
+    `
+    };
+
+    setMessages((prev) =>
+      includesCTA ? [...prev, finalReply, ctaMessage] : [...prev, finalReply]
+    );
 
     setLoading(false);
   };
@@ -123,28 +140,6 @@ export default function Home() {
           Send
         </button>
       </form>
-
-      {showActions && (
-        <div style={{ marginTop: 40 }}>
-          <h3>Let's Get Started:</h3>
-          <a href="https://www.map.clickprimer.com/aimm-setup-call" target="_blank">
-            <button style={buttonStyle('#0068ff', 'white')}>🚀 Book a Service Setup Call</button>
-          </a>
-          <button
-            onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })}
-            style={buttonStyle('#30d64f', 'white')}
-          >
-            📄 Download My AI Marketing Map PDF
-          </button>
-          <h3 style={{ marginTop: 30 }}>Have questions first? We're happy to help.</h3>
-          <a href="tel:12083144088">
-            <button style={buttonStyle('#00aaff', 'white')}>📞 Give Us A Call (We pick up!)</button>
-          </a>
-          <a href="https://www.clickprimer.com/contact" target="_blank">
-            <button style={buttonStyle('#e8cc00', '#002654')}>📩 Send Us A Message</button>
-          </a>
-        </div>
-      )}
 
       <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
         © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
