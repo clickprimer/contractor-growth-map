@@ -133,7 +133,7 @@ export default function Home() {
                   a: ({ href, children }) => {
                     let style = buttonStyle('#30d64f', 'white');
                     if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
+                    if (href.includes('tel') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
                     if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
                     return href === '#download' ? (
