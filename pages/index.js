@@ -68,8 +68,11 @@ export default function Home() {
 
 ### 🚀 Let's Get Started:
 
-- [📄 Download Your AI Marketing Map PDF](#download)
 - [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
+- [📄 Download Your AI Marketing Map PDF](#download)
+
+### ❓ Still have questions? We're happy to help:
+
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
 - [📱 Call Us Now: (208) 314-4088](tel:12083144088)
       `
@@ -130,8 +133,8 @@ export default function Home() {
                   a: ({ href, children }) => {
                     let style = buttonStyle('#30d64f', 'white');
                     if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#0068ff', 'white');
-                    if (href.includes('contact')) style = buttonStyle('#002654', 'white');
+                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
+                    if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
                     return href === '#download' ? (
                       <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
