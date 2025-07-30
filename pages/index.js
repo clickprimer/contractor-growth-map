@@ -63,7 +63,7 @@ export default function Home() {
 - [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
 - [📱 Call Us Now: (208) 314-4088](tel:12083144088)
-    `
+      `
     };
 
     setMessages((prev) =>
@@ -108,7 +108,30 @@ export default function Home() {
               borderRadius: '10px'
             }}
           >
-            <ReactMarkdown>{msg.content}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                a: ({ href, children }) => {
+                  let style = buttonStyle('#0068ff', 'white');
+                  if (href.includes('pdf') || href === '#download') style = buttonStyle('#30d64f', 'white');
+                  if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#00aaff', 'white');
+                  if (href.includes('contact')) style = buttonStyle('#e8cc00', '#002654');
+
+                  return href === '#download' ? (
+                    <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
+                      {children}
+                    </button>
+                  ) : (
+                    <a href={href} target="_blank" rel="noopener noreferrer">
+                      <button style={style}>{children}</button>
+                    </a>
+                  );
+                },
+                h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
+                li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
+              }}
+            >
+              {msg.content}
+            </ReactMarkdown>
           </div>
         ))}
         {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
