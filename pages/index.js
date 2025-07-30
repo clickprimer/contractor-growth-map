@@ -74,7 +74,7 @@ export default function Home() {
 ### ❓ Still have questions? We're happy to help:
 
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us (We pick up!)](tel:12083144088)
+- [📱 Call Us - we pickup](tel:12083144088)
       `
     };
 
@@ -83,6 +83,7 @@ export default function Home() {
       : [...messages, userMessage, finalReply];
 
     setMessages(updatedMessages);
+
     const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setScrollTargetIndex(newIndex);
 
@@ -104,7 +105,8 @@ export default function Home() {
         margin: '0 auto',
         display: 'flex',
         flexDirection: 'column',
-        flexGrow: 1,
+        flex: 1,
+        minHeight: 0,
         padding: '2rem'
       }}>
         <div style={{ textAlign: 'center' }}>
@@ -116,15 +118,15 @@ export default function Home() {
         </div>
 
         <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'auto',
+          msOverflowStyle: 'auto',
           background: 'white',
           padding: 20,
           borderRadius: 8,
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          flexGrow: 1,
-          overflowY: 'scroll',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'auto',
-          msOverflowStyle: 'auto',
           marginBottom: 20
         }}>
           {messages.map((msg, i) => {
@@ -145,7 +147,7 @@ export default function Home() {
                     a: ({ href, children }) => {
                       let style = buttonStyle('#30d64f', 'white');
                       if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                      if (href.startsWith('tel:')) style = buttonStyle('#002654', 'white');
+                      if (href.includes('tel:12083144088')) style = buttonStyle('#002654', 'white');
                       if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
                       return href === '#download' ? (
@@ -171,7 +173,7 @@ export default function Home() {
           <div ref={chatEndRef} />
         </div>
 
-        <form onSubmit={sendMessage} style={{ marginTop: 10, display: 'flex', gap: 10 }}>
+        <form onSubmit={sendMessage} style={{ display: 'flex', gap: 10 }}>
           <input
             type="text"
             value={input}
@@ -197,7 +199,7 @@ export default function Home() {
           </button>
         </form>
 
-        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 20, color: '#666' }}>
+        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
           © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
         </div>
       </div>
@@ -215,7 +217,6 @@ function buttonStyle(bg, color) {
     border: 'none',
     fontWeight: 'bold',
     fontSize: '16px',
-    borderRadius: 4,
-    cursor: 'pointer'
+    borderRadius: 4
   };
 }
