@@ -6,7 +6,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n**You’ll get a personalized AI Marketing Map with:**\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
+      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n**You’ll get a personalized AI Marketing Map with:**\n\n✅ Your strengths**\n\n🚧 Missed opportunities**\n\n🛠️ Clear action steps**\n\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -61,6 +61,9 @@ export default function Home() {
 
 - [📄 Download Your AI Marketing Map PDF](#download)
 - [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
+
+### ❓ Have questions first? We're happy to help:
+
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
 - [📱 Call Us Now: (208) 314-4088](tel:12083144088)
       `
