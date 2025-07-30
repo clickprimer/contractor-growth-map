@@ -74,7 +74,7 @@ export default function Home() {
 ### ❓ Still have questions? We're happy to help:
 
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us Now: (208) 314-4088](tel:12083144088)
+- [📱 Call Us (We pickup!)](tel:12083144088)
       `
     };
 
