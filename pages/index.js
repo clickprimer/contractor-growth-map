@@ -129,8 +129,9 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
             alt="ClickPrimer Logo"
             style={{ width: '160px', marginBottom: '10px' }}
           />
-          <h1 style={{ color: '#0068ff', fontSize: '1.8rem', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
-          <p style={{
+        <h1 className="text-primary mt-0 text-2xl sm:text-3xl md:text-4xl font-roboto font-bold text-center">
+  The Contractor’s AI Marketing Map</h1>
+            <p style={{
             fontWeight: 'bold',
             color: '#002654',
             marginBottom: '1.5rem',
