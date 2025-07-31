@@ -90,22 +90,25 @@ export default function Home() {
 
   return (
     <div style={{
-      height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       background: '#e8eeff',
-      padding: '2vh 1vw'
+      minHeight: '100vh',
+      padding: '2vh 1vw',
+      boxSizing: 'border-box'
     }}>
       <div style={{
         width: '100%',
         maxWidth: 700,
         display: 'flex',
         flexDirection: 'column',
-        flex: 1
+        flex: 1,
+        height: '100%',
+        boxSizing: 'border-box'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: '150px', margin: '20px auto 10px' }} />
+        <div style={{ textAlign: 'center', marginBottom: 10 }}>
+          <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: '150px', marginTop: 20 }} />
           <h1 style={{ color: '#0068ff', margin: 0, fontSize: '1.5rem' }}>The Contractor’s AI Marketing Map</h1>
           <p style={{
             fontWeight: 'bold',
@@ -173,7 +176,7 @@ export default function Home() {
           <div ref={chatEndRef} />
         </div>
 
-        <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+        <form onSubmit={sendMessage} style={{ marginTop: 10, display: 'flex', gap: 10 }}>
           <input
             type="text"
             value={input}
@@ -199,7 +202,7 @@ export default function Home() {
           </button>
         </form>
 
-        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 20, color: '#666' }}>
+        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, paddingBottom: 10, color: '#666' }}>
           © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
         </div>
       </div>
