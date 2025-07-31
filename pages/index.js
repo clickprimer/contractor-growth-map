@@ -6,7 +6,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
+      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n**You’ll get a personalized AI Marketing Map with:**\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -83,8 +83,10 @@ export default function Home() {
       : [...messages, userMessage, finalReply];
 
     setMessages(updatedMessages);
+
     const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setScrollTargetIndex(newIndex);
+
     setLoading(false);
   };
 
@@ -92,49 +94,50 @@ export default function Home() {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
+      height: '100vh',
+      overflow: 'hidden',
       alignItems: 'center',
-      background: '#e8eeff',
-      minHeight: '100vh',
-      padding: '2vh 1vw',
-      boxSizing: 'border-box'
+      justifyContent: 'center',
+      padding: '1rem',
+      backgroundColor: '#e8eeff'
     }}>
       <div style={{
         width: '100%',
-        maxWidth: 700,
+        maxWidth: '700px',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        flex: 1
+        background: '#e8eeff'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: 10 }}>
-          <img src="/logo.png" alt="ClickPrimer Logo" style={{
-            width: '150px',
-            marginTop: '20px',
-            marginBottom: '10px'
-          }} />
-          <h1 style={{ color: '#0068ff', margin: 0, fontSize: '1.5rem' }}>The Contractor’s AI Marketing Map</h1>
+        <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
+          <img
+            src="/logo.png"
+            alt="ClickPrimer Logo"
+            style={{ width: '160px', marginBottom: '10px' }}
+          />
+          <h1 style={{ color: '#0068ff', fontSize: '1.8rem', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
           <p style={{
             fontWeight: 'bold',
             color: '#002654',
-            margin: '10px auto 20px',
-            padding: '0 10px'
+            marginBottom: '1.5rem',
+            paddingLeft: '1rem',
+            paddingRight: '1rem'
           }}>
             🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
           </p>
         </div>
 
         <div style={{
-          background: 'white',
           flex: 1,
-          overflowY: 'auto',
-          padding: 20,
-          borderRadius: 8,
+          background: 'white',
+          padding: '1rem',
+          borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          marginBottom: 10
+          overflowY: 'auto'
         }}>
           {messages.map((msg, i) => {
-            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
             const isUser = msg.role === 'user';
+            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
             return (
               <div
                 key={i}
@@ -144,9 +147,9 @@ export default function Home() {
                   margin: '10px 0',
                   padding: '10px 15px',
                   borderRadius: '10px',
-                  maxWidth: '85%',
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
-                  whiteSpace: 'pre-wrap'
+                  maxWidth: '100%',
+                  textAlign: isUser ? 'right' : 'left'
                 }}
               >
                 <ReactMarkdown
@@ -154,11 +157,16 @@ export default function Home() {
                     a: ({ href, children }) => {
                       let style = buttonStyle('#30d64f', 'white');
                       if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                      if (href.includes('tel')) style = buttonStyle('#002654', 'white');
+                      if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
                       if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
                       return href === '#download' ? (
-                        <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
+                        <button
+                          onClick={() =>
+                            generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })
+                          }
+                          style={style}
+                        >
                           {children}
                         </button>
                       ) : (
@@ -181,9 +189,10 @@ export default function Home() {
         </div>
 
         <form onSubmit={sendMessage} style={{
+          marginTop: 10,
           display: 'flex',
           gap: 10,
-          marginBottom: 10
+          paddingTop: 10
         }}>
           <input
             type="text"
@@ -210,14 +219,14 @@ export default function Home() {
           </button>
         </form>
 
-        <div style={{
-          fontSize: 12,
-          textAlign: 'center',
-          marginBottom: 10,
-          color: '#666'
-        }}>
+        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, color: '#666' }}>
           © ClickPrimer 2025. All Rights Reserved.{' '}
-          <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>
+          <a
+            href="https://www.clickprimer.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#0068ff' }}
+          >
             www.ClickPrimer.com
           </a>
         </div>
