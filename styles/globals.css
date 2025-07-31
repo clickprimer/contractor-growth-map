@@ -5,8 +5,7 @@
 @tailwind utilities;
 
 /* Base layout fix */
-html,
-body {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -16,7 +15,7 @@ body {
   overflow: hidden; /* Prevent outer scroll */
 }
 
-/* Ensure Next.js app fills height */
+/* Support full height inside Next.js app */
 #__next {
   height: 100%;
   display: flex;
@@ -43,29 +42,29 @@ button {
   font-weight: bold;
 }
 
-/* Heading styles */
-h1,
-h2,
-h3 {
+/* Headings */
+h1 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: #0068ff !important;
+  font-size: 1.5rem; /* Mobile default */
+}
+
+@media (min-width: 640px) {
+  h1 {
+    font-size: 2.25rem; /* Desktop */
+}
+
+h2, h3 {
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
 
-/* h1 color and responsive size fix */
-h1 {
-  color: #0068ff !important;
-  font-size: 1.75rem; /* ~text-2xl for mobile */
-}
-
-@media (min-width: 640px) {
-  h1 {
-    font-size: 3rem; /* ~text-5xl for desktop */
-  }
-}
-
-/* Scrollbar styling */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
