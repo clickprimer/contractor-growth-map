@@ -6,7 +6,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
+      content: `Hello and welcome!\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -103,12 +103,15 @@ export default function Home() {
         maxWidth: 700,
         display: 'flex',
         flexDirection: 'column',
-        flex: 1,
         height: '100%',
-        boxSizing: 'border-box'
+        flex: 1
       }}>
         <div style={{ textAlign: 'center', marginBottom: 10 }}>
-          <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: '150px', marginTop: 20 }} />
+          <img src="/logo.png" alt="ClickPrimer Logo" style={{
+            width: '150px',
+            marginTop: '20px',
+            marginBottom: '10px'
+          }} />
           <h1 style={{ color: '#0068ff', margin: 0, fontSize: '1.5rem' }}>The Contractor’s AI Marketing Map</h1>
           <p style={{
             fontWeight: 'bold',
@@ -126,7 +129,8 @@ export default function Home() {
           overflowY: 'auto',
           padding: 20,
           borderRadius: 8,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          marginBottom: 10
         }}>
           {messages.map((msg, i) => {
             const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
@@ -176,7 +180,11 @@ export default function Home() {
           <div ref={chatEndRef} />
         </div>
 
-        <form onSubmit={sendMessage} style={{ marginTop: 10, display: 'flex', gap: 10 }}>
+        <form onSubmit={sendMessage} style={{
+          display: 'flex',
+          gap: 10,
+          marginBottom: 10
+        }}>
           <input
             type="text"
             value={input}
@@ -202,8 +210,16 @@ export default function Home() {
           </button>
         </form>
 
-        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, paddingBottom: 10, color: '#666' }}>
-          © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
+        <div style={{
+          fontSize: 12,
+          textAlign: 'center',
+          marginBottom: 10,
+          color: '#666'
+        }}>
+          © ClickPrimer 2025. All Rights Reserved.{' '}
+          <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>
+            www.ClickPrimer.com
+          </a>
         </div>
       </div>
     </div>
