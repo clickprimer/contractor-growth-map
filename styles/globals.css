@@ -40,28 +40,22 @@ button {
   border: none;
   font-size: 16px;
   font-weight: bold;
-  background-color: #30d64f;
-  color: white;
-  padding: 10px 20px;
-}
-
-/* Override for PDF download or call buttons if needed */
-button[href*="pdf"],
-button[href="#download"] {
-  background-color: #00aaff;
-}
-
-button[href*="tel"],
-button[href*="call"] {
-  background-color: #002654;
-}
-
-button[href*="contact"] {
-  background-color: #0068ff;
 }
 
 /* Headings */
 h1, h2, h3 {
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
-  margin-top: 1.5r
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
