@@ -11,6 +11,10 @@ module.exports = {
         highlight: '#e8cc00',
         offwhite: '#e8eeff',
       },
+      fontFamily: {
+        sans: ['Open Sans', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],
