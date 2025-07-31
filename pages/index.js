@@ -6,7 +6,22 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n**You’ll get a personalized AI Marketing Map with:**\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
+      content: `Hello and welcome!
+
+This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+
+**You’ll get a personalized AI Marketing Map with:**
+
+✅ Your strengths  
+🚧 Missed opportunities  
+🛠️ Clear action steps  
+💡 Tools and services that match your goals
+
+It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
+
+**First, what’s your name?**
+
+⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -82,11 +97,10 @@ export default function Home() {
       ? [...messages, userMessage, finalReply, ctaMessage]
       : [...messages, userMessage, finalReply];
 
-    setMessages(updatedMessages);
-
     const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setScrollTargetIndex(newIndex);
 
+    setMessages(updatedMessages);
     setLoading(false);
   };
 
