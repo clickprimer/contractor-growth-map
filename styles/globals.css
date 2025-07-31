@@ -1,61 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@700&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Base layout fix */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #e8eeff;
-  font-family: 'Open Sans', sans-serif;
-  color: #002654;
-  overflow: hidden; /* Prevent outer scroll */
-}
-
-/* Support full height inside Next.js app */
-#__next {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Input styling */
-input[type="text"],
-input[type="email"] {
-  padding: 10px;
-  font-size: 16px;
-  font-family: 'Open Sans', sans-serif;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-/* Button styling */
-button {
-  cursor: pointer;
-  border-radius: 4px;
-  font-family: 'Open Sans', sans-serif;
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-/* Headings */
-h1, h2, h3 {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 700;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0068ff',     // For titles
+        accent: '#2ea3f2',
+        dark: '#002654',        // Default body text
+        cta: '#30d64f',
+        highlight: '#e8cc00',
+        offwhite: '#e8eeff',
+      },
+      fontFamily: {
+        sans: ['Open Sans', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
 }
