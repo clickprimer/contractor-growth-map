@@ -83,162 +83,125 @@ export default function Home() {
       : [...messages, userMessage, finalReply];
 
     setMessages(updatedMessages);
-
     const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setScrollTargetIndex(newIndex);
-
     setLoading(false);
   };
 
   return (
-    <div
-      style={{
-        fontFamily: 'Open Sans, sans-serif',
-        minHeight: '100vh',
-        padding: '2vh 1vw',
+    <div style={{
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      background: '#e8eeff',
+      padding: '2vh 1vw'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: 700,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        background: '#e8eeff'
-      }}
-    >
-      <div style={{ textAlign: 'center', marginTop: 20 }}>
-        <img
-          src="/logo.png"
-          alt="ClickPrimer Logo"
-          style={{
-            width: '200px',
-            maxWidth: '80vw',
-            marginBottom: 10
-          }}
-        />
-        <h1 style={{ color: '#0068ff', fontSize: '1.8rem', marginTop: 10 }}>The Contractor’s AI Marketing Map</h1>
-        <p
-          style={{
+        flex: 1
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: '150px', margin: '20px auto 10px' }} />
+          <h1 style={{ color: '#0068ff', margin: 0, fontSize: '1.5rem' }}>The Contractor’s AI Marketing Map</h1>
+          <p style={{
             fontWeight: 'bold',
             color: '#002654',
-            marginBottom: 30,
-            padding: '0 15px'
-          }}
-        >
-          🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
-        </p>
-      </div>
+            margin: '10px auto 20px',
+            padding: '0 10px'
+          }}>
+            🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
+          </p>
+        </div>
 
-      <div
-        style={{
+        <div style={{
           background: 'white',
+          flex: 1,
+          overflowY: 'auto',
           padding: 20,
           borderRadius: 8,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          flex: 1,
-          width: '100%',
-          maxWidth: 700,
-          overflowY: 'scroll',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        {messages.map((msg, i) => {
-          const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
-          return (
-            <div
-              key={i}
-              ref={isScrollTarget ? latestAssistantRef : null}
-              style={{
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
-                margin: '10px 0',
-                padding: '10px 15px',
-                borderRadius: '10px',
-                whiteSpace: 'pre-wrap',
-                maxWidth: '90%'
-              }}
-            >
-              <ReactMarkdown
-                components={{
-                  a: ({ href, children }) => {
-                    let style = buttonStyle('#30d64f', 'white');
-                    if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                    if (href.includes('call') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
-                    if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
-
-                    return href === '#download' ? (
-                      <button
-                        onClick={() =>
-                          generatePDF({ ...leadInfo, result: messages.map((m) => m.content).join('\n\n') })
-                        }
-                        style={style}
-                      >
-                        {children}
-                      </button>
-                    ) : (
-                      <a href={href} target="_blank" rel="noopener noreferrer">
-                        <button style={style}>{children}</button>
-                      </a>
-                    );
-                  },
-                  h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
-                  li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          {messages.map((msg, i) => {
+            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
+            const isUser = msg.role === 'user';
+            return (
+              <div
+                key={i}
+                ref={isScrollTarget ? latestAssistantRef : null}
+                style={{
+                  background: isUser ? '#d2e9ff' : '#f1f1f1',
+                  margin: '10px 0',
+                  padding: '10px 15px',
+                  borderRadius: '10px',
+                  maxWidth: '85%',
+                  alignSelf: isUser ? 'flex-end' : 'flex-start',
+                  whiteSpace: 'pre-wrap'
                 }}
               >
-                {msg.content}
-              </ReactMarkdown>
-            </div>
-          );
-        })}
-        {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
-        <div ref={chatEndRef} />
-      </div>
+                <ReactMarkdown
+                  components={{
+                    a: ({ href, children }) => {
+                      let style = buttonStyle('#30d64f', 'white');
+                      if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
+                      if (href.includes('tel')) style = buttonStyle('#002654', 'white');
+                      if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
-      <form
-        onSubmit={sendMessage}
-        style={{
-          marginTop: 20,
-          display: 'flex',
-          gap: 10,
-          width: '100%',
-          maxWidth: 700
-        }}
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your answer..."
-          style={{
-            flex: 1,
-            padding: '10px',
-            borderRadius: 4,
-            border: '1px solid #ccc',
-            fontSize: 16
-          }}
-        />
-        <button
-          type="submit"
-          style={{
+                      return href === '#download' ? (
+                        <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
+                          {children}
+                        </button>
+                      ) : (
+                        <a href={href} target="_blank" rel="noopener noreferrer">
+                          <button style={style}>{children}</button>
+                        </a>
+                      );
+                    },
+                    h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
+                    li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              </div>
+            );
+          })}
+          {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
+          <div ref={chatEndRef} />
+        </div>
+
+        <form onSubmit={sendMessage} style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your answer..."
+            style={{
+              flex: 1,
+              padding: '10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              fontSize: 16
+            }}
+          />
+          <button type="submit" style={{
             background: '#30d64f',
             color: 'white',
             border: 'none',
             padding: '10px 20px',
             fontWeight: 'bold',
             borderRadius: 4
-          }}
-        >
-          Send
-        </button>
-      </form>
+          }}>
+            Send
+          </button>
+        </form>
 
-      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
-        © ClickPrimer 2025. All Rights Reserved.{' '}
-        <a
-          href="https://www.clickprimer.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: '#0068ff' }}
-        >
-          www.ClickPrimer.com
-        </a>
+        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 20, color: '#666' }}>
+          © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
+        </div>
       </div>
     </div>
   );
