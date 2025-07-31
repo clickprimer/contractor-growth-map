@@ -55,6 +55,7 @@ h1 {
 @media (min-width: 640px) {
   h1 {
     font-size: 2.25rem; /* Desktop */
+  }
 }
 
 h2, h3 {
