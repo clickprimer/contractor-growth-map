@@ -6,22 +6,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'system',
-      content: `Hello and welcome!
-
-This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
-
-**You’ll get a personalized AI Marketing Map with:**
-
-✅ Your strengths
-🚧 Missed opportunities
-🛠️ Clear action steps
-💡 Tools and services that match your goals
-
-It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
-
-**First, what’s your name?**
-
-⬇️ Type below to answer.`
+      content: `Hello and welcome!\n\nThis quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!\n\n**First, what’s your name?**\n\n⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState('');
@@ -89,51 +74,71 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 ### ❓ Still have questions? We're happy to help:
 
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us (We pickup!)](tel:12083144088)`
+- [📱 Call Us (We pickup!)](tel:12083144088)
+      `
     };
 
     const updatedMessages = includesCTA
       ? [...messages, userMessage, finalReply, ctaMessage]
       : [...messages, userMessage, finalReply];
 
-    const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setMessages(updatedMessages);
+
+    const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
     setScrollTargetIndex(newIndex);
+
     setLoading(false);
   };
 
   return (
-    <div style={{
-      fontFamily: 'Open Sans, sans-serif',
-      width: '100vw',
-      height: '100dvh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      background: '#e8eeff',
-      overflow: 'hidden'
-    }}>
-      <div style={{ textAlign: 'center', width: '95%', maxWidth: 700 }}>
-        <img src="/logo.png" alt="ClickPrimer Logo" style={{ width: '150px', marginBottom: 10 }} />
-        <h1 style={{ color: '#0068ff', fontSize: '1.5rem', marginTop: 0 }}>The Contractor’s AI Marketing Map</h1>
-        <p style={{ fontWeight: 'bold', color: '#002654', marginBottom: 30, paddingLeft: 10, paddingRight: 10 }}>
+    <div
+      style={{
+        fontFamily: 'Open Sans, sans-serif',
+        minHeight: '100vh',
+        padding: '2vh 1vw',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        background: '#e8eeff'
+      }}
+    >
+      <div style={{ textAlign: 'center', marginTop: 20 }}>
+        <img
+          src="/logo.png"
+          alt="ClickPrimer Logo"
+          style={{
+            width: '200px',
+            maxWidth: '80vw',
+            marginBottom: 10
+          }}
+        />
+        <h1 style={{ color: '#0068ff', fontSize: '1.8rem', marginTop: 10 }}>The Contractor’s AI Marketing Map</h1>
+        <p
+          style={{
+            fontWeight: 'bold',
+            color: '#002654',
+            marginBottom: 30,
+            padding: '0 15px'
+          }}
+        >
           🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
         </p>
       </div>
 
-      <div style={{
-        background: 'white',
-        padding: 20,
-        borderRadius: 8,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        width: '95%',
-        maxWidth: 700,
-        flexGrow: 1,
-        overflowY: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 0
-      }}>
+      <div
+        style={{
+          background: 'white',
+          padding: 20,
+          borderRadius: 8,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          flex: 1,
+          width: '100%',
+          maxWidth: 700,
+          overflowY: 'scroll',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
         {messages.map((msg, i) => {
           const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
           return (
@@ -141,13 +146,13 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
               key={i}
               ref={isScrollTarget ? latestAssistantRef : null}
               style={{
+                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 background: msg.role === 'user' ? '#d2e9ff' : '#f1f1f1',
                 margin: '10px 0',
                 padding: '10px 15px',
                 borderRadius: '10px',
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '80%',
-                textAlign: msg.role === 'user' ? 'right' : 'left'
+                whiteSpace: 'pre-wrap',
+                maxWidth: '90%'
               }}
             >
               <ReactMarkdown
@@ -159,7 +164,12 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                     if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
                     return href === '#download' ? (
-                      <button onClick={() => generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })} style={style}>
+                      <button
+                        onClick={() =>
+                          generatePDF({ ...leadInfo, result: messages.map((m) => m.content).join('\n\n') })
+                        }
+                        style={style}
+                      >
                         {children}
                       </button>
                     ) : (
@@ -181,13 +191,16 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
         <div ref={chatEndRef} />
       </div>
 
-      <form onSubmit={sendMessage} style={{
-        marginTop: 10,
-        display: 'flex',
-        gap: 10,
-        width: '95%',
-        maxWidth: 700
-      }}>
+      <form
+        onSubmit={sendMessage}
+        style={{
+          marginTop: 20,
+          display: 'flex',
+          gap: 10,
+          width: '100%',
+          maxWidth: 700
+        }}
+      >
         <input
           type="text"
           value={input}
@@ -201,20 +214,31 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
             fontSize: 16
           }}
         />
-        <button type="submit" style={{
-          background: '#30d64f',
-          color: 'white',
-          border: 'none',
-          padding: '10px 20px',
-          fontWeight: 'bold',
-          borderRadius: 4
-        }}>
+        <button
+          type="submit"
+          style={{
+            background: '#30d64f',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            fontWeight: 'bold',
+            borderRadius: 4
+          }}
+        >
           Send
         </button>
       </form>
 
-      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, color: '#666', paddingBottom: 10 }}>
-        © ClickPrimer 2025. All Rights Reserved. <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0068ff' }}>www.ClickPrimer.com</a>
+      <div style={{ fontSize: 12, textAlign: 'center', marginTop: 30, color: '#666' }}>
+        © ClickPrimer 2025. All Rights Reserved.{' '}
+        <a
+          href="https://www.clickprimer.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#0068ff' }}
+        >
+          www.ClickPrimer.com
+        </a>
       </div>
     </div>
   );
