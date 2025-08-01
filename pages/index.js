@@ -1,4 +1,4 @@
-
+// pages/index.js
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
@@ -53,7 +53,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     if (!input.trim()) return;
 
     const userMessage = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage, { role: 'assistant', content: '__typing__' }]);
     setInput('');
     setLoading(true);
 
@@ -73,8 +73,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
     const finalReply = { role: 'assistant', content: data.reply };
 
-    const includesCTA =
-      data.reply.includes('<!-- TRIGGER:CTA -->');
+    const includesCTA = data.reply.includes('<!-- TRIGGER:CTA -->');
 
     const ctaMessage = {
       role: 'assistant',
@@ -93,14 +92,15 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       `
     };
 
-    const updatedMessages = includesCTA
-      ? [...messages, userMessage, finalReply, ctaMessage]
-      : [...messages, userMessage, finalReply];
+    const newMessages = [...messages, userMessage];
+    newMessages.pop(); // Remove __typing__ placeholder
+    newMessages.push(finalReply);
+    if (includesCTA) newMessages.push(ctaMessage);
 
-    const newIndex = includesCTA ? updatedMessages.length - 2 : updatedMessages.length - 1;
+    const newIndex = includesCTA ? newMessages.length - 2 : newMessages.length - 1;
     setScrollTargetIndex(newIndex);
 
-    setMessages(updatedMessages);
+    setMessages(newMessages);
     setLoading(false);
   };
 
@@ -129,10 +129,10 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
             alt="ClickPrimer Logo"
             style={{ width: '160px', marginBottom: '10px' }}
           />
-        <h1 className="text-[#0068ff] mt-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-roboto font-bold text-center">
-  The Contractor’s AI Marketing Map
-</h1>
-            <p style={{
+          <h1 className="text-[#0068ff] mt-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-roboto font-bold text-center">
+            The Contractor’s AI Marketing Map
+          </h1>
+          <p style={{
             fontWeight: 'bold',
             color: '#002654',
             marginBottom: '1.5rem',
@@ -154,6 +154,8 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           {messages.map((msg, i) => {
             const isUser = msg.role === 'user';
             const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
+            const isTypingIndicator = msg.content === '__typing__';
+
             return (
               <div
                 key={i}
@@ -165,42 +167,47 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                   borderRadius: '10px',
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
                   maxWidth: '100%',
-                  textAlign: isUser ? 'right' : 'left'
+                  textAlign: isUser ? 'right' : 'left',
+                  fontStyle: isTypingIndicator ? 'italic' : 'normal',
+                  color: isTypingIndicator ? '#aaa' : 'inherit'
                 }}
               >
-                <ReactMarkdown
-                  components={{
-                    a: ({ href, children }) => {
-                      let style = buttonStyle('#30d64f', 'white');
-                      if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                      if (href.includes('tel') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
-                      if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
+                {isTypingIndicator ? (
+                  'Typing...'
+                ) : (
+                  <ReactMarkdown
+                    components={{
+                      a: ({ href, children }) => {
+                        let style = buttonStyle('#30d64f', 'white');
+                        if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
+                        if (href.includes('tel') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
+                        if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
 
-                      return href === '#download' ? (
-                        <button
-                          onClick={() =>
-                            generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })
-                          }
-                          style={style}
-                        >
-                          {children}
-                        </button>
-                      ) : (
-                        <a href={href} target="_blank" rel="noopener noreferrer">
-                          <button style={style}>{children}</button>
-                        </a>
-                      );
-                    },
-                    h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
-                    li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
+                        return href === '#download' ? (
+                          <button
+                            onClick={() =>
+                              generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })
+                            }
+                            style={style}
+                          >
+                            {children}
+                          </button>
+                        ) : (
+                          <a href={href} target="_blank" rel="noopener noreferrer">
+                            <button style={style}>{children}</button>
+                          </a>
+                        );
+                      },
+                      h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
+                      li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                )}
               </div>
             );
           })}
-          {loading && <div style={{ fontStyle: 'italic', color: '#aaa' }}>Typing...</div>}
           <div ref={chatEndRef} />
         </div>
 
