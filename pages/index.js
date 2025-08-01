@@ -19,7 +19,7 @@ This quick, interactive consultation will help you uncover where your trade busi
 
 It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
 
-**First, what’s your name?**
+**First, what’s your name and what type of work do you do?**
 
 ⬇️ Type below to answer.`
     }
