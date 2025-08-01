@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     const maxAttempts = 30;
 
     do {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 300));
       runStatus = await openai.beta.threads.runs.retrieve(thread, run.id);
       attempts++;
     } while (runStatus.status !== 'completed' && attempts < maxAttempts);
