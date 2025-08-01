@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       thread = threadResponse.id;
     }
 
-    // 2. Add user's message to the thread
+    // 2. Add the user's message to the thread
     await openai.beta.threads.messages.create(thread, {
       role: 'user',
       content: userMessage,
@@ -26,10 +26,10 @@ export default async function handler(req, res) {
 
     // 3. Run the assistant
     const run = await openai.beta.threads.runs.create(thread, {
-      assistant_id: process.env.OPENAI_ASSISTANT_ID, // safer + cleaner
+      assistant_id: process.env.OPENAI_ASSISTANT_ID, // Use ENV for security
     });
 
-    // 4. Poll until the run completes (with timeout)
+    // 4. Poll until the run completes, with timeout
     let runStatus;
     let attempts = 0;
     const maxAttempts = 30;
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       throw new Error('Assistant response timed out.');
     }
 
-    // 5. Get the latest assistant reply
+    // 5. Get the latest assistant message
     const messages = await openai.beta.threads.messages.list(thread, { limit: 5 });
     const assistantReply = messages.data.find(m => m.role === 'assistant');
 
@@ -57,6 +57,7 @@ export default async function handler(req, res) {
       .filter(Boolean)
       .join('\n');
 
+    // 6. Return reply + thread ID for reuse
     res.status(200).json({ threadId: thread, reply: responseText });
   } catch (err) {
     console.error('Error handling GPT assistant:', err);
