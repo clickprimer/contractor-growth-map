@@ -1,3 +1,5 @@
+// pages/api/chat.js
+
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -16,13 +18,11 @@ export default async function handler(req, res) {
       model: 'gpt-4o',
       messages,
       temperature: 0.7,
+      stream: false, // Set to true later for real-time typing
     });
-
-    console.log('GPT response:', response);
 
     const reply = response.choices?.[0]?.message;
     if (!reply) {
-      console.error('No message returned from GPT');
       return res.status(500).json({ error: 'No response from GPT' });
     }
 
