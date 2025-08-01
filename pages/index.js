@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
@@ -73,8 +74,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const finalReply = { role: 'assistant', content: data.reply };
 
     const includesCTA =
-      data.reply.includes('Your ClickPrimer Matched Offers') ||
-      data.reply.includes('Let’s Get Started');
+      data.reply.includes('<!-- TRIGGER:CTA -->');
 
     const ctaMessage = {
       role: 'assistant',
