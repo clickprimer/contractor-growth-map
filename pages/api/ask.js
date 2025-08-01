@@ -1,66 +1,40 @@
+// pages/api/ask.js
 import { OpenAI } from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // NEVER expose this in the frontend
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { threadId, userMessage } = req.body;
+  const { messages } = req.body; // Expecting full message history (user + assistant)
 
   try {
-    let thread = threadId;
-
-    // 1. Create a new thread if none exists
-    if (!thread) {
-      const threadResponse = await openai.beta.threads.create();
-      thread = threadResponse.id;
-    }
-
-    // 2. Add the user's message to the thread
-    await openai.beta.threads.messages.create(thread, {
-      role: 'user',
-      content: userMessage,
+    const stream = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages,
+      temperature: 0.7,
+      stream: true,
     });
 
-    // 3. Run the assistant
-    const run = await openai.beta.threads.runs.create(thread, {
-      assistant_id: process.env.OPENAI_ASSISTANT_ID, // Use ENV for security
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
     });
 
-    // 4. Poll until the run completes, with timeout
-    let runStatus;
-    let attempts = 0;
-    const maxAttempts = 30;
+    let fullResponse = '';
 
-    do {
-      await new Promise(r => setTimeout(r, 300));
-      runStatus = await openai.beta.threads.runs.retrieve(thread, run.id);
-      attempts++;
-    } while (runStatus.status !== 'completed' && attempts < maxAttempts);
-
-    if (runStatus.status !== 'completed') {
-      throw new Error('Assistant response timed out.');
+    for await (const chunk of stream) {
+      const content = chunk.choices?.[0]?.delta?.content || '';
+      fullResponse += content;
+      res.write(content); // Send each piece to the client
     }
 
-    // 5. Get the latest assistant message
-    const messages = await openai.beta.threads.messages.list(thread, { limit: 5 });
-    const assistantReply = messages.data.find(m => m.role === 'assistant');
-
-    if (!assistantReply) {
-      throw new Error('No assistant reply found.');
-    }
-
-    const responseText = assistantReply.content
-      .map(part => part?.text?.value)
-      .filter(Boolean)
-      .join('\n');
-
-    // 6. Return reply + thread ID for reuse
-    res.status(200).json({ threadId: thread, reply: responseText });
+    res.end(); // Finish the response
   } catch (err) {
-    console.error('Error handling GPT assistant:', err);
+    console.error('Streaming error:', err);
     res.status(500).json({ error: 'Something went wrong.' });
   }
 }
