@@ -1,4 +1,3 @@
-// pages/index.js
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
@@ -72,7 +71,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     setThreadId(data.threadId);
 
     const finalReply = { role: 'assistant', content: data.reply };
-
     const includesCTA = data.reply.includes('<!-- TRIGGER:CTA -->');
 
     const ctaMessage = {
@@ -93,7 +91,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     };
 
     const newMessages = [...messages, userMessage];
-    newMessages.pop(); // Remove __typing__ placeholder
+    newMessages.pop(); // Remove typing
     newMessages.push(finalReply);
     if (includesCTA) newMessages.push(ctaMessage);
 
