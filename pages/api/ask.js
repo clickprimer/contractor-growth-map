@@ -8,7 +8,7 @@ const openai = new OpenAI({
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { messages } = req.body; // Expecting full message history (user + assistant)
+  const { messages } = req.body; // Full chat history
 
   try {
     const stream = await openai.chat.completions.create({
@@ -29,10 +29,10 @@ export default async function handler(req, res) {
     for await (const chunk of stream) {
       const content = chunk.choices?.[0]?.delta?.content || '';
       fullResponse += content;
-      res.write(content); // Send each piece to the client
+      res.write(content);
     }
 
-    res.end(); // Finish the response
+    res.end();
   } catch (err) {
     console.error('Streaming error:', err);
     res.status(500).json({ error: 'Something went wrong.' });
