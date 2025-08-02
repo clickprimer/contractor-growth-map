@@ -1,4 +1,3 @@
-// pages/index.js
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
@@ -20,10 +19,11 @@ This quick, interactive consultation will help you uncover where your trade busi
 
 It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
 
-**First, what’s your name and what type of work do you do?**`
+**First, what’s your name and what type of work do you do?**
+
+⬇️ Type below to answer.`
     }
   ]);
-
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
@@ -31,7 +31,9 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const [leadInfo, setLeadInfo] = useState({ name: '' });
   const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
 
-  const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     if (scrollTargetIndex !== null) {
@@ -229,4 +231,62 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
         </div>
 
         <form onSubmit={sendMessage} style={{
-          marginT
+          marginTop: 10,
+          display: 'flex',
+          gap: 10,
+          paddingTop: 10
+        }}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your answer..."
+            style={{
+              flex: 1,
+              padding: '10px',
+              borderRadius: 4,
+              border: '1px solid #ccc',
+              fontSize: 16
+            }}
+          />
+          <button type="submit" style={{
+            background: '#30d64f',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            fontWeight: 'bold',
+            borderRadius: 4
+          }}>
+            Send
+          </button>
+        </form>
+
+        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, color: '#666' }}>
+          © ClickPrimer 2025. All Rights Reserved.{' '}
+          <a
+            href="https://www.clickprimer.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#0068ff' }}
+          >
+            www.ClickPrimer.com
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function buttonStyle(bg, color) {
+  return {
+    width: '100%',
+    marginBottom: 10,
+    padding: '12px',
+    background: bg,
+    color: color,
+    border: 'none',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    borderRadius: 4
+  };
+}
