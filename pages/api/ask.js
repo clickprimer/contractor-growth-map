@@ -1,4 +1,5 @@
 import { OpenAI } from 'openai';
+import quiz from '../lib/quiz.js'; // Adjust path as needed
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -184,6 +185,13 @@ Recommend only if the tag is present AND user asks for expert help.
 We'll help you grow smarter, faster, and with less stress using automated marketing systems made just for your trade. Whether you're just starting or scaling up, we're ready to help you reach the next level.
 
 <!-- TRIGGER:CTA -->
+
+---
+
+Here is the dynamic quiz logic to use during the quiz:  
+\`\`\`json
+${JSON.stringify(quiz, null, 2)}
+\`\`\`
 `;
 
   const response = await openai.chat.completions.create({
