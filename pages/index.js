@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 export default function Home() {
   const [messages, setMessages] = useState([
     {
-      role: 'system',
+      role: 'assistant',
       content: `Hello and welcome!
 
 This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
