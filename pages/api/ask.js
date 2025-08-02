@@ -1,5 +1,6 @@
 import { OpenAI } from 'openai';
-import quiz from '../lib/quiz.js'; // Adjust path as needed
+import quiz from '../../lib/quiz.js';
+
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
