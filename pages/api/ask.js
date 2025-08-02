@@ -1,10 +1,25 @@
 import { OpenAI } from 'openai';
 import quiz from '../../lib/quiz.js';
 
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// ✅ TEMPORARY SESSION-LIKE MEMORY DURING QUIZ FLOW
+// This object is in-memory only. Will reset each time the instance reloads.
+const sessionState = {
+  totalScore: 0,
+  tags: [],
+  answers: {
+    // Format:
+    // 'branding-question-1': {
+    //   matchedOption: 'B',
+    //   score: 2,
+    //   tags: ['branding:partial'],
+    //   answerText: 'I used Canva and had a friend help with my logo'
+    // }
+  }
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
