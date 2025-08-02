@@ -26,7 +26,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [threadId, setThreadId] = useState(null);
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
@@ -64,14 +63,36 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const res = await fetch('/api/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ threadId, userMessage: input })
+      body: JSON.stringify({ messages: [...messages, userMessage] }),
     });
 
-    const data = await res.json();
-    setThreadId(data.threadId);
+    if (!res.ok || !res.body) {
+      console.error('No response body');
+      setLoading(false);
+      return;
+    }
 
-    const finalReply = { role: 'assistant', content: data.reply };
-    const includesCTA = data.reply.includes('<!-- TRIGGER:CTA -->');
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let finalReply = '';
+
+    const updateStreamedReply = (chunk) => {
+      finalReply += chunk;
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = { role: 'assistant', content: finalReply };
+        return updated;
+      });
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      updateStreamedReply(chunk);
+    }
+
+    const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
 
     const ctaMessage = {
       role: 'assistant',
@@ -92,7 +113,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
     const newMessages = [...messages, userMessage];
     newMessages.pop(); // Remove typing
-    newMessages.push(finalReply);
+    newMessages.push({ role: 'assistant', content: finalReply });
     if (includesCTA) newMessages.push(ctaMessage);
 
     const newIndex = includesCTA ? newMessages.length - 2 : newMessages.length - 1;
