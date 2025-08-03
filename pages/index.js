@@ -19,174 +19,191 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
 **First, what’s your name and what type of work do you do?**
 
-⬇️ Type below to answer.`
+⬇️ Type below to answer`
     }
   ]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const chatEndRef = useRef(null);
-  const latestAssistantRef = useRef(null);
-  const [leadInfo, setLeadInfo] = useState({ name: '' });
-  const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
-
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCTA, setShowCTA] = useState(false);
+  const messageListRef = useRef(null);
 
   useEffect(() => {
-    if (scrollTargetIndex !== null) {
-      latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setScrollTargetIndex(null);
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-  }, [messages, scrollTargetIndex]);
+  }, [messages]);
 
-  useEffect(() => {
-    if (loading) scrollToBottom();
-  }, [loading]);
-
-  const sendMessage = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage, { role: 'assistant', content: '__typing__' }]);
-    setInput('');
-    setLoading(true);
-
-    if (!leadInfo.name) {
-      const nameOnly = input.replace(/[^a-zA-Z\s]/g, '').split(' ')[0];
-      setLeadInfo({ name: nameOnly });
-    }
-
-    const res = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [...messages, userMessage] }),
-    });
-
-    if (!res.ok || !res.body) {
-      console.error('No response body');
-      setLoading(false);
-      return;
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let finalReply = '';
-
-    const updateStreamedReply = (chunk) => {
-      finalReply += chunk;
-      setMessages((prev) => {
-        const updated = [...prev];
-        const typingIndex = updated.findIndex(
-          (msg, i) => msg.role === 'assistant' && msg.content === '__typing__' && i === updated.length - 1
-        );
-        if (typingIndex !== -1) {
-          updated[typingIndex] = { role: 'assistant', content: finalReply };
-        }
-        return updated;
-      });
-    };
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      updateStreamedReply(chunk);
-    }
-
-    const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
-
-    const ctaMessage = {
-      role: 'assistant',
-      content: `
----
-
-### 🚀 Let's Get Started:
-
-- [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
-- [📄 Download Your AI Marketing Map PDF](#download)
-
-### ❓ Still have questions? We're happy to help:
-
-- [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us (We pickup!)](tel:12083144088)
-      `
-    };
-
-    const newMessages = [...messages, userMessage];
-    newMessages.push({ role: 'assistant', content: finalReply });
-    if (includesCTA) newMessages.push(ctaMessage);
-
-    const newIndex = includesCTA ? newMessages.length - 2 : newMessages.length - 1;
-    setScrollTargetIndex(newIndex);
-
+    const newMessages = [...messages, { role: 'user', content: input }];
     setMessages(newMessages);
-    setLoading(false);
+    setInput('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages })
+      });
+
+      const data = await response.json();
+      const botMessage = data.reply;
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: botMessage }]);
+      if (botMessage.includes('<!-- TRIGGER:CTA -->')) {
+        setShowCTA(true);
+      }
+    } catch (err) {
+      console.error('Error sending message:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    generatePDF(messages);
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      overflow: 'hidden',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem',
-      backgroundColor: '#e8eeff'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '700px',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        background: '#e8eeff'
-      }}>
-        <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
-          <img
-            src="/logo.png"
-            alt="ClickPrimer Logo"
-            style={{ width: '160px', marginBottom: '10px' }}
-          />
-          <h1 className="text-[#0068ff] mt-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-roboto font-bold text-center">
-            The Contractor’s AI Marketing Map
-          </h1>
-          <p style={{
-            fontWeight: 'bold',
-            color: '#002654',
-            marginBottom: '1.5rem',
-            paddingLeft: '1rem',
-            paddingRight: '1rem'
-          }}>
-            🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
-          </p>
-        </div>
-
-        <div style={{
-          flex: 1,
-          background: 'white',
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <div
+        ref={messageListRef}
+        style={{
+          flexGrow: 1,
+          overflowY: 'auto',
           padding: '1rem',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          overflowY: 'auto'
-        }}>
-          {messages.map((msg, i) => {
-            const isUser = msg.role === 'user';
-            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
-            const isTypingIndicator = msg.content === '__typing__';
+          background: '#f0f4ff'
+        }}
+      >
+        {messages.map((msg, i) => {
+          const isUser = msg.role === 'user';
+          const isTypingIndicator = msg.content === '...';
 
-            return (
-              <div
-                key={i}
-                ref={isScrollTarget ? latestAssistantRef : null}
-                style={{
-                  background: isUser ? '#d2e9ff' : '#f1f1f1',
-                  margin: '10px 0',
-                  padding: '10px 15px',
-                  borderRadius: '10px',
-                  alignSelf: isUser ? 'flex-end' : 'flex-start',
-                  maxWidth: '100%',
-                  textAlign: isUser ? 'right' : 'left',
-                  fontStyle:
+          return (
+            <div
+              key={i}
+              style={{
+                background: isUser ? '#30d64f' : '#fff',
+                color: isUser ? '#fff' : '#002654',
+                borderRadius: '1rem',
+                padding: '0.75rem 1rem',
+                marginBottom: '0.75rem',
+                alignSelf: isUser ? 'flex-end' : 'flex-start',
+                maxWidth: '100%',
+                textAlign: isUser ? 'right' : 'left',
+                fontStyle: isTypingIndicator ? 'italic' : 'normal',
+              }}
+            >
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            </div>
+          );
+        })}
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '1rem',
+          background: '#fff',
+          borderTop: '1px solid #ccc'
+        }}
+      >
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your reply here..."
+          disabled={isSubmitting}
+          style={{
+            padding: '0.75rem 1rem',
+            borderRadius: '0.5rem',
+            border: '1px solid #ccc',
+            marginBottom: '0.75rem',
+            fontSize: '1rem'
+          }}
+        />
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{
+            padding: '0.75rem 1rem',
+            borderRadius: '0.5rem',
+            background: '#0068ff',
+            color: '#fff',
+            border: 'none',
+            fontSize: '1rem',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {isSubmitting ? 'Thinking…' : 'Send'}
+        </button>
+
+        {showCTA && (
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <button
+              onClick={handleDownloadPDF}
+              style={{
+                background: '#30d64f',
+                color: '#fff',
+                border: 'none',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                marginRight: '0.5rem'
+              }}
+            >
+              📄 Download PDF
+            </button>
+            <a
+              href="https://clickprimer.com/start"
+              style={{
+                background: '#0068ff',
+                color: '#fff',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                textDecoration: 'none',
+                marginRight: '0.5rem'
+              }}
+            >
+              🚀 Start with ClickPrimer Lite
+            </a>
+            <a
+              href="https://clickprimer.com/system"
+              style={{
+                background: '#002654',
+                color: '#fff',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                textDecoration: 'none',
+                marginRight: '0.5rem'
+              }}
+            >
+              🧠 See the Full System
+            </a>
+            <a
+              href="https://clickprimer.com/booking"
+              style={{
+                background: '#e8cc00',
+                color: '#002654',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                textDecoration: 'none'
+              }}
+            >
+              ☎️ Book Setup Call
+            </a>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+}
