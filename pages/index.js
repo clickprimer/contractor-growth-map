@@ -34,36 +34,25 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   };
 
   useEffect(() => {
-    if (scrollTargetIndex !== null) {
-      const timeout = setTimeout(() => {
-        if (latestAssistantRef.current) {
-          latestAssistantRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'nearest'
-          });
-
-          latestAssistantRef.current.parentNode?.scrollTo({
-            top: latestAssistantRef.current.offsetTop,
-            behavior: 'smooth'
-          });
-        }
-        setScrollTargetIndex(null);
-      }, 100);
-      return () => clearTimeout(timeout);
+    if (scrollTargetIndex !== null && latestAssistantRef.current) {
+      latestAssistantRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+      setScrollTargetIndex(null);
     }
   }, [messages, scrollTargetIndex]);
 
   useEffect(() => {
-    if (loading) scrollToBottom();
-  }, [loading]);
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     const userMessage = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage, { role: 'assistant', content: '__typing__' }]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
 
@@ -87,16 +76,17 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let finalReply = '';
+    let started = false;
 
     const updateStreamedReply = (chunk) => {
       finalReply += chunk;
       setMessages((prev) => {
         const updated = [...prev];
-        const typingIndex = updated.findIndex(
-          (msg, i) => msg.role === 'assistant' && msg.content === '__typing__' && i === updated.length - 1
-        );
-        if (typingIndex !== -1) {
-          updated[typingIndex] = { role: 'assistant', content: finalReply };
+        if (!started) {
+          updated.push({ role: 'assistant', content: chunk });
+          started = true;
+        } else {
+          updated[updated.length - 1].content = finalReply;
         }
         return updated;
       });
@@ -128,14 +118,13 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       `
     };
 
-    const newMessages = [...messages, userMessage];
-    newMessages.push({ role: 'assistant', content: finalReply });
-    if (includesCTA) newMessages.push(ctaMessage);
+    if (includesCTA) {
+      setMessages((prev) => [...prev, ctaMessage]);
+      setScrollTargetIndex(messages.length + 1);
+    } else {
+      setScrollTargetIndex(messages.length);
+    }
 
-    const newIndex = includesCTA ? newMessages.length - 2 : newMessages.length - 1;
-    setScrollTargetIndex(newIndex);
-
-    setMessages(newMessages);
     setLoading(false);
   };
 
@@ -189,7 +178,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           {messages.map((msg, i) => {
             const isUser = msg.role === 'user';
             const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
-            const isTypingIndicator = msg.content === '__typing__';
 
             return (
               <div
@@ -202,11 +190,10 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                   borderRadius: '10px',
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
                   maxWidth: '100%',
-                  textAlign: isUser ? 'right' : 'left',
-                  fontStyle: undefined
+                  textAlign: isUser ? 'right' : 'left'
                 }}
               >
-                <ReactMarkdown>{isTypingIndicator ? '...' : msg.content}</ReactMarkdown>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
             );
           })}
