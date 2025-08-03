@@ -78,7 +78,12 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       finalReply += chunk;
       setMessages((prev) => {
         const updated = [...prev];
-        updated[updated.length - 1] = { role: 'assistant', content: finalReply };
+        const typingIndex = updated.findIndex(
+          (msg, i) => msg.role === 'assistant' && msg.content === '__typing__' && i === updated.length - 1
+        );
+        if (typingIndex !== -1) {
+          updated[typingIndex] = { role: 'assistant', content: finalReply };
+        }
         return updated;
       });
     };
@@ -110,7 +115,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     };
 
     const newMessages = [...messages, userMessage];
-    newMessages.pop(); // Remove typing
     newMessages.push({ role: 'assistant', content: finalReply });
     if (includesCTA) newMessages.push(ctaMessage);
 
@@ -185,106 +189,4 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
                   maxWidth: '100%',
                   textAlign: isUser ? 'right' : 'left',
-                  fontStyle: isTypingIndicator ? 'italic' : 'normal',
-                  color: isTypingIndicator ? '#aaa' : 'inherit'
-                }}
-              >
-                {isTypingIndicator ? (
-                  'Typing...'
-                ) : (
-                  <ReactMarkdown
-                    components={{
-                      a: ({ href, children }) => {
-                        let style = buttonStyle('#30d64f', 'white');
-                        if (href.includes('pdf') || href === '#download') style = buttonStyle('#00aaff', 'white');
-                        if (href.includes('tel') && href.startsWith('tel')) style = buttonStyle('#002654', 'white');
-                        if (href.includes('contact')) style = buttonStyle('#0068ff', 'white');
-
-                        return href === '#download' ? (
-                          <button
-                            onClick={() =>
-                              generatePDF({ ...leadInfo, result: messages.map(m => m.content).join('\n\n') })
-                            }
-                            style={style}
-                          >
-                            {children}
-                          </button>
-                        ) : (
-                          <a href={href} target="_blank" rel="noopener noreferrer">
-                            <button style={style}>{children}</button>
-                          </a>
-                        );
-                      },
-                      h3: ({ children }) => <h3 style={{ marginBottom: '10px' }}>{children}</h3>,
-                      li: ({ children }) => <div style={{ marginBottom: '8px' }}>{children}</div>
-                    }}
-                  >
-                    {msg.content}
-                  </ReactMarkdown>
-                )}
-              </div>
-            );
-          })}
-          <div ref={chatEndRef} />
-        </div>
-
-        <form onSubmit={sendMessage} style={{
-          marginTop: 10,
-          display: 'flex',
-          gap: 10,
-          paddingTop: 10
-        }}>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your answer..."
-            style={{
-              flex: 1,
-              padding: '10px',
-              borderRadius: 4,
-              border: '1px solid #ccc',
-              fontSize: 16
-            }}
-          />
-          <button type="submit" style={{
-            background: '#30d64f',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            fontWeight: 'bold',
-            borderRadius: 4
-          }}>
-            Send
-          </button>
-        </form>
-
-        <div style={{ fontSize: 12, textAlign: 'center', marginTop: 10, color: '#666' }}>
-          © ClickPrimer 2025. All Rights Reserved.{' '}
-          <a
-            href="https://www.clickprimer.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: '#0068ff' }}
-          >
-            www.ClickPrimer.com
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function buttonStyle(bg, color) {
-  return {
-    width: '100%',
-    marginBottom: 10,
-    padding: '12px',
-    background: bg,
-    color: color,
-    border: 'none',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    borderRadius: 4
-  };
-}
+                  fontStyle:
