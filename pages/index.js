@@ -33,19 +33,19 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    if (scrollTargetIndex !== null) {
-      const timeout = setTimeout(() => {
-        latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setScrollTargetIndex(null);
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [messages, scrollTargetIndex]);
+ useEffect(() => {
+  if (scrollTargetIndex !== null) {
+    const timeout = setTimeout(() => {
+      latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setScrollTargetIndex(null);
+    }, 100);
+    return () => clearTimeout(timeout);
+  }
+}, [messages, scrollTargetIndex]);
 
-  useEffect(() => {
-    if (loading) scrollToBottom();
-  }, [loading]);
+useEffect(() => {
+  scrollToBottom();
+}, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
