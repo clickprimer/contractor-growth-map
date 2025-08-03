@@ -184,6 +184,7 @@ Only recommend these if \`recommend_clickprimer\` tag is NOT present.
 - OnSite Architect ($250/mo)
 
 🚫 Don’t mix DIY + ClickPrimer System unless they ask to “start small.”
+🚫 Do not recommend the EliteCrew Toolset if the tag `skip_elitecrew` is present.
 
 ✅ Recommend ClickPrimer System ($600/mo) if:
 - Tag \`recommend_clickprimer\` is present
