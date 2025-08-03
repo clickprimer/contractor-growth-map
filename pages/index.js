@@ -35,11 +35,8 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
   useEffect(() => {
     if (scrollTargetIndex !== null) {
-      const timeout = setTimeout(() => {
-        latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setScrollTargetIndex(null);
-      }, 100);
-      return () => clearTimeout(timeout);
+      latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setScrollTargetIndex(null);
     }
   }, [messages, scrollTargetIndex]);
 
@@ -76,9 +73,12 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let finalReply = '';
+    let buffer = '';
+    let lastUpdate = Date.now();
 
-    const updateStreamedReply = (chunk) => {
-      finalReply += chunk;
+    const updateStreamedReply = () => {
+      finalReply += buffer;
+      buffer = '';
       setMessages((prev) => {
         const updated = [...prev];
         const typingIndex = updated.findIndex(
@@ -95,8 +95,16 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       const { done, value } = await reader.read();
       if (done) break;
       const chunk = decoder.decode(value, { stream: true });
-      updateStreamedReply(chunk);
+      buffer += chunk;
+
+      const now = Date.now();
+      if (now - lastUpdate > 10) {
+        updateStreamedReply();
+        lastUpdate = now;
+      }
     }
+
+    updateStreamedReply(); // final flush
 
     const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
 
@@ -192,43 +200,47 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
                   maxWidth: '100%',
                   textAlign: isUser ? 'right' : 'left',
-                  fontStyle: undefined
+                  fontStyle: isTypingIndicator ? 'italic' : 'normal',
+                  color: '#002654',
                 }}
               >
-                <ReactMarkdown>{isTypingIndicator ? '...' : msg.content}</ReactMarkdown>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
             );
           })}
           <div ref={chatEndRef} />
         </div>
 
-        <form onSubmit={sendMessage} style={{ display: 'flex', marginTop: '1rem' }}>
+        <form onSubmit={sendMessage} style={{
+          marginTop: '1rem',
+          display: 'flex',
+          gap: '0.5rem',
+          padding: '0.5rem',
+          background: '#e8eeff',
+          borderRadius: '8px'
+        }}>
           <input
+            type="text"
+            placeholder="Type your answer here..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your reply here..."
             style={{
               flex: 1,
               padding: '0.75rem',
-              borderRadius: '8px',
+              borderRadius: '6px',
               border: '1px solid #ccc',
-              fontSize: '1rem'
+              fontSize: '16px'
             }}
           />
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginLeft: '10px',
-              padding: '0.75rem 1.25rem',
-              backgroundColor: '#0068ff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
+          <button type="submit" disabled={loading} style={{
+            padding: '0.75rem 1rem',
+            background: '#0068ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}>
             Send
           </button>
         </form>
