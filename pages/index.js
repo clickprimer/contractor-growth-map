@@ -73,12 +73,9 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let finalReply = '';
-    let buffer = '';
-    let lastUpdate = Date.now();
 
-    const updateStreamedReply = () => {
-      finalReply += buffer;
-      buffer = '';
+    const updateStreamedReply = (chunk) => {
+      finalReply += chunk;
       setMessages((prev) => {
         const updated = [...prev];
         const typingIndex = updated.findIndex(
@@ -95,16 +92,8 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       const { done, value } = await reader.read();
       if (done) break;
       const chunk = decoder.decode(value, { stream: true });
-      buffer += chunk;
-
-      const now = Date.now();
-      if (now - lastUpdate > 10) {
-        updateStreamedReply();
-        lastUpdate = now;
-      }
+      updateStreamedReply(chunk);
     }
-
-    updateStreamedReply(); // final flush
 
     const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
 
@@ -200,8 +189,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
                   maxWidth: '100%',
                   textAlign: isUser ? 'right' : 'left',
-                  fontStyle: isTypingIndicator ? 'italic' : 'normal',
-                  color: '#002654',
+                  fontStyle: isTypingIndicator ? 'italic' : 'normal'
                 }}
               >
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -211,35 +199,27 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           <div ref={chatEndRef} />
         </div>
 
-        <form onSubmit={sendMessage} style={{
-          marginTop: '1rem',
-          display: 'flex',
-          gap: '0.5rem',
-          padding: '0.5rem',
-          background: '#e8eeff',
-          borderRadius: '8px'
-        }}>
+        <form onSubmit={sendMessage} style={{ marginTop: '1rem', display: 'flex' }}>
           <input
             type="text"
-            placeholder="Type your answer here..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your answer..."
             style={{
               flex: 1,
               padding: '0.75rem',
-              borderRadius: '6px',
+              borderRadius: '4px',
               border: '1px solid #ccc',
-              fontSize: '16px'
+              marginRight: '0.5rem'
             }}
           />
           <button type="submit" disabled={loading} style={{
-            padding: '0.75rem 1rem',
-            background: '#0068ff',
-            color: 'white',
+            padding: '0.75rem 1.25rem',
+            backgroundColor: '#0068ff',
+            color: '#fff',
             border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer'
           }}>
             Send
           </button>
