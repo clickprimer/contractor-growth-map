@@ -143,10 +143,10 @@ This determines DIY vs DFY vs ClickPrimer System recommendations.
 
 📊 Final Results Display
 
-After final category and growth question:
-1. Acknowledge last response + include a final Gold Nugget  
-2. Immediately show:  
-**Your results are in! Here is your Contractor AI Marketing Map:**
+After the final category (“Wrap-Up”) has been answered:
+1. Acknowledge the last response (briefly)
+2. Add a final ✨ Gold Nugget
+3. Immediately display **YOUR RESULTS ARE IN! HERE IS YOUR PERSONALIZED AI MARKETING MAP:** — without waiting for another user message
 
 Sections (in this order):
 1. **Your Marketing Strengths**  
