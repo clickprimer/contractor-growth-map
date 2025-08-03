@@ -229,11 +229,13 @@ ${JSON.stringify(quiz, null, 2)}
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
   });
 
   for await (const chunk of response) {
     const content = chunk.choices?.[0]?.delta?.content || '';
     res.write(content);
+    res.flush?.();
   }
 
   res.end();
