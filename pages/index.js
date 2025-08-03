@@ -19,116 +19,218 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
 **First, what’s your name and what type of work do you do?**
 
-⬇️ Type below to answer`,
-    },
+⬇️ Type below to answer.`
+    }
   ]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const chatEndRef = useRef(null);
+  const latestAssistantRef = useRef(null);
+  const [leadInfo, setLeadInfo] = useState({ name: '' });
+  const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (scrollTargetIndex !== null) {
+      const timeout = setTimeout(() => {
+        latestAssistantRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setScrollTargetIndex(null);
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [messages, scrollTargetIndex]);
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    if (loading) scrollToBottom();
+  }, [loading]);
+
+  const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const updatedMessages = [...messages, { role: 'user', content: input }];
-    setMessages(updatedMessages);
+    const userMessage = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
-    setIsLoading(true);
+    setLoading(true);
 
-    const response = await fetch('/api/ask', {
+    if (!leadInfo.name) {
+      const nameOnly = input.replace(/[^a-zA-Z\s]/g, '').split(' ')[0];
+      setLeadInfo({ name: nameOnly });
+    }
+
+    const res = await fetch('/api/ask', {
       method: 'POST',
-      body: JSON.stringify({ messages: updatedMessages }),
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [...messages, userMessage] }),
     });
 
-    const reader = response.body.getReader();
+    if (!res.ok || !res.body) {
+      console.error('No response body');
+      setLoading(false);
+      return;
+    }
+
+    const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
-    let incoming = '';
-    const source = new ReadableStream({
-      async start(controller) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value);
-          incoming += chunk;
+    let finalReply = '';
+    let started = false;
 
-          setMessages((prevMessages) => {
-            const last = prevMessages[prevMessages.length - 1];
-            if (last?.role === 'assistant') {
-              const updated = [...prevMessages];
-              updated[updated.length - 1] = {
-                ...last,
-                content: incoming,
-              };
-              return updated;
-            } else {
-              return [...prevMessages, { role: 'assistant', content: chunk }];
-            }
-          });
+    const updateStreamedReply = (chunk) => {
+      finalReply += chunk;
+      setMessages((prev) => {
+        const updated = [...prev];
+        if (!started) {
+          updated.push({ role: 'assistant', content: chunk });
+          started = true;
+        } else {
+          updated[updated.length - 1].content = finalReply;
         }
-        setIsLoading(false);
-        controller.close();
-      },
-    });
+        return updated;
+      });
+    };
 
-    await new Response(source).text();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      updateStreamedReply(chunk);
+    }
+
+    const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
+
+    const ctaMessage = {
+      role: 'assistant',
+      content: `
+---
+
+### 🚀 Let's Get Started:
+
+- [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
+- [📄 Download Your AI Marketing Map PDF](#download)
+
+### ❓ Still have questions? We're happy to help:
+
+- [💬 Send Us a Message](https://www.clickprimer.com/contact)
+- [📱 Call Us (We pickup!)](tel:12083144088)
+      `
+    };
+
+    if (includesCTA) {
+      setMessages((prev) => [...prev, ctaMessage]);
+      setScrollTargetIndex(messages.length + 1);
+    } else {
+      setScrollTargetIndex(messages.length);
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white p-4 overflow-hidden">
-      <div className="flex-1 overflow-y-auto pr-2">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`mb-4 whitespace-pre-wrap ${
-              msg.role === 'user' ? 'text-right' : 'text-left'
-            }`}
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      overflow: 'hidden',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1rem',
+      backgroundColor: '#e8eeff'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '700px',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        background: '#e8eeff'
+      }}>
+        <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
+          <img
+            src="/logo.png"
+            alt="ClickPrimer Logo"
+            style={{ width: '160px', marginBottom: '10px' }}
+          />
+          <h1 className="text-[#0068ff] mt-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-roboto font-bold text-center">
+            The Contractor’s AI Marketing Map
+          </h1>
+          <p style={{
+            fontWeight: 'bold',
+            color: '#002654',
+            marginBottom: '1.5rem',
+            paddingLeft: '1rem',
+            paddingRight: '1rem'
+          }}>
+            🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
+          </p>
+        </div>
+
+        <div style={{
+          flex: 1,
+          background: 'white',
+          padding: '1rem',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          overflowY: 'auto'
+        }}>
+          {messages.map((msg, i) => {
+            const isUser = msg.role === 'user';
+            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
+
+            return (
+              <div
+                key={i}
+                ref={isScrollTarget ? latestAssistantRef : null}
+                style={{
+                  background: isUser ? '#d2e9ff' : '#f1f1f1',
+                  margin: '10px 0',
+                  padding: '10px 15px',
+                  borderRadius: '10px',
+                  alignSelf: isUser ? 'flex-end' : 'flex-start',
+                  maxWidth: '100%',
+                  textAlign: isUser ? 'right' : 'left'
+                }}
+              >
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              </div>
+            );
+          })}
+          <div ref={chatEndRef} />
+        </div>
+
+        <form onSubmit={sendMessage} style={{ display: 'flex', marginTop: '1rem' }}>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your reply here..."
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              borderRadius: '8px',
+              border: '1px solid #ccc',
+              fontSize: '1rem'
+            }}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              marginLeft: '10px',
+              padding: '0.75rem 1.25rem',
+              backgroundColor: '#0068ff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
           >
-            <div
-              className={`inline-block px-4 py-2 rounded-lg ${
-                msg.role === 'user'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-              style={{
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '100%',
-                textAlign: msg.role === 'user' ? 'right' : 'left',
-              }}
-            >
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+            Send
+          </button>
+        </form>
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="mt-4 flex items-center border-t pt-4"
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your response..."
-          className="flex-1 border border-gray-300 rounded px-4 py-2 mr-2"
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
-        >
-          Send
-        </button>
-      </form>
     </div>
   );
 }
