@@ -195,7 +195,7 @@ Recommend only if the tag is present AND user asks for expert help.
 
 ---
 
-🏁 Close the quiz with this section (verbatim):
+🏁 Close the quiz with this section (verbatim and at the very end of the assistant's reply):
 
 ### Who We Are
 
@@ -203,6 +203,10 @@ Recommend only if the tag is present AND user asks for expert help.
 We'll help you grow smarter, faster, and with less stress using automated marketing systems made just for your trade. Whether you're just starting or scaling up, we're ready to help you reach the next level.
 
 <!-- TRIGGER:CTA -->
+
+✅ Important: Always place <!-- TRIGGER:CTA --> at the very end of your reply — after “Who We Are”.  
+🚫 Never include it mid-reply or in any message other than the final results message.
+
 
 ---
 
