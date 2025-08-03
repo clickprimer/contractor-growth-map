@@ -17,6 +17,15 @@ export default async function handler(req, res) {
 
   const { messages } = req.body;
 
+  // ✅ Logic to suppress EliteCrew if user selects D in Team & Operations
+  const lastUserMessage = messages[messages.length - 1];
+  if (
+    lastUserMessage?.content?.toLowerCase?.().includes("team") &&
+    lastUserMessage?.content.includes("D")
+  ) {
+    sessionState.tags.push("skip_elitecrew");
+  }
+
   const systemInstructions = `
 /*
 🧠 ClickPrimer AI Marketing Map Quiz Instructions (Finalized + JSON-Aligned)
