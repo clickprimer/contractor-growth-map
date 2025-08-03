@@ -45,19 +45,21 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     try {
       const response = await fetch('/api/ask', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: newMessages }),
       });
 
       const data = await response.json();
-      const botMessage = data.reply;
+      const reply = data.reply;
+      setMessages([...newMessages, { role: 'assistant', content: reply }]);
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: botMessage }]);
-      if (botMessage.includes('<!-- TRIGGER:CTA -->')) {
+      if (reply.includes('<!-- TRIGGER:CTA -->')) {
         setShowCTA(true);
       }
-    } catch (err) {
-      console.error('Error sending message:', err);
+    } catch (error) {
+      console.error('Error:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -68,33 +70,30 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div
         ref={messageListRef}
         style={{
-          flexGrow: 1,
+          flex: 1,
           overflowY: 'auto',
-          padding: '1rem',
-          background: '#f0f4ff'
+          padding: '20px',
+          background: '#f0f0f0',
         }}
       >
-        {messages.map((msg, i) => {
+        {messages.map((msg, index) => {
           const isUser = msg.role === 'user';
-          const isTypingIndicator = msg.content === '...';
-
           return (
             <div
-              key={i}
+              key={index}
               style={{
-                background: isUser ? '#30d64f' : '#fff',
-                color: isUser ? '#fff' : '#002654',
-                borderRadius: '1rem',
-                padding: '0.75rem 1rem',
-                marginBottom: '0.75rem',
+                background: isUser ? '#DCF8C6' : '#FFFFFF',
+                borderRadius: '10px',
+                padding: '10px 15px',
+                marginBottom: '10px',
                 alignSelf: isUser ? 'flex-end' : 'flex-start',
-                maxWidth: '100%',
+                maxWidth: '80%',
                 textAlign: isUser ? 'right' : 'left',
-                fontStyle: isTypingIndicator ? 'italic' : 'normal',
+                fontStyle: msg.content === '...' ? 'italic' : 'normal',
               }}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -102,15 +101,14 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           );
         })}
       </div>
-
       <form
         onSubmit={handleSubmit}
         style={{
+          padding: '10px',
+          borderTop: '1px solid #ccc',
+          background: '#fff',
           display: 'flex',
           flexDirection: 'column',
-          padding: '1rem',
-          background: '#fff',
-          borderTop: '1px solid #ccc'
         }}
       >
         <input
@@ -120,87 +118,35 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           placeholder="Type your reply here..."
           disabled={isSubmitting}
           style={{
-            padding: '0.75rem 1rem',
-            borderRadius: '0.5rem',
+            padding: '10px',
+            fontSize: '16px',
+            borderRadius: '5px',
             border: '1px solid #ccc',
-            marginBottom: '0.75rem',
-            fontSize: '1rem'
+            marginBottom: '10px',
           }}
         />
         <button
           type="submit"
           disabled={isSubmitting}
           style={{
-            padding: '0.75rem 1rem',
-            borderRadius: '0.5rem',
-            background: '#0068ff',
+            padding: '10px',
+            fontSize: '16px',
+            backgroundColor: '#0068ff',
             color: '#fff',
             border: 'none',
-            fontSize: '1rem',
-            cursor: isSubmitting ? 'not-allowed' : 'pointer'
+            borderRadius: '5px',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
           }}
         >
-          {isSubmitting ? 'Thinking…' : 'Send'}
+          {isSubmitting ? 'Thinking...' : 'Send'}
         </button>
 
         {showCTA && (
-          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <button
-              onClick={handleDownloadPDF}
-              style={{
-                background: '#30d64f',
-                color: '#fff',
-                border: 'none',
-                padding: '0.75rem 1rem',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                cursor: 'pointer',
-                marginRight: '0.5rem'
-              }}
-            >
-              📄 Download PDF
-            </button>
-            <a
-              href="https://clickprimer.com/start"
-              style={{
-                background: '#0068ff',
-                color: '#fff',
-                padding: '0.75rem 1rem',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                textDecoration: 'none',
-                marginRight: '0.5rem'
-              }}
-            >
-              🚀 Start with ClickPrimer Lite
-            </a>
-            <a
-              href="https://clickprimer.com/system"
-              style={{
-                background: '#002654',
-                color: '#fff',
-                padding: '0.75rem 1rem',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                textDecoration: 'none',
-                marginRight: '0.5rem'
-              }}
-            >
-              🧠 See the Full System
-            </a>
-            <a
-              href="https://clickprimer.com/booking"
-              style={{
-                background: '#e8cc00',
-                color: '#002654',
-                padding: '0.75rem 1rem',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                textDecoration: 'none'
-              }}
-            >
-              ☎️ Book Setup Call
-            </a>
+          <div style={{ marginTop: '15px', textAlign: 'center' }}>
+            <button onClick={handleDownloadPDF}>📄 Download PDF</button>
+            <a href="https://clickprimer.com/start">🚀 Start with ClickPrimer Lite</a>
+            <a href="https://clickprimer.com/system">🧠 See the Full System</a>
+            <a href="https://clickprimer.com/booking">☎️ Book Setup Call</a>
           </div>
         )}
       </form>
