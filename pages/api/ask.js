@@ -1,4 +1,3 @@
-
 import { OpenAI } from 'openai';
 import quiz from '../../lib/quiz.js';
 
@@ -18,8 +17,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { messages } = req.body;
-  const modelQuery = req.query?.model;
-  const model = modelQuery === '3.5' ? 'gpt-3.5-turbo' : 'gpt-4';
+  const model = 'gpt-3.5-turbo'; // Hardcoded to GPT-3.5
 
   console.log(`Using model: ${model}`);
 
@@ -183,10 +181,7 @@ Recommend max 3 offers. Use tags, user goals, and pain points.
 
 🚫 Don’t mix DIY + System unless they request to "start small."  
 🚫 Don’t show EliteCrew Toolset if tag \`skip_elitecrew\` is present.
-
----
-
-\`;
+`;
 
   const payloadMessages = finalQuizComplete
     ? [
