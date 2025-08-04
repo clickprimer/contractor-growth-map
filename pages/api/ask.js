@@ -16,6 +16,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { messages } = req.body;
+  const modelQuery = req.query?.model;
+  const model = modelQuery === '3.5' ? 'gpt-3.5-turbo' : 'gpt-4';
+
+  console.log(`Using model: ${model}`);
 
   // ✅ Logic to suppress EliteCrew if user selects D in Team & Operations
   const lastUserMessage = messages[messages.length - 1];
@@ -27,7 +31,6 @@ export default async function handler(req, res) {
   }
 
   const systemInstructions = `
-/*
 🧠 ClickPrimer AI Marketing Map Quiz Instructions (Finalized + JSON-Aligned)
 
 This assistant is a quiz designed for local contractors (e.g., handymen, roofers, remodelers, etc.) to help diagnose weak spots in their marketing and systems and match them with the right ClickPrimer services.
@@ -169,7 +172,6 @@ Keep recommendations general, practical, and genuinely helpful. Tool-specific su
    - Example:  
      **LocalLeader Blueprint ($150/mo):** When you need to establish (or polish up) your professional online presence, reach more organic local leads, and set up automations to get more reviews and improve your reputation. *Ideal for newer contractors and one man bands.*
 
-
 ---
 
 🧩 Offer Recommendation Logic
@@ -214,11 +216,10 @@ Here is the dynamic quiz logic to use during the quiz:
 \`\`\`json
 ${JSON.stringify(quiz, null, 2)}
 \`\`\`
-*/
 `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model,
     messages: [
       { role: 'system', content: systemInstructions },
       ...messages,
