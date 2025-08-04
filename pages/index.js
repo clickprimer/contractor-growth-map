@@ -79,28 +79,44 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let finalReply = '';
+    let bufferedReply = '';
     let started = false;
 
-    const updateStreamedReply = (chunk) => {
-      finalReply += chunk;
+    const flushBuffer = () => {
+      if (!bufferedReply) return;
+      finalReply += bufferedReply;
+
       setMessages((prev) => {
         const updated = [...prev];
         if (!started) {
-          updated.push({ role: 'assistant', content: chunk });
+          updated.push({ role: 'assistant', content: bufferedReply });
           started = true;
         } else {
           updated[updated.length - 1].content = finalReply;
         }
         return updated;
       });
+
+      bufferedReply = '';
     };
+
+    let lastFlush = Date.now();
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+
       const chunk = decoder.decode(value, { stream: true });
-      updateStreamedReply(chunk);
+      bufferedReply += chunk;
+
+      const now = Date.now();
+      if (now - lastFlush > 50) {
+        flushBuffer();
+        lastFlush = now;
+      }
     }
+
+    flushBuffer(); // final flush after stream ends
 
     // ✅ CTA injection logic
     const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
