@@ -28,7 +28,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const latestAssistantRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
   const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
-  const [model, setModel] = useState('gpt-4'); // 💬 GPT model toggle
+  const model = 'gpt-3.5-turbo'; // 🔒 Locked to GPT-3.5
 
   useEffect(() => {
     if (scrollTargetIndex !== null && latestAssistantRef.current) {
@@ -158,21 +158,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           }}>
             🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
           </p>
-
-          {/* ✅ GPT Model Selector */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="model" style={{ marginRight: '10px' }}>
-              GPT Version:
-            </label>
-            <select
-              id="model"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-            >
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-3.5-turbo">GPT-3.5</option>
-            </select>
-          </div>
         </div>
 
         <div style={{
