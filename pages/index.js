@@ -26,10 +26,15 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
+  const [quizProgress, setQuizProgress] = useState({
+    answers: {}, // Category: Answer
+    tags: [],
+    totalScore: 0,
+  });
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
   const userMessageRef = useRef(null);
-  const [history, setHistory] = useState([]); // Only store compact log (tags/summary)
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
     const lastAssistantIndex = [...messages].reverse().findIndex(msg => msg.role === 'assistant');
@@ -64,7 +69,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const res = await fetch(`/api/ask?model=gpt-3.5-turbo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [userMessage] }), // Only send last exchange
+      body: JSON.stringify({ currentInput: input, quizProgress }), // ✅ updated to send quizProgress only
     });
 
     if (!res.ok || !res.body) {
@@ -99,7 +104,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       updateStreamedReply(chunk);
     }
 
-    // Append a compact summary to history log
     setHistory((prev) => [...prev, { q: input, a: finalReply.slice(0, 300) }]);
 
     const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
