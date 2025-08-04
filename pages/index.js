@@ -29,13 +29,16 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
 
-  // ✅ Scroll to the top of the latest assistant message when messages change
+  // ✅ Scroll to top of the newest assistant message
   useEffect(() => {
-    if (latestAssistantRef.current) {
-      latestAssistantRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+    const lastAssistantIndex = [...messages].reverse().findIndex(msg => msg.role === 'assistant');
+    const assistantElements = document.querySelectorAll('.assistant-msg');
+
+    if (assistantElements.length > 0 && lastAssistantIndex !== -1) {
+      const el = assistantElements[assistantElements.length - 1 - lastAssistantIndex];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   }, [messages]);
 
@@ -91,11 +94,13 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       updateStreamedReply(chunk);
     }
 
+    // ✅ CTA injection logic
     const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
 
-    const ctaMessage = {
-      role: 'assistant',
-      content: `
+    if (includesCTA) {
+      const ctaMessage = {
+        role: 'assistant',
+        content: `
 ---
 
 ### 🚀 Let's Get Started:
@@ -107,10 +112,8 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
 - [💬 Send Us a Message](https://www.clickprimer.com/contact)
 - [📱 Call Us (We pickup!)](tel:12083144088)
-      `
-    };
-
-    if (includesCTA) {
+        `
+      };
       setMessages((prev) => [...prev, ctaMessage]);
     }
 
@@ -171,6 +174,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
             return (
               <div
                 key={i}
+                className={msg.role === 'assistant' ? 'assistant-msg' : ''}
                 ref={isLatestAssistant ? latestAssistantRef : null}
                 style={{
                   background: isUser ? '#d2e9ff' : '#f1f1f1',
