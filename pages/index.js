@@ -29,17 +29,14 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
   const userMessageRef = useRef(null);
+  const [history, setHistory] = useState([]); // Only store compact log (tags/summary)
 
-  // ✅ Scroll to top of the newest assistant message
   useEffect(() => {
     const lastAssistantIndex = [...messages].reverse().findIndex(msg => msg.role === 'assistant');
     const assistantElements = document.querySelectorAll('.assistant-msg');
-
     if (assistantElements.length > 0 && lastAssistantIndex !== -1) {
       const el = assistantElements[assistantElements.length - 1 - lastAssistantIndex];
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [messages]);
 
@@ -67,7 +64,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const res = await fetch(`/api/ask?model=gpt-3.5-turbo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [...messages, userMessage] }),
+      body: JSON.stringify({ messages: [userMessage] }), // Only send last exchange
     });
 
     if (!res.ok || !res.body) {
@@ -79,48 +76,33 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let finalReply = '';
-    let bufferedReply = '';
     let started = false;
 
-    const flushBuffer = () => {
-      if (!bufferedReply) return;
-      finalReply += bufferedReply;
-
+    const updateStreamedReply = (chunk) => {
+      finalReply += chunk;
       setMessages((prev) => {
         const updated = [...prev];
         if (!started) {
-          updated.push({ role: 'assistant', content: bufferedReply });
+          updated.push({ role: 'assistant', content: chunk });
           started = true;
         } else {
           updated[updated.length - 1].content = finalReply;
         }
         return updated;
       });
-
-      bufferedReply = '';
     };
-
-    let lastFlush = Date.now();
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       const chunk = decoder.decode(value, { stream: true });
-      bufferedReply += chunk;
-
-      const now = Date.now();
-      if (now - lastFlush > 50) {
-        flushBuffer();
-        lastFlush = now;
-      }
+      updateStreamedReply(chunk);
     }
 
-    flushBuffer(); // final flush after stream ends
+    // Append a compact summary to history log
+    setHistory((prev) => [...prev, { q: input, a: finalReply.slice(0, 300) }]);
 
-    // ✅ CTA injection logic
     const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
-
     if (includesCTA) {
       const ctaMessage = {
         role: 'assistant',
