@@ -35,35 +35,20 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
   useEffect(() => {
     if (scrollTargetIndex !== null && latestAssistantRef.current) {
-      const targetElement = latestAssistantRef.current;
-
-      // Scroll to top of the new assistant message
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // Lock scroll position during dynamic content expansion
-      const lockScroll = () => {
-        const scrollY = window.scrollY;
-        window.scrollTo({ top: scrollY });
-      };
-
-      const observer = new ResizeObserver(lockScroll);
-      observer.observe(targetElement);
-
-      const timeout = setTimeout(() => {
-        observer.disconnect();
-        setScrollTargetIndex(null);
-      }, 2000);
-
-      return () => {
-        observer.disconnect();
-        clearTimeout(timeout);
-      };
+      latestAssistantRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+      setScrollTargetIndex(null);
     }
   }, [messages, scrollTargetIndex]);
 
+  // ✅ Only scroll to bottom when no intentional scroll target is set
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (scrollTargetIndex === null) {
+      scrollToBottom();
+    }
+  }, [messages, scrollTargetIndex]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
