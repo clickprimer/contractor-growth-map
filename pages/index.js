@@ -40,15 +40,10 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
         block: 'start'
       });
       setScrollTargetIndex(null);
-    }
-  }, [messages, scrollTargetIndex]);
-
-  // ✅ Only scroll to bottom when no intentional scroll target is set
-  useEffect(() => {
-    if (scrollTargetIndex === null) {
+    } else {
       scrollToBottom();
     }
-  }, [messages, scrollTargetIndex]);
+  }, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
