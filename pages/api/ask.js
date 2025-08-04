@@ -1,3 +1,4 @@
+
 import { OpenAI } from 'openai';
 import quiz from '../../lib/quiz.js';
 
@@ -185,11 +186,7 @@ Recommend max 3 offers. Use tags, user goals, and pain points.
 
 ---
 
-Here is the quiz logic:
-\`\`\`json
-${JSON.stringify(quiz, null, 2)}
-\`\`\`
-`;
+\`;
 
   const payloadMessages = finalQuizComplete
     ? [
