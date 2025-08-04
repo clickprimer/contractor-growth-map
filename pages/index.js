@@ -27,18 +27,18 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
-  const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
-  const model = 'gpt-3.5-turbo'; // 🔒 Locked to GPT-3.5
 
   useEffect(() => {
-    if (scrollTargetIndex !== null && latestAssistantRef.current) {
-      latestAssistantRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
+    if (latestAssistantRef.current) {
+      const yOffset = -40;
+      const elementTop = latestAssistantRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+      window.scrollTo({
+        top: elementTop,
+        behavior: 'smooth'
       });
-      setScrollTargetIndex(null);
     }
-  }, [messages, scrollTargetIndex]);
+  }, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -54,7 +54,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       setLeadInfo({ name: nameOnly });
     }
 
-    const res = await fetch(`/api/ask?model=${model}`, {
+    const res = await fetch(`/api/ask?model=gpt-3.5-turbo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: [...messages, userMessage] }),
@@ -113,9 +113,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
     if (includesCTA) {
       setMessages((prev) => [...prev, ctaMessage]);
-      setScrollTargetIndex(messages.length + 1);
-    } else {
-      setScrollTargetIndex(messages.length);
     }
 
     setLoading(false);
@@ -170,12 +167,12 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
         }}>
           {messages.map((msg, i) => {
             const isUser = msg.role === 'user';
-            const isScrollTarget = i === scrollTargetIndex && msg.role === 'assistant';
+            const isLastAssistant = i === messages.length - 1 && msg.role === 'assistant';
 
             return (
               <div
                 key={i}
-                ref={isScrollTarget ? latestAssistantRef : null}
+                ref={isLastAssistant ? latestAssistantRef : null}
                 style={{
                   background: isUser ? '#d2e9ff' : '#f1f1f1',
                   margin: '10px 0',
