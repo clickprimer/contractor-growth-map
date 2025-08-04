@@ -119,7 +119,7 @@ B. Second answer
 C. Third answer  
 D. Something else — type your answer  
 
-Use \n for line breaks between answers.
+Use \\n for line breaks between answers.
 
 ---
 
