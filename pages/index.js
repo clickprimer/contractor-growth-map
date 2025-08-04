@@ -29,10 +29,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const [leadInfo, setLeadInfo] = useState({ name: '' });
   const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
 
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
     if (scrollTargetIndex !== null && latestAssistantRef.current) {
       latestAssistantRef.current.scrollIntoView({
@@ -40,10 +36,9 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
         block: 'start'
       });
       setScrollTargetIndex(null);
-    } else {
-      scrollToBottom();
     }
-  }, [messages]);
+    // No scrollToBottom here—prevents auto-following streaming content
+  }, [messages, scrollTargetIndex]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
