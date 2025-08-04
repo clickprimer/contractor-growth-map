@@ -28,6 +28,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const latestAssistantRef = useRef(null);
   const [leadInfo, setLeadInfo] = useState({ name: '' });
   const [scrollTargetIndex, setScrollTargetIndex] = useState(null);
+  const [model, setModel] = useState('gpt-4'); // 💬 GPT model toggle
 
   useEffect(() => {
     if (scrollTargetIndex !== null && latestAssistantRef.current) {
@@ -37,7 +38,6 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       });
       setScrollTargetIndex(null);
     }
-    // No scrollToBottom here—prevents auto-following streaming content
   }, [messages, scrollTargetIndex]);
 
   const sendMessage = async (e) => {
@@ -54,7 +54,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
       setLeadInfo({ name: nameOnly });
     }
 
-    const res = await fetch('/api/ask', {
+    const res = await fetch(`/api/ask?model=${model}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: [...messages, userMessage] }),
@@ -158,6 +158,21 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
           }}>
             🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
           </p>
+
+          {/* ✅ GPT Model Selector */}
+          <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="model" style={{ marginRight: '10px' }}>
+              GPT Version:
+            </label>
+            <select
+              id="model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+            >
+              <option value="gpt-4">GPT-4</option>
+              <option value="gpt-3.5-turbo">GPT-3.5</option>
+            </select>
+          </div>
         </div>
 
         <div style={{
