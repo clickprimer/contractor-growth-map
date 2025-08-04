@@ -28,6 +28,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const [leadInfo, setLeadInfo] = useState({ name: '' });
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
+  const userMessageRef = useRef(null);
 
   // ✅ Scroll to top of the newest assistant message
   useEffect(() => {
@@ -48,6 +49,13 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
     const userMessage = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
+
+    setTimeout(() => {
+      if (userMessageRef.current) {
+        userMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    }, 50);
+
     setInput('');
     setLoading(true);
 
@@ -175,7 +183,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
               <div
                 key={i}
                 className={msg.role === 'assistant' ? 'assistant-msg' : ''}
-                ref={isLatestAssistant ? latestAssistantRef : null}
+                ref={isUser ? userMessageRef : isLatestAssistant ? latestAssistantRef : null}
                 style={{
                   background: isUser ? '#d2e9ff' : '#f1f1f1',
                   margin: '10px 0',
