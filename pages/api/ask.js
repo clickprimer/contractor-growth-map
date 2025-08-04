@@ -168,7 +168,7 @@ Keep recommendations general, practical, and genuinely helpful. Tool-specific su
    - Each numbered recommendation should be on its own line with spacing between
    - Example:  
      **LocalLeader Blueprint ($150/mo):** When you need to establish (or polish up) your professional online presence, reach more organic local leads, and set up automations to get more reviews and improve your reputation. *Ideal for newer contractors and one man bands.*
-   - End with invitation to contact us for more information or to get started today.
+
 
 ---
 
@@ -203,6 +203,8 @@ Recommend only if the tag is present AND user asks for expert help.
 
 **ClickPrimer builds lead systems for contractors who want real results.**  
 We'll help you grow smarter, faster, and with less stress using automated marketing systems made just for your trade. Whether you're just starting or scaling up, we're ready to help you reach the next level.
+
+End with invitation to contact us for more information or to get started today.
 
 <!-- TRIGGER:CTA -->
 
