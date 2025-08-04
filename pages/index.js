@@ -22,20 +22,19 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 ⬇️ Type below to answer.`
     }
   ]);
+
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [leadInfo, setLeadInfo] = useState({ name: '' });
   const chatEndRef = useRef(null);
   const latestAssistantRef = useRef(null);
-  const [leadInfo, setLeadInfo] = useState({ name: '' });
 
+  // ✅ Scroll to the top of the latest assistant message when messages change
   useEffect(() => {
     if (latestAssistantRef.current) {
-      const yOffset = -40;
-      const elementTop = latestAssistantRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-      window.scrollTo({
-        top: elementTop,
-        behavior: 'smooth'
+      latestAssistantRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
       });
     }
   }, [messages]);
@@ -167,12 +166,12 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
         }}>
           {messages.map((msg, i) => {
             const isUser = msg.role === 'user';
-            const isLastAssistant = i === messages.length - 1 && msg.role === 'assistant';
+            const isLatestAssistant = msg.role === 'assistant' && i === messages.length - 1;
 
             return (
               <div
                 key={i}
-                ref={isLastAssistant ? latestAssistantRef : null}
+                ref={isLatestAssistant ? latestAssistantRef : null}
                 style={{
                   background: isUser ? '#d2e9ff' : '#f1f1f1',
                   margin: '10px 0',
