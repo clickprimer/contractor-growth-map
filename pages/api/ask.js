@@ -40,18 +40,24 @@ export default async function handler(req, res) {
 
   console.log(`Using model: ${model}`);
 
-  // Score/tagging logic
+  // Score and tagging
   const lastCategory = Object.keys(quizProgress.answers || {}).slice(-1)[0];
   const lastAnswer = quizProgress.answers?.[lastCategory];
   if (lastCategory && lastAnswer) {
     updateTagsAndScore(lastCategory, lastAnswer, quizProgress);
   }
 
-  // Determine category flow
+  // Current quiz index
   let currentIndex = quizProgress.currentCategoryIndex ?? 0;
   const expectedCategory = quiz[currentIndex]?.category;
 
-  if (lastCategory === expectedCategory) {
+  // If user already answered this category, and didn’t just give a vague “D” or short answer, move on
+  const answerIsVague =
+    !lastAnswer ||
+    lastAnswer.trim().length < 5 ||
+    lastAnswer.trim().toUpperCase().startsWith('D');
+
+  if (lastCategory === expectedCategory && !answerIsVague) {
     currentIndex++;
     quizProgress.currentCategoryIndex = currentIndex;
   }
