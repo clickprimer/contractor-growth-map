@@ -40,29 +40,28 @@ export default async function handler(req, res) {
 
   console.log(`Using model: ${model}`);
 
-  // Corrected scoring/tagging logic using currentCategoryIndex
-  if (quizProgress.currentCategoryIndex > 0) {
-    const prevIndex = quizProgress.currentCategoryIndex - 1;
-    const prevCategory = quiz[prevIndex]?.category;
-    const prevAnswer = quizProgress.answers?.[prevCategory];
-    if (prevCategory && prevAnswer) {
-      updateTagsAndScore(prevCategory, prevAnswer, quizProgress);
-    }
+  // Score/tagging logic
+  const lastCategory = Object.keys(quizProgress.answers || {}).slice(-1)[0];
+  const lastAnswer = quizProgress.answers?.[lastCategory];
+  if (lastCategory && lastAnswer) {
+    updateTagsAndScore(lastCategory, lastAnswer, quizProgress);
   }
 
-  // Advance category if last was just answered
+  // Determine category flow
   let currentIndex = quizProgress.currentCategoryIndex ?? 0;
   const expectedCategory = quiz[currentIndex]?.category;
 
-  const lastAnsweredCategory = quiz[quizProgress.currentCategoryIndex - 1]?.category;
-  const lastAnswer = quizProgress.answers?.[lastAnsweredCategory];
-
-  if (lastAnsweredCategory === expectedCategory && lastAnswer) {
+  if (lastCategory === expectedCategory) {
     currentIndex++;
     quizProgress.currentCategoryIndex = currentIndex;
   }
 
   const nextCategory = quiz[currentIndex]?.category;
+
+  // 🛑 Stop if no next category (quiz complete)
+  if (!nextCategory) {
+    return res.status(200).end();
+  }
 
   const messages = [
     { role: 'system', content: quizInstructions },
