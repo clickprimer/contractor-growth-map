@@ -1,3 +1,4 @@
+
 import { OpenAI } from 'openai';
 import { quiz, quizInstructions } from '../../lib/quiz.js';
 
@@ -21,7 +22,6 @@ function updateTagsAndScore(category, answer, progress) {
     progress.totalScore += scoreMap[letter];
   }
 
-  // Tagging logic
   if (category === 'Team & Operations' && letter === 'D') {
     progress.tags.push('skip_elitecrew');
   }
@@ -40,28 +40,21 @@ export default async function handler(req, res) {
 
   console.log(`Using model: ${model}`);
 
-  // Score/tagging logic
   const lastCategory = Object.keys(quizProgress.answers || {}).slice(-1)[0];
   const lastAnswer = quizProgress.answers?.[lastCategory];
   if (lastCategory && lastAnswer) {
     updateTagsAndScore(lastCategory, lastAnswer, quizProgress);
   }
 
-  // Determine category flow
   let currentIndex = quizProgress.currentCategoryIndex ?? 0;
   const expectedCategory = quiz[currentIndex]?.category;
 
-  if (lastCategory === expectedCategory) {
+  if (lastCategory?.toLowerCase() === expectedCategory?.toLowerCase()) {
     currentIndex++;
     quizProgress.currentCategoryIndex = currentIndex;
   }
 
   const nextCategory = quiz[currentIndex]?.category;
-
-  // 🛑 Stop if no next category (quiz complete)
-  if (!nextCategory) {
-    return res.status(200).end();
-  }
 
   const messages = [
     { role: 'system', content: quizInstructions },
