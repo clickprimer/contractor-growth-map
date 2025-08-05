@@ -1,4 +1,3 @@
-// ask.js — updated on 2025-08-05 04:39 PM CDT
 import { OpenAI } from 'openai';
 import { quiz, quizInstructions } from '../../lib/quiz.js';
 
@@ -7,7 +6,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 function buildCondensedHistory(progress) {
   return Object.entries(progress.answers || {}).map(([category, answer]) => ({
     role: 'user',
-    content: `${category}: ${answer}`,
+    content: `${category}: ${answer}`
   }));
 }
 
@@ -41,35 +40,28 @@ export default async function handler(req, res) {
 
   console.log(`Using model: ${model}`);
 
-  // Initialize progress fields
-  if (!quizProgress.answers) quizProgress.answers = {};
-  if (!quizProgress.currentCategoryIndex) quizProgress.currentCategoryIndex = 0;
-
-  // Determine last answered category
+  // Score/tagging logic
   const lastCategory = Object.keys(quizProgress.answers || {}).slice(-1)[0];
   const lastAnswer = quizProgress.answers?.[lastCategory];
-
-  // Update scoring/tags based on last answer
   if (lastCategory && lastAnswer) {
     updateTagsAndScore(lastCategory, lastAnswer, quizProgress);
   }
 
-  // Get current category index and name
-  let nextIndex = quizProgress.currentCategoryIndex;
-  const nextCategory = quiz[nextIndex]?.category;
+  // Determine category flow
+  let currentIndex = quizProgress.currentCategoryIndex ?? 0;
+  const expectedCategory = quiz[currentIndex]?.category;
 
-  // If last category answered matches current, advance to next
-  if (lastCategory === nextCategory) {
-    nextIndex += 1;
-    quizProgress.currentCategoryIndex = nextIndex;
+  if (lastCategory === expectedCategory) {
+    currentIndex++;
+    quizProgress.currentCategoryIndex = currentIndex;
   }
 
-  const systemInstructions = quizInstructions;
+  const nextCategory = quiz[currentIndex]?.category;
 
   const messages = [
-    { role: 'system', content: systemInstructions },
+    { role: 'system', content: quizInstructions },
     ...buildCondensedHistory(quizProgress),
-    { role: 'user', content: `Continue with category: ${quiz[quizProgress.currentCategoryIndex]?.category}` },
+    { role: 'user', content: `Continue with category: ${nextCategory}` },
     { role: 'user', content: currentInput }
   ];
 
