@@ -1,7 +1,6 @@
 import { OpenAI } from 'openai';
 import { quiz, quizInstructions } from '../../lib/quiz.js';
 
-
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 function buildCondensedHistory(progress) {
@@ -41,24 +40,24 @@ export default async function handler(req, res) {
 
   console.log(`Using model: ${model}`);
 
-  // Score and tagging
-  const lastCategory = Object.keys(quizProgress.answers || {}).slice(-1)[0];
-  const lastAnswer = quizProgress.answers?.[lastCategory];
-  if (lastCategory && lastAnswer) {
-    updateTagsAndScore(lastCategory, lastAnswer, quizProgress);
+  // Corrected scoring/tagging logic using currentCategoryIndex
+  if (quizProgress.currentCategoryIndex > 0) {
+    const prevIndex = quizProgress.currentCategoryIndex - 1;
+    const prevCategory = quiz[prevIndex]?.category;
+    const prevAnswer = quizProgress.answers?.[prevCategory];
+    if (prevCategory && prevAnswer) {
+      updateTagsAndScore(prevCategory, prevAnswer, quizProgress);
+    }
   }
 
-  // Current quiz index
+  // Advance category if last was just answered
   let currentIndex = quizProgress.currentCategoryIndex ?? 0;
   const expectedCategory = quiz[currentIndex]?.category;
 
-  // If user already answered this category, and didn’t just give a vague “D” or short answer, move on
-  const answerIsVague =
-    !lastAnswer ||
-    lastAnswer.trim().length < 5 ||
-    lastAnswer.trim().toUpperCase().startsWith('D');
+  const lastAnsweredCategory = quiz[quizProgress.currentCategoryIndex - 1]?.category;
+  const lastAnswer = quizProgress.answers?.[lastAnsweredCategory];
 
-  if (lastCategory === expectedCategory && !answerIsVague) {
+  if (lastAnsweredCategory === expectedCategory && lastAnswer) {
     currentIndex++;
     quizProgress.currentCategoryIndex = currentIndex;
   }
