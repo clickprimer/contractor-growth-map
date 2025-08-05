@@ -17,223 +17,164 @@ export default function Home() {
 
 It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
 
-**First, what’s your name and what type of work do you do?**
-
-⬇️ Type below to answer.`
-    }
+**First, what’s your name and trade?**`,
+    },
   ]);
-
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [leadInfo, setLeadInfo] = useState({ name: '' });
+  const [source, setSource] = useState(null);
   const [quizProgress, setQuizProgress] = useState({
-    answers: {}, // Category: Answer
-    tags: [],
+    answers: {},
     totalScore: 0,
+    tags: [],
+    currentCategoryIndex: 0,
   });
-  const chatEndRef = useRef(null);
-  const latestAssistantRef = useRef(null);
-  const userMessageRef = useRef(null);
-  const [history, setHistory] = useState([]);
+
+  const bottomRef = useRef(null);
+  const topRef = useRef(null);
 
   useEffect(() => {
-    const lastAssistantIndex = [...messages].reverse().findIndex(msg => msg.role === 'assistant');
-    const assistantElements = document.querySelectorAll('.assistant-msg');
-    if (assistantElements.length > 0 && lastAssistantIndex !== -1) {
-      const el = assistantElements[assistantElements.length - 1 - lastAssistantIndex];
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async (e) => {
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+  };
+
+  const scrollToTop = () => {
+    topRef.current?.scrollIntoView({ behavior: 'auto' });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
-
-    setTimeout(() => {
-      if (userMessageRef.current) {
-        userMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }
-    }, 50);
-
+    const newMessages = [...messages, { role: 'user', content: input }];
+    setMessages(newMessages);
     setInput('');
     setLoading(true);
 
-    if (!leadInfo.name) {
-      const nameOnly = input.replace(/[^a-zA-Z\s]/g, '').split(' ')[0];
-      setLeadInfo({ name: nameOnly });
-    }
-
-    const res = await fetch(`/api/ask?model=gpt-3.5-turbo`, {
+    const newSource = new EventSource('/api/ask', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentInput: input, quizProgress }), // ✅ updated to send quizProgress only
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currentInput: input,
+        quizProgress,
+      }),
     });
 
-    if (!res.ok || !res.body) {
-      console.error('No response body');
-      setLoading(false);
-      return;
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let finalReply = '';
-    let started = false;
-
-    const updateStreamedReply = (chunk) => {
-      finalReply += chunk;
-      setMessages((prev) => {
-        const updated = [...prev];
-        if (!started) {
-          updated.push({ role: 'assistant', content: chunk });
-          started = true;
-        } else {
-          updated[updated.length - 1].content = finalReply;
-        }
-        return updated;
-      });
+    let assistantReply = '';
+    newSource.onmessage = (event) => {
+      assistantReply += event.data;
+      setMessages((prev) => [
+        ...prev.filter((m) => m.role !== 'assistant' || m.content !== ''),
+        { role: 'assistant', content: assistantReply },
+      ]);
     };
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      updateStreamedReply(chunk);
-    }
+    newSource.onerror = () => {
+      newSource.close();
+      setLoading(false);
+    };
 
-    setHistory((prev) => [...prev, { q: input, a: finalReply.slice(0, 300) }]);
+    newSource.addEventListener('end', () => {
+      newSource.close();
+      setLoading(false);
+      scrollToTop();
+    });
 
-    const includesCTA = finalReply.includes('<!-- TRIGGER:CTA -->');
-    if (includesCTA) {
-      const ctaMessage = {
-        role: 'assistant',
-        content: `
----
+    setSource(newSource);
+  };
 
-### 🚀 Let's Get Started:
+  const handleAnswer = (category, answer) => {
+    setQuizProgress((prev) => ({
+      ...prev,
+      answers: {
+        ...prev.answers,
+        [category]: answer,
+      },
+    }));
+  };
 
-- [📞 Book a Service Setup Call](https://www.map.clickprimer.com/aimm-setup-call)
-- [📄 Download Your AI Marketing Map PDF](#download)
-
-### ❓ Still have questions? We're happy to help:
-
-- [💬 Send Us a Message](https://www.clickprimer.com/contact)
-- [📱 Call Us (We pickup!)](tel:12083144088)
-        `
-      };
-      setMessages((prev) => [...prev, ctaMessage]);
-    }
-
-    setLoading(false);
+  const downloadPDF = () => {
+    generatePDF(messages);
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      overflow: 'hidden',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem',
-      backgroundColor: '#e8eeff'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '700px',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        background: '#e8eeff'
-      }}>
-        <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
-          <img
-            src="/logo.png"
-            alt="ClickPrimer Logo"
-            style={{ width: '160px', marginBottom: '10px' }}
-          />
-          <h1 className="text-[#0068ff] mt-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-roboto font-bold text-center">
-            The Contractor’s AI Marketing Map
-          </h1>
-          <p style={{
-            fontWeight: 'bold',
-            color: '#002654',
-            marginBottom: '1.5rem',
-            paddingLeft: '1rem',
-            paddingRight: '1rem'
-          }}>
-            🚧 This is an interactive consultation for contractors by ClickPrimer. 🚧
-          </p>
-        </div>
-
-        <div style={{
-          flex: 1,
-          background: 'white',
-          padding: '1rem',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          overflowY: 'auto'
-        }}>
-          {messages.map((msg, i) => {
-            const isUser = msg.role === 'user';
-            const isLatestAssistant = msg.role === 'assistant' && i === messages.length - 1;
-
-            return (
-              <div
-                key={i}
-                className={msg.role === 'assistant' ? 'assistant-msg' : ''}
-                ref={isUser ? userMessageRef : isLatestAssistant ? latestAssistantRef : null}
-                style={{
-                  background: isUser ? '#d2e9ff' : '#f1f1f1',
-                  margin: '10px 0',
-                  padding: '10px 15px',
-                  borderRadius: '10px',
-                  alignSelf: isUser ? 'flex-end' : 'flex-start',
-                  maxWidth: '100%',
-                  textAlign: isUser ? 'right' : 'left'
-                }}
-              >
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
-              </div>
-            );
-          })}
-          <div ref={chatEndRef} />
-        </div>
-
-        <form onSubmit={sendMessage} style={{ display: 'flex', marginTop: '1rem' }}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your reply here..."
-            style={{
-              flex: 1,
-              padding: '0.75rem',
-              borderRadius: '8px',
-              border: '1px solid #ccc',
-              fontSize: '1rem'
-            }}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginLeft: '10px',
-              padding: '0.75rem 1.25rem',
-              backgroundColor: '#0068ff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            Send
-          </button>
-        </form>
+    <div className="container">
+      <div ref={topRef} />
+      <div className="chat-box">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`message ${msg.role}`}>
+            <ReactMarkdown>{msg.content}</ReactMarkdown>
+          </div>
+        ))}
+        <div ref={bottomRef} />
       </div>
+
+      <form onSubmit={handleSubmit} className="input-form">
+        <input
+          type="text"
+          placeholder="Type your response..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={loading}
+        />
+        <button type="submit" disabled={loading}>
+          Send
+        </button>
+      </form>
+
+      <div className="button-row">
+        <button onClick={downloadPDF}>Download Results PDF</button>
+      </div>
+
+      <style jsx>{`
+        .container {
+          padding: 20px;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+        .chat-box {
+          max-height: 500px;
+          overflow-y: auto;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          padding: 15px;
+          border-radius: 10px;
+        }
+        .message {
+          margin-bottom: 15px;
+          white-space: pre-wrap;
+        }
+        .message.user {
+          text-align: right;
+          color: #0070f3;
+        }
+        .message.assistant {
+          text-align: left;
+          color: #333;
+        }
+        .input-form {
+          display: flex;
+        }
+        input[type='text'] {
+          flex-grow: 1;
+          padding: 10px;
+          font-size: 16px;
+        }
+        button {
+          padding: 10px 20px;
+          margin-left: 10px;
+          font-size: 16px;
+        }
+        .button-row {
+          text-align: right;
+          margin-top: 10px;
+        }
+      `}</style>
     </div>
   );
 }
