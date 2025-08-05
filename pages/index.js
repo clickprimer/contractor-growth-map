@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
@@ -28,6 +29,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   const [leadInfo, setLeadInfo] = useState({ name: '' });
   const [quizProgress, setQuizProgress] = useState({
     answers: {}, // Category: Answer
+    currentCategoryIndex: 0,
     tags: [],
     totalScore: 0,
   });
