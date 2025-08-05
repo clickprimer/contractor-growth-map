@@ -1,8 +1,6 @@
 import { OpenAI } from 'openai';
 import { quiz, quizInstructions } from '../../lib/quiz.js';
 
-console.log('Incoming Progress:', JSON.stringify(quizProgress, null, 2));
-
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
