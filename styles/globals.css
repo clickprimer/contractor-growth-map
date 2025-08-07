@@ -57,6 +57,17 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+.chat-message ul {
+  margin: 0.5em 0;
+  padding-left: 1.2em;
+  line-height: 1.2; /* tighter spacing */
+}
+
+.chat-message li {
+  margin-bottom: 4px; /* reduce space between items */
+}
+
+
 .chat-input {
   display: flex;
   width: 100%;
