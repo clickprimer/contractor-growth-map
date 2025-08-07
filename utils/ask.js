@@ -1,63 +1,34 @@
 import { quiz } from "./quiz";
 
-let state = {
-  step: 0,
-  current: quiz[0],
-  answers: [],
-  followingUp: false,
-};
+let currentIndex = 0;
+let responses = [];
 
 export function getNextPrompt(userInput) {
-  const last = state.current;
-
-  if (state.followingUp) {
-    // Store the follow-up response
-    state.answers[state.answers.length - 1].followUp = userInput;
-    state.followingUp = false;
-    state.step += 1;
-  } else {
-    // Store the screener response
-    const needsFollowUp =
-      last.followUpIf && last.followUpIf.includes(userInput);
-
-    state.answers.push({
-      category: last.category,
-      screener: userInput,
-      followUp: null,
-    });
-
-    if (needsFollowUp && last.followUp) {
-      state.followingUp = true;
-      return {
-        type: "followUp",
-        prompt: last.followUp.question,
-        options: last.followUp.options,
-      };
-    } else {
-      state.step += 1;
-    }
+  if (userInput !== undefined) {
+    responses.push(userInput);
   }
 
-  if (state.step >= quiz.length) {
-    return {
-      type: "complete",
-      answers: state.answers,
-    };
+  if (currentIndex >= quiz.length) {
+    const summary = generateSummary(responses);
+    resetQuiz(); // reset for next user
+    return { done: true, summary };
   }
 
-  state.current = quiz[state.step];
-  return {
-    type: "question",
-    prompt: state.current.screener,
-    options: state.current.options,
-  };
+  const { category, question, options } = quiz[currentIndex];
+  const prompt = `**Category:** ${category}\n\n${question}\n\n` +
+    options.map((opt) => `${opt.label}`).join("\n");
+
+  currentIndex++;
+  return { done: false, prompt };
 }
 
 export function resetQuiz() {
-  state = {
-    step: 0,
-    current: quiz[0],
-    answers: [],
-    followingUp: false,
-  };
+  currentIndex = 0;
+  responses = [];
+}
+
+function generateSummary(answers) {
+  return `Thanks for completing the quiz! Your answers:\n\n${answers.map((a, i) =>
+    `Q${i + 1}: ${a}`
+  ).join("\n")}`;
 }
