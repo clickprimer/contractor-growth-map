@@ -1,95 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=Roboto:wght@700&display=swap');
-
 body {
-  font-family: 'Open Sans', sans-serif;
-  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  background-color: #f8f8f8;
   margin: 0;
   padding: 0;
-  color: #002654;
 }
 
-.bold {
-  font-weight: bold;
-  color: #0068ff;
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
 }
 
 .chat-container {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box;
+  max-width: 800px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.chat-box {
-  border: 1px solid #ccc;
-  padding: 20px;
-  height: 500px;
-  overflow-y: auto;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+.chat-messages {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
 }
 
-/* Chat message styles */
-.message {
+.chat-message {
   max-width: 75%;
-  padding: 12px 16px;
-  border-radius: 18px;
-  font-size: 16px;
+  padding: 1rem;
+  border-radius: 12px;
   line-height: 1.5;
   white-space: pre-wrap;
-  word-wrap: break-word;
 }
 
-/* AI messages */
-.message-left {
+.chat-message.assistant {
   align-self: flex-start;
   background-color: #d6ebff;
   color: #002654;
-  border-radius: 18px 18px 18px 0;
+  font-weight: 500;
 }
 
-/* User messages */
-.message-right {
+.chat-message.user {
   align-self: flex-end;
   background-color: #0068ff;
   color: white;
-  border-radius: 18px 18px 0 18px;
+  font-weight: 500;
 }
 
-/* Input area */
-.input-container {
+.chat-send {
   display: flex;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 20px 20px 20px;
-  box-sizing: border-box;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
 }
 
-input[type='text'] {
+.chat-input {
   flex: 1;
-  padding: 10px 16px;
-  border-radius: 8px 0 0 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
-  font-size: 16px;
+  border-radius: 8px;
   outline: none;
-  font-family: 'Open Sans', sans-serif;
-  color: #002654;
 }
 
 .chat-send-button {
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
   background-color: #0068ff;
-  color: #ffffff;
+  color: white;
   border: none;
-  padding: 10px 16px;
-  border-radius: 0 8px 8px 0;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 16px;
-  height: 100%;
-  font-family: 'Open Sans', sans-serif;
+}
+
+.chat-send-button:hover {
+  background-color: #0056cc;
 }
