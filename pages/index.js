@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { getNextPrompt } from "../utils/ask";
 import ReactMarkdown from "react-markdown";
-import "../styles/styles.css";
+import "../styles/globals.css";
 
 export default function Home() {
   const [messages, setMessages] = useState([
