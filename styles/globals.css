@@ -69,3 +69,28 @@ body {
   flex: 1;
   padding: 12px;
   border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  font-size: 1rem;
+  font-family: 'Open Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+/* Send button */
+.chat-send-button {
+  background-color: #0068ff;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.chat-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
