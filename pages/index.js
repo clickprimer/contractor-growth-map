@@ -8,10 +8,12 @@ export default function Home() {
       role: 'assistant',
       content: `**Hello and welcome!** This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
-✅ Your strengths  
-🚧 Missed opportunities  
-🛠️ Clear action steps  
-💡 Tools and services that match your goals
+**Your Contractor Growth Map will include:**
+
+✅ Your Marketing & Operations Strengths  
+🚧 Your Bottlenecks & Missed Opportunities  
+🛠️ Recommendations to Fix Your Leaks & Grow Your Profits  
+💡 How ClickPrimer Can Help You
 
 It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
 
@@ -20,10 +22,11 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   ]);
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
+  const messageContainerRef = useRef(null);
 
   useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.role === 'user') {
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === 'user') {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
@@ -55,16 +58,16 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   return (
     <div className="container">
       <div className="chat-box">
-        <div className="chat-messages">
+        <div className="chat-messages" ref={messageContainerRef}>
           {messages.map((msg, idx) => (
             <div
               key={idx}
               className={`chat-message ${msg.role === 'user' ? 'user' : 'ai'}`}
-              ref={msg.role === 'user' ? chatEndRef : null}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
           ))}
+          <div ref={chatEndRef} />
         </div>
 
         <form onSubmit={handleSubmit} className="chat-input">
