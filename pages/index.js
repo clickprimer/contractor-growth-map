@@ -5,8 +5,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content:
-        "Hello and welcome! This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+     content: `Hello and welcome! This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
 **You’ll get a personalized Growth Map with:**
 
@@ -19,7 +18,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
 **First, what’s your name and what type of work do you do?**
 
-⬇️ Type below to answer."
+⬇️ Type below to answer.`
     }
   ]);
   const [input, setInput] = useState("");
