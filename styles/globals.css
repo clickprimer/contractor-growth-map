@@ -41,7 +41,7 @@ body {
   flex-direction: column;
   margin-bottom: 8px; /* was 16px */
   font-size: 1rem;
-  line-height: 1.2; /* was 1.6 */
+  line-height: 1; /* was 1.6 */
   white-space: pre-line;
 }
 
