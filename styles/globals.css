@@ -27,9 +27,9 @@ body {
 }
 
 .chat-message {
-  margin-bottom: 16px;
+  margin-bottom: 8px; /* was 16px */
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.5; /* was 1.6 */
   white-space: pre-line;
 }
 
