@@ -43,8 +43,13 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     setInput('');
 
     try {
-      const result = await getNextPrompt(input.trim());
-      const newBotMessage = { role: 'assistant', content: result.prompt || result.summary };
+      const { done, prompt, summary } = await getNextPrompt(input.trim());
+
+      const newBotMessage = {
+        role: 'assistant',
+        content: done && summary ? summary : prompt
+      };
+
       setMessages((prev) => [...prev, newBotMessage]);
     } catch (error) {
       console.error('Error:', error);
