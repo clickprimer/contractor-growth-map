@@ -1,120 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@700&display=swap');
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Roboto:wght@700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* === Base Layout === */
-html, body {
-  height: 100%;
+body {
   margin: 0;
   padding: 0;
-  background-color: #e8eeff;
   font-family: 'Open Sans', sans-serif;
+  background-color: #f8f9fc;
   color: #002654;
-  overflow: hidden; /* Lock outer scroll */
 }
 
-#__next {
-  height: 100%;
+.container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  min-height: 100vh;
 }
 
-/* === Layout Containers === */
-.quiz-container {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 100%;
-  max-width: 100vw;
-  overflow: hidden;
-  padding: 1rem;
-}
-
-/* === Chat Window === */
-.chat-window {
-  flex-grow: 1;
-  overflow-y: auto;
+.chat-box {
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
   padding: 1rem;
   background-color: white;
-  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* === Scrollbar Styling === */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+.message {
+  margin-bottom: 1rem;
+  line-height: 1.5;
 }
 
-/* === Inputs === */
-input[type="text"],
-input[type="email"],
-textarea {
-  padding: 10px;
-  font-size: 16px;
-  font-family: 'Open Sans', sans-serif;
+.message b {
+  color: #0068ff;
+  font-weight: bold;
+}
+
+.input-area {
+  display: flex;
+  gap: 0.5rem;
+}
+
+input[type="text"] {
+  flex-grow: 1;
+  padding: 0.75rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* === Buttons === */
-button {
-  cursor: pointer;
   border-radius: 8px;
   font-family: 'Open Sans', sans-serif;
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
-  background-color: #30d64f;
+  font-size: 1rem;
+}
+
+button {
+  padding: 0.75rem 1.25rem;
+  background-color: #0068ff;
   color: white;
-  padding: 0.75rem 1.5rem;
-  transition: background-color 0.2s ease;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Open Sans', sans-serif;
 }
 
 button:hover {
-  background-color: #28b842;
-}
-
-/* === Headings === */
-h1 {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 700;
-  color: #0068ff;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-}
-
-@media (min-width: 640px) {
-  h1 {
-    font-size: 2.25rem;
-  }
-}
-
-h2, h3 {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 700;
-  margin-top: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
-/* === Fixed Footer Button Container (if needed) === */
-.sticky-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  background-color: #e8eeff;
-  border-top: 1px solid #ccc;
-  text-align: center;
-  z-index: 10;
+  background-color: #005ad6;
 }
