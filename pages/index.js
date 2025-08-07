@@ -6,7 +6,20 @@ export default function Home() {
     {
       role: "assistant",
       content:
-        "Welcome to the AI Marketing Map! I’ll ask a few quick questions to help assess your marketing setup. Ready?"
+        "Hello and welcome! This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+
+**You’ll get a personalized Growth Map with:**
+
+✅ Your strengths  
+🚧 Missed opportunities  
+🛠️ Clear action steps  
+💡 Tools and services that match your goals
+
+It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
+
+**First, what’s your name and what type of work do you do?**
+
+⬇️ Type below to answer."
     }
   ]);
   const [input, setInput] = useState("");
@@ -27,7 +40,6 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: 600, margin: "auto", padding: 20 }}>
-      <h1>Contractor Growth Quiz</h1>
       <div style={{ border: "1px solid #ccc", padding: 10, height: 300, overflowY: "auto", marginBottom: 10 }}>
         {messages.map((msg, i) => (
           <div key={i} style={{ margin: "10px 0", textAlign: msg.role === "user" ? "right" : "left" }}>
