@@ -1,9 +1,8 @@
-// index.js
+// /pages/index.js
 
 import { useState } from "react";
-import { getNextPrompt } from "./api/ask";
-import { quiz } from "./api/quiz";
-
+import { getNextPrompt, resetQuiz } from "../utils/ask";
+import { quiz } from "../utils/quiz";
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -82,8 +81,7 @@ export default function Home() {
           >
             <div
               style={{
-                background:
-                  m.role === "assistant" ? "#e8eeff" : "#30d64f",
+                background: m.role === "assistant" ? "#e8eeff" : "#30d64f",
                 padding: 10,
                 borderRadius: 8,
               }}
@@ -130,17 +128,56 @@ export default function Home() {
       )}
 
       {isComplete && (
-        <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: "10px" }}>
-          <button style={{ background: "#30d64f", color: "#fff", padding: "12px", borderRadius: "6px", border: "none" }}>
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <button
+            style={{
+              background: "#30d64f",
+              color: "#fff",
+              padding: "12px",
+              borderRadius: "6px",
+              border: "none",
+            }}
+          >
             📥 Download PDF Report
           </button>
-          <button style={{ background: "#0068ff", color: "#fff", padding: "12px", borderRadius: "6px", border: "none" }}>
+          <button
+            style={{
+              background: "#0068ff",
+              color: "#fff",
+              padding: "12px",
+              borderRadius: "6px",
+              border: "none",
+            }}
+          >
             🔧 Start with ClickPrimer Lite ($150/mo)
           </button>
-          <button style={{ background: "#002654", color: "#fff", padding: "12px", borderRadius: "6px", border: "none" }}>
+          <button
+            style={{
+              background: "#002654",
+              color: "#fff",
+              padding: "12px",
+              borderRadius: "6px",
+              border: "none",
+            }}
+          >
             💼 Start the Full ClickPrimer System ($400/mo)
           </button>
-          <button style={{ background: "#e8cc00", color: "#000", padding: "12px", borderRadius: "6px", border: "none" }}>
+          <button
+            style={{
+              background: "#e8cc00",
+              color: "#000",
+              padding: "12px",
+              borderRadius: "6px",
+              border: "none",
+            }}
+          >
             📞 Book a Service Setup Call
           </button>
         </div>
