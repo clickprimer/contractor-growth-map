@@ -3,16 +3,19 @@ import { quiz } from "./quiz";
 let currentIndex = 0;
 let responses = [];
 
-export function getNextPrompt(userInput) {
+/**
+ * Returns the next prompt or the final summary.
+ * Must be awaited by the caller.
+ */
+export async function getNextPrompt(userInput) {
   if (userInput !== undefined) {
     responses.push(userInput);
   }
 
   if (currentIndex >= quiz.length) {
-    return generateSummary(responses).then((summary) => {
-      resetQuiz(); // reset for next user
-      return { done: true, summary };
-    });
+    const summary = await generateSummary(responses);
+    resetQuiz(); // reset for next user
+    return { done: true, summary };
   }
 
   const { category, question, options } = quiz[currentIndex];
@@ -20,7 +23,7 @@ export function getNextPrompt(userInput) {
     options.map((opt) => `${opt.label}`).join("\n");
 
   currentIndex++;
-  return Promise.resolve({ done: false, prompt });
+  return { done: false, prompt };
 }
 
 export function resetQuiz() {
