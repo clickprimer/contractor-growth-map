@@ -8,10 +8,10 @@ export default function Home() {
       role: 'assistant',
       content: `**Hello and welcome!** This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
-✅ Your strengths  
-🚧 Missed opportunities  
-🛠️ Clear action steps  
-💡 Tools and services that match your goals
+✅ Your Marketing & Operations Strengths  
+🚧 Your Bottlenecks & Missed Opportunities
+🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
+💡 How ClickPrimer Can Help You
 
 It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
 
