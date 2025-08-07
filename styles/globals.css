@@ -69,24 +69,6 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
-/* Markdown content inside messages */
-.chat-message p {
-  margin: 0 0 0.5em 0;
-  line-height: 1.4;
-}
-
-.chat-message ul {
-  margin: 0.3em 0;
-  padding-left: 1.2em;
-  list-style-position: outside;
-}
-
-.chat-message li {
-  margin: 0;
-  padding: 0;
-  line-height: 1.2; /* Try 1.1 or 1.0 if you want it tighter */
-}
-
 /* Chat input row */
 .chat-input {
   display: flex;
