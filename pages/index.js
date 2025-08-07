@@ -9,6 +9,7 @@ export default function Home() {
       content: `**Hello and welcome!** This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
 **Your Contractor Growth Map will include:**
+
 ✅ Your Marketing & Operations Strengths
 🚧 Your Bottlenecks & Missed Opportunities
 🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
