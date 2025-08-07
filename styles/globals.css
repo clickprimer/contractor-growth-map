@@ -65,6 +65,16 @@ body {
   font-weight: bold;
 }
 
+/* Reduce spacing between AI paragraphs */
+.chat-message.ai p {
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.chat-message.ai p:last-child {
+  margin-bottom: 0;
+}
+
 .chat-input {
   display: flex;
   max-width: 800px;
@@ -95,13 +105,4 @@ body {
 
 .chat-input button:hover {
   background-color: #005ad6;
-}
-
-.chat-message.ai p {
-  margin: 0.25rem 0;
-  line-height: 1.4;
-}
-
-.chat-message.ai p:last-child {
-  margin-bottom: 0;
 }
