@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { getNextPrompt } from "../utils/ask";
+import ReactMarkdown from "react-markdown";
+import "../styles.css";
 
 export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-     content: `Hello and welcome! This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+      content: `Hello and welcome! This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
 **You’ll get a personalized Growth Map with:**
 
@@ -38,22 +40,27 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: "auto", padding: 20 }}>
-      <div style={{ border: "1px solid #ccc", padding: 10, height: 300, overflowY: "auto", marginBottom: 10 }}>
-        {messages.map((msg, i) => (
-          <div key={i} style={{ margin: "10px 0", textAlign: msg.role === "user" ? "right" : "left" }}>
-            <strong>{msg.role === "user" ? "You" : "AI"}:</strong> <br />
-            <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, "<br/>") }} />
+    <div className="chat-window">
+      {messages.map((msg, i) => (
+        <div key={i} className={`message ${msg.role === "user" ? "user-message" : "ai-message"}`}>
+          <div>
+            {msg.role === "assistant" && <div className="sender-label">Your AI Consultant:</div>}
+            <div className="message-bubble">
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            </div>
           </div>
-        ))}
+        </div>
+      ))}
+      <div className="input-container">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          placeholder="Type your answer (A/B/C/D)..."
+        />
+        <button onClick={handleSend}>Send</button>
       </div>
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        style={{ width: "100%", padding: 10 }}
-        placeholder="Type your answer (A/B/C/D)..."
-      />
     </div>
   );
 }
