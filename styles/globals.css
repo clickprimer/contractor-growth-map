@@ -1,91 +1,74 @@
-/* styles/globals.css */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@700&display=swap');
-
 body {
-  font-family: 'Open Sans', sans-serif;
-  background: #f6f8fc;
   margin: 0;
-  padding: 0;
-  color: #002654;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
 }
 
 .chat-container {
-  max-width: 600px;
-  margin: auto;
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
 }
 
 .chat-window {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  background: white;
-  height: 400px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  height: 70vh;
   overflow-y: auto;
-  margin-bottom: 10px;
-}
-
-.message {
   display: flex;
-  margin: 10px 0;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 8px;
 }
 
-.message.user {
-  justify-content: flex-end;
-}
-
-.message.assistant {
-  justify-content: flex-start;
-}
-
-.bubble {
+.chat-bubble {
+  padding: 12px 16px;
+  border-radius: 12px;
   max-width: 75%;
-  padding: 10px 15px;
-  border-radius: 15px;
-  font-size: 15px;
-  line-height: 1.4;
-  background-color: #e8eeff;
-  font-family: 'Open Sans', sans-serif;
+  line-height: 1.5;
   white-space: pre-wrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.message.user .bubble {
-  background-color: #d4e9ff;
-  text-align: right;
-}
-
-.sender {
-  font-family: 'Roboto', sans-serif;
-  font-weight: bold;
-  color: #0068ff;
-  margin-bottom: 4px;
-}
-
-input {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px 0 0 8px;
-  outline: none;
-}
-
-button {
+.chat-bubble.user {
+  align-self: flex-end;
   background-color: #0068ff;
   color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 0 8px 8px 0;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
+  border-bottom-right-radius: 0;
+}
+
+.chat-bubble.assistant {
+  align-self: flex-start;
+  background-color: #e8eeff;
+  color: #002654;
+  border-bottom-left-radius: 0;
 }
 
 .input-area {
   display: flex;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-/* Markdown-style bold text */
-strong {
-  color: #0068ff;
+.input-area input {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.input-area button {
+  padding: 10px 20px;
+  background-color: #30d64f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.input-area button:hover {
+  background-color: #28b240;
 }
