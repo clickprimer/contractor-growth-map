@@ -77,11 +77,21 @@ strong {
   margin-top: 16px;
 }
 
+/* Chat input row */
+.chat-input {
+  display: flex;
+  width: 100%;
+  margin-top: 16px;
+  box-sizing: border-box;
+}
+
+/* Input field */
 .chat-input input {
   flex: 1;
   padding: 12px;
-  border-radius: 8px 0 0 8px;
   border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
   font-size: 1rem;
   font-family: 'Open Sans', sans-serif;
   box-sizing: border-box;
@@ -99,6 +109,11 @@ strong {
   font-family: 'Roboto', sans-serif;
   font-weight: bold;
   white-space: nowrap;
+}
+
+.chat-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .chat-send-button:disabled {
