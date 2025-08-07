@@ -3,6 +3,8 @@ import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
 
 export default function Home() {
+  console.log('patched'); // 🔧 TEMP DIFF to enable GitHub commit
+
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
