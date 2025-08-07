@@ -88,6 +88,10 @@ body {
   line-height: 1; /* Helps avoid weird spacing from bullet line-height */
 }
 
+.chat-message li {
+  outline: 1px solid red; /* Temporarily see each li boundary */
+}
+
 /* Chat input row */
 .chat-input {
   display: flex;
