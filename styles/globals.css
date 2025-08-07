@@ -57,15 +57,21 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+.chat-message p {
+  margin: 0 0 0.5em 0; /* tighten paragraphs inside Markdown */
+  line-height: 1;
+}
+
 .chat-message ul {
-  margin: 0.5em 0;
+  margin: 0.3em 0;
   padding-left: 1.2em;
-  line-height: 1.2; /* tighter spacing */
+  line-height: 1.2;
 }
 
 .chat-message li {
-  margin-bottom: 4px; /* reduce space between items */
+  margin-bottom: 0.25em;
 }
+
 
 
 .chat-input {
