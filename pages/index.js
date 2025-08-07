@@ -1,8 +1,9 @@
 // index.js
 
 import { useState } from "react";
-import { getNextPrompt, resetQuiz } from "./ask";
-import { quiz } from "./quiz";
+import { getNextPrompt } from "./api/ask";
+import { quiz } from "./api/quiz";
+
 
 export default function Home() {
   const [messages, setMessages] = useState([
