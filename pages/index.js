@@ -6,65 +6,78 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: `Hello and welcome! This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n✅ Your strengths\n🚧 Missed opportunities\n🛠️ Clear action steps\n💡 Tools and services that match your goals\n\nIt only takes a few minutes, and you're free to skip or expand on answers as you go. So let's get started!\n\n**First, what's your name and what type of work do you do?**`,
-    },
+      content: `**Hello and welcome!** This quick, interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+
+✅ Your strengths  
+🚧 Missed opportunities  
+🛠️ Clear action steps  
+💡 Tools and services that match your goals
+
+It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
+
+**First, what’s your name and what type of work do you do?**`
+    }
   ]);
-
   const [input, setInput] = useState('');
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
-    scrollToBottom();
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = { role: 'user', content: input };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    const newUserMessage = { role: 'user', content: input.trim() };
+    setMessages((prev) => [...prev, newUserMessage]);
     setInput('');
 
-    const res = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: updatedMessages }),
-    });
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, newUserMessage] })
+      });
 
-    const data = await res.json();
-    setMessages([...updatedMessages, { role: 'assistant', content: data.result }]);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSend();
+      const data = await res.json();
+      if (data.result) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: data.result }]);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
-    <div className="chat-container">
-      <div className="chat-window">
-        {messages.map((msg, index) => (
+    <div className="container">
+      <div className="chat-box">
+        {messages.map((msg, idx) => (
           <div
-            key={index}
-            className={`chat-bubble ${msg.role === 'user' ? 'user' : 'assistant'}`}
+            key={idx}
+            className={`chat-message ${msg.role === 'user' ? 'user' : 'ai'}`}
           >
-            <ReactMarkdown>{msg.role === 'assistant' ? `**Your AI Consultant:**\n\n${msg.content}` : msg.content}</ReactMarkdown>
+            <ReactMarkdown>{msg.content}</ReactMarkdown>
           </div>
         ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="input-area">
-        <input
-          type="text"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
-        <button onClick={handleSend}>Send</button>
+
+        <div ref={chatEndRef} />
+
+        <form onSubmit={handleSubmit} className="chat-input">
+          <input
+            type="text"
+            placeholder="Type your answer..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="chat-send-button"
+            disabled={!input.trim()}
+          >
+            SEND
+          </button>
+        </form>
       </div>
     </div>
   );
