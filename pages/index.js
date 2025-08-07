@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
+import { getNextPrompt } from '../utils/ask'; // 🧠 Custom quiz logic
 
 export default function Home() {
   console.log('patched'); // 🔧 TEMP DIFF to enable GitHub commit
@@ -42,18 +43,15 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     setInput('');
 
     try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, newUserMessage] })
-      });
-
-      const data = await res.json();
-      if (data.result) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.result }]);
-      }
+      const result = await getNextPrompt(input.trim());
+      const newBotMessage = { role: 'assistant', content: result.prompt || result.summary };
+      setMessages((prev) => [...prev, newBotMessage]);
     } catch (error) {
       console.error('Error:', error);
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: `⚠️ Sorry, something went wrong. Please try again.`
+      }]);
     }
   };
 
