@@ -21,11 +21,21 @@ body {
   padding: 24px;
   max-width: 700px;
   width: 100%;
+  height: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  padding-right: 8px; /* space for scrollbar */
+}
+
+/* Chat message blocks */
 .chat-message {
   margin-bottom: 8px; /* was 16px */
   font-size: 1rem;
@@ -57,8 +67,9 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+/* Markdown content inside messages */
 .chat-message p {
-  margin: 0 0 0.5em 0; /* tighten paragraphs inside Markdown */
+  margin: 0 0 0.5em 0;
   line-height: 1;
 }
 
@@ -72,12 +83,10 @@ body {
   margin-bottom: 0.25em;
 }
 
-
-
+/* Chat input row */
 .chat-input {
   display: flex;
   width: 100%;
-  margin-top: 16px;
   box-sizing: border-box;
 }
 
