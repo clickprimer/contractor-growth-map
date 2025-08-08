@@ -212,7 +212,7 @@ body {
 }
 
 /* Markdown spacing tweaks */
-.bubble p { margin: 0 0 8px 0; }
+.bubble p { margin: 0 0 2px 0; }
 .bubble p + p { margin-top: 8px; }
 .bubble ul, .bubble ol { margin: 8px 0 8px 18px; }
 .bubble li { margin: 4px 0; }
