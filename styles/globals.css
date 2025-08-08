@@ -162,3 +162,8 @@ body {
 .bubble li { margin: 4px 0; }
 .bubble h1, .bubble h2, .bubble h3 { margin: 8px 0; }
 .bubble strong { font-weight: 700; }
+
+/* Quiz colors */
+.bubble.ai .question-text strong { color: #002654; }
+.bubble.ai .opt-letter strong { color: #3788d8; font-weight: 700; margin-right: 4px; }
+
