@@ -13,7 +13,7 @@
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.0",
     "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.5.28"
+    "jspdf-autotable": "^3.5.28",
     "rehype-raw": "^7.0.0"
   },
   "devDependencies": {
