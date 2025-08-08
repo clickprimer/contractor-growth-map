@@ -74,6 +74,7 @@ async function streamPost(url, payload, onChunk) {
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -91,8 +92,8 @@ export async function getNextWithStreaming(userInput, onAssistantChunk) {
   if (!greeted) {
     greeted = true;
     const { name, job } = parseNameAndJob(userInput);
-    const safeName = name ? name.replace(/[^a-zA-Z0-9\s\-'_.]/g, "").trim() : "";
-    const safeJob = job ? job.replace(/[^a-zA-Z0-9\s\-'_.]/g, "").trim() : "";
+    const safeName = name ? name.replace(/[^a-zA-Z0-9\s\-_'./]/g, "").trim() : "";
+    const safeJob = job ? job.replace(/[^a-zA-Z0-9\s\-_'./]/g, "").trim() : "";
 
     const greeting =
       safeName && safeJob
@@ -131,4 +132,41 @@ export async function getNextWithStreaming(userInput, onAssistantChunk) {
     return { done: false };
   }
 
-  // Not awaiting follow-up
+  // Not awaiting follow-up yet: decide if we should ask it based on choice
+  const fu = thisCategory.followUp;
+  const needsFollowUp = fu && choice && fu.condition && fu.condition.includes(choice);
+
+  // Stream a concise comment + fact/stat nugget about this category
+  await streamPost(
+    "/api/followup-stream",
+    { answer: userInput, category: thisCategory.category },
+    onAssistantChunk
+  );
+
+  if (needsFollowUp) {
+    awaitingFollowUp = true;
+    const fuQ = formatFollowUp(thisCategory);
+    onAssistantChunk("\n\n" + fuQ);
+    return { done: false };
+  }
+
+  // Move to next category
+  currentIndex += 1;
+
+  if (currentIndex >= quiz.length) {
+    await streamPost("/api/summary-stream", { answers: answersStore }, onAssistantChunk);
+    resetQuiz();
+    return { done: true };
+  }
+
+  const nextQ = formatQuestion(quiz[currentIndex]);
+  onAssistantChunk("\n\n" + nextQ);
+  return { done: false };
+}
+
+export function resetQuiz() {
+  currentIndex = 0;
+  awaitingFollowUp = false;
+  greeted = false;
+  answersStore = [];
+}
