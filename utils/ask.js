@@ -1,25 +1,40 @@
 import { quiz } from "./quiz";
 
-
 let currentIndex = 0;
 let awaitingFollowUp = false;
 let greeted = false;
 let answersStore = [];
 
 // ---------- formatting helpers ----------
+// Render option letters as HTML so we can color them via CSS
 function formatOptions(options) {
-  return (options || []).map(opt => `${opt.label}`).join("\n\n");
+  return (options || [])
+    .map(opt => {
+      const label = String(opt.label || "");
+      const m = label.match(/^([A-Ea-e])\.\s*(.*)$/);
+      if (!m) return `<p>${label}</p>`; // fallback
+      const letter = m[1].toUpperCase();
+      const rest = m[2];
+      return `<p><span class="opt-letter"><strong>${letter}.</strong></span> ${rest}</p>`;
+    })
+    .join("\n\n");
 }
 
 function formatQuestion(categoryObj) {
   const { category, question, options } = categoryObj;
-  return `**${category}**\n\n**${question}**\n\n${formatOptions(options)}`;
+  return `**${category}**
+
+<span class="question-text"><strong>${question}</strong></span>
+
+${formatOptions(options)}`;
 }
 
 function formatFollowUp(categoryObj) {
   const fu = categoryObj.followUp;
   if (!fu) return null;
-  return `**${fu.question}**\n\n${formatOptions(fu.options)}`;
+  return `<span class="question-text"><strong>${fu.question}</strong></span>
+
+${formatOptions(fu.options)}`;
 }
 
 function extractChoiceLetter(input) {
@@ -31,30 +46,30 @@ function extractChoiceLetter(input) {
 // ---------- name & job parsing ----------
 function parseNameAndJob(text) {
   const raw = (text || "").trim();
-  let name = raw;
-  let job = "";
 
+  // Delimiters first: "," | " - " | "|"
   if (raw.includes(",")) {
     const [n, ...rest] = raw.split(",");
-    name = n.trim();
-    job = rest.join(",").trim();
-  } else if (raw.includes(" - ")) {
+    return { name: n.trim(), job: rest.join(",").trim() };
+  }
+  if (raw.includes(" - ")) {
     const [n, ...rest] = raw.split(" - ");
-    name = n.trim();
-    job = rest.join(" - ").trim();
-  } else if (raw.includes("|")) {
+    return { name: n.trim(), job: rest.join(" - ").trim() };
+  }
+  if (raw.includes("|")) {
     const [n, ...rest] = raw.split("|");
-    name = n.trim();
-    job = rest.join("|").trim();
+    return { name: n.trim(), job: rest.join("|").trim() };
   }
 
-  // If job still empty but there are multiple words, assume the rest is job
-  if (!job) {
-    const parts = raw.split(/\s+/);
-    if (parts.length >= 2) job = parts.slice(1).join(" ");
+  // No delimiters: assume "FirstName rest-is-job"
+  const parts = raw.split(/\s+/);
+  if (parts.length >= 2) {
+    const [first, ...rest] = parts;
+    return { name: first.trim(), job: rest.join(" ").trim() };
   }
 
-  return { name: name || "", job: job || "" };
+  // Single token fallback
+  return { name: raw || "", job: "" };
 }
 
 // ---------- trade-aware encouragement ----------
