@@ -1,25 +1,13 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
-import { getNextPrompt } from '../utils/ask'; // 🧠 Custom quiz logic
+import { getNextWithStreaming } from '../utils/ask';
 
 export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: `**Hello and welcome!** This interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
-
-**Your Contractor Growth Map will include:**
-
-✅ Your Marketing & Operations Strengths  
-🚧 Your Bottlenecks & Missed Opportunities  
-🛠️ Recommendations to Fix Your Leaks & Grow Your Profits  
-💡 How ClickPrimer Can Help You
-
-It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
-
-**First, what’s your name and what type of work do you do?**`
+      content: `**Hello and welcome!** This interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.\n\n**First, what's your name and what type of work do you do?**`
     }
   ]);
   const [input, setInput] = useState('');
@@ -33,35 +21,41 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
     e.preventDefault();
     if (!input.trim()) return;
 
+    // Push user's message (no streaming for user)
     const newUserMessage = { role: 'user', content: input.trim() };
-    setMessages((prev) => [...prev, newUserMessage]);
-
+    setMessages(prev => [...prev, newUserMessage]);
     setInput('');
 
+    // Create empty assistant message to stream into
+    const assistantIndex = messages.length + 1;
+    setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+    const onAssistantChunk = (chunk) => {
+      setMessages(prev => {
+        const copy = [...prev];
+        const existing = copy[assistantIndex];
+        if (!existing) return prev;
+        copy[assistantIndex] = { ...existing, content: (existing.content || '') + chunk };
+        return copy;
+      });
+    };
+
     try {
-      const { done, prompt } = await getNextPrompt(newUserMessage.content);
-      setMessages((prev) => [...prev, { role: 'assistant', content: prompt }]);
-      // Optionally, when done === true, we could expose a "Download PDF" button that calls generatePDF.
-      // For now, we just display the summary in the chat.
-    } catch (error) {
-      console.error('Error:', error);
-      setMessages((prev) => [...prev, {
-        role: 'assistant',
-        content: `⚠️ Sorry, something went wrong. Please try again.`
-      }]);
+      await getNextWithStreaming(newUserMessage.content, onAssistantChunk);
+    } catch (err) {
+      onAssistantChunk("\n\n⚠️ Sorry, something went wrong. Please try again.");
     }
   };
 
   return (
     <div className="container">
-      <div className="chat-box">
-        <div className="chat-messages">
+      <div className="chat-box fixed">
+        <div className="chat-messages scrollable">
           {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`chat-message ${msg.role === 'user' ? 'user' : 'ai'}`}
-            >
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            <div key={idx} className={`chat-message ${msg.role === 'user' ? 'user' : 'ai'}`}>
+              <div className={`bubble ${msg.role}`}>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              </div>
             </div>
           ))}
           <div ref={chatEndRef} />
@@ -74,11 +68,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button
-            type="submit"
-            className="chat-send-button"
-            disabled={!input.trim()}
-          >
+          <button type="submit" disabled={!input.trim()}>
             SEND
           </button>
         </form>
