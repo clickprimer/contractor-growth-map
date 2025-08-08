@@ -1,11 +1,10 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { generatePDF } from '../utils/generatePDF';
 import ReactMarkdown from 'react-markdown';
 import { getNextPrompt } from '../utils/ask'; // 🧠 Custom quiz logic
 
 export default function Home() {
-  console.log('patched'); // 🔧 TEMP DIFF to enable GitHub commit
-
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -25,13 +24,9 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   ]);
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
-  const messageContainerRef = useRef(null);
 
   useEffect(() => {
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'user') {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSubmit = async (e) => {
@@ -40,17 +35,14 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
 
     const newUserMessage = { role: 'user', content: input.trim() };
     setMessages((prev) => [...prev, newUserMessage]);
+
     setInput('');
 
     try {
-      const { done, prompt, summary } = await getNextPrompt(input.trim());
-
-      const newBotMessage = {
-        role: 'assistant',
-        content: done && summary ? summary : prompt
-      };
-
-      setMessages((prev) => [...prev, newBotMessage]);
+      const { done, prompt } = await getNextPrompt(newUserMessage.content);
+      setMessages((prev) => [...prev, { role: 'assistant', content: prompt }]);
+      // Optionally, when done === true, we could expose a "Download PDF" button that calls generatePDF.
+      // For now, we just display the summary in the chat.
     } catch (error) {
       console.error('Error:', error);
       setMessages((prev) => [...prev, {
@@ -63,7 +55,7 @@ It only takes a few minutes, and you’re free to skip or expand on answers as y
   return (
     <div className="container">
       <div className="chat-box">
-        <div className="chat-messages" ref={messageContainerRef}>
+        <div className="chat-messages">
           {messages.map((msg, idx) => (
             <div
               key={idx}
