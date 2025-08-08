@@ -212,8 +212,8 @@ body {
 }
 
 /* Markdown spacing tweaks */
-.bubble p { margin: 0 0 4px 0; line-height: 1; }
-.bubble p + p { margin-top: 4px; }
+.bubble p { margin: 0 0 1px 0; line-height: 1; }
+.bubble p + p { margin-top: 1px; }
 .bubble ul, .bubble ol { margin: 8px 0 8px 18px; }
 .bubble li { margin: 4px 0; }
 .bubble h1, .bubble h2, .bubble h3 { margin: 8px 0; }
