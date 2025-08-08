@@ -1,4 +1,3 @@
-// ask.js v2025-08-08-001
 import { quiz } from "./quiz";
 
 
