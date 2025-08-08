@@ -1,13 +1,12 @@
-
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { getNextWithStreaming } from '../utils/ask';
 
 export default function Home() {
- const [messages, setMessages] = useState([
-  {
-    role: 'assistant',
-    content: `**Hello and welcome!** This interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: `**Hello and welcome!** This interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
 **Your Contractor Growth Map will include:**
 
@@ -19,8 +18,8 @@ export default function Home() {
 It only takes a few minutes, and you’re free to add your own answers as you go. So let’s get started!
 
 **First, what’s your name and what type of work do you do?**`
-  }
-]);
+    }
+  ]);
 
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
