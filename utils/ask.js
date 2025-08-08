@@ -7,7 +7,7 @@ let answersStore = [];
 
 // Format options with a blank line between (A., B., ...)
 function formatOptions(options) {
-  return options.map(opt => `${opt.label}`).join("\n\n");
+  return (options || []).map(opt => `${opt.label}`).join("\n\n");
 }
 
 function formatQuestion(categoryObj) {
@@ -18,7 +18,7 @@ function formatQuestion(categoryObj) {
 function formatFollowUp(categoryObj) {
   const fu = categoryObj.followUp;
   if (!fu) return null;
-  return `**${fu.question}**\n\n${formatOptions(fu.options || [])}`;
+  return `**${fu.question}**\n\n${formatOptions(fu.options)}`;
 }
 
 function extractChoiceLetter(input) {
@@ -31,7 +31,9 @@ function extractChoiceLetter(input) {
 function parseNameAndJob(text) {
   const raw = (text || "").trim();
   // Split by comma first ("Wes, handyman"), else split by " - " or " | "
-  let name = raw, job = "";
+  let name = raw;
+  let job = "";
+
   if (raw.includes(",")) {
     const [n, ...rest] = raw.split(",");
     name = n.trim();
@@ -45,15 +47,39 @@ function parseNameAndJob(text) {
     name = n.trim();
     job = rest.join("|").trim();
   }
-  // If job still empty but second word looks like a trade, grab it
+
+  // If job still empty but there are multiple words, assume the rest is job
   if (!job) {
     const parts = raw.split(/\s+/);
     if (parts.length >= 2) job = parts.slice(1).join(" ");
   }
-  return {
-    name: name || "",
-    job: job || ""
-  };
+
+  return { name: name || "", job: job || "" };
+}
+
+// Stream helper — posts JSON and yields text chunks to onChunk
+async function streamPost(url, payload, onChunk) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.body || !res.body.getReader) {
+    // Non-streaming fallback: read as text once
+    const text = await res.text();
+    if (text) onChunk(text);
+    return;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    if (chunk) onChunk(chunk);
+  }
 }
 
 export async function getNextWithStreaming(userInput, onAssistantChunk) {
@@ -92,58 +118,17 @@ export async function getNextWithStreaming(userInput, onAssistantChunk) {
       await streamPost("/api/summary-stream", { answers: answersStore }, onAssistantChunk);
       resetQuiz();
       return { done: true };
-    } else {
-      await streamPost("/api/followup-stream", { answer: userInput, category: thisCategory.category }, onAssistantChunk);
-      const nextQ = formatQuestion(quiz[currentIndex]);
-      onAssistantChunk("\n\n" + nextQ);
-      return { done: false };
     }
-  }
 
-  // Not awaiting follow-up yet: decide if we should ask it based on choice
-  const fu = thisCategory.followUp;
-  const needsFollowUp = fu && choice && fu.condition && fu.condition.includes(choice);
-
-  await streamPost("/api/followup-stream", { answer: userInput, category: thisCategory.category }, onAssistantChunk);
-
-  if (needsFollowUp) {
-    awaitingFollowUp = true;
-    const fuQ = formatFollowUp(thisCategory);
-    onAssistantChunk("\n\n" + fuQ);
+    // Acknowledge last input + stream nugget, then next question
+    await streamPost(
+      "/api/followup-stream",
+      { answer: userInput, category: thisCategory.category },
+      onAssistantChunk
+    );
+    const nextQ = formatQuestion(quiz[currentIndex]);
+    onAssistantChunk("\n\n" + nextQ);
     return { done: false };
   }
 
-  // Move to next category
-  currentIndex += 1;
-  if (currentIndex >= quiz.length) {
-    await streamPost("/api/summary-stream", { answers: answersStore }, onAssistantChunk);
-    resetQuiz();
-    return { done: true };
-  }
-
-  const nextQ = formatQuestion(quiz[currentIndex]);
-  onAssistantChunk("\n\n" + nextQ);
-  return { done: false };
-}
-
-export function resetQuiz() {
-  currentIndex = 0;
-  awaitingFollowUp = false;
-  greeted = false;
-  answersStore = [];
-}
-
-// Stream helper
-async function streamPost(url, payload, onChunk) {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let done, value;
-  while (true) {
-    ({ done, value } = await reader.read());
-    if (done) break;
-    const chunk = decoder.decode(valu
+  // Not awaiting follow-up
