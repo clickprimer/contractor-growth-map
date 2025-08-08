@@ -3,9 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { OpenAI } from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
 function loadInstructions() {
   const candidates = [
@@ -16,48 +15,37 @@ function loadInstructions() {
   ];
   for (const p of candidates) {
     try {
-      if (fs.existsSync(p)) {
-        return fs.readFileSync(p, 'utf8');
-      }
+      if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
     } catch {}
   }
   return `You are generating the final "Contractor Growth Map" summary.
-Organize into 4 sections with headers exactly:
+DO NOT restate or list the quiz questions. Do not ask more questions.
+Organize into exactly these sections (with these headers and emojis):
 📊 Contractor Growth Map
 ✅ Your Marketing & Operations Strengths – 3–5 bullets
 ⚠️ Your Bottlenecks & Missed Opportunities – 3–5 bullets
-🛠️ Recommendations to Fix Your Leaks & Grow Your Profits – 5 bullets
+🛠️ Recommendations to Fix Your Leaks & Grow Your Profits – 5 bullets (prioritized)
 💡 How ClickPrimer Can Help You – up to 3–5 relevant tools/services
-
-Keep tone practical and concise for contractors.`;
+Tone: practical, blue-collar friendly, concise.`;
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { answers } = req.body;
-
+  const { answers } = req.body || {};
+  const userContent = (answers || []).map((a, i) => `A${i + 1}: ${a}`).join('\n');
   try {
-    const systemPrompt = loadInstructions();
-
-    // Format user message as numbered answers
-    const userContent = (answers || []).map((a, i) => `Q${i + 1}: ${a}`).join('\n');
-
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: MODEL,
+      temperature: 0.6,
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userContent }
-      ],
-      temperature: 0.7
+        { role: 'system', content: loadInstructions() },
+        { role: 'user', content: `Here are ONLY the user's answers in order. Do not list or restate questions.\n${userContent}\n\nProduce the final Contractor Growth Map now.` }
+      ]
     });
-
-    const result = completion.choices?.[0]?.message?.content || "";
-    return res.status(200).json({ summary: result });
-  } catch (error) {
-    console.error('GPT error (summary):', error?.response?.data || error?.message || error);
-    return res.status(500).json({ error: 'Failed to generate summary' });
+    const text = completion.choices?.[0]?.message?.content?.trim() || "";
+    res.status(200).json({ summary: text });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to generate summary' });
   }
 }
