@@ -3,135 +3,122 @@ import { quiz } from "./quiz";
 
 let currentIndex = 0;
 let awaitingFollowUp = false;
-let responses = [];
+let greeted = false;
+let answersStore = [];
 
-/**
- * Helper: format a question+options into markdown for the chat.
- */
 function formatQuestion(categoryObj) {
   const { category, question, options } = categoryObj;
-  const lines = options.map(opt => `${opt.label}`); // already includes "A. ..."
-  return `**${category}**\n\n${question}\n\n${lines.join("\n")}`;
+  const lines = options.map(opt => `${opt.label}`);
+  return `**${category}**\n\n**${question}**\n\n${lines.join("\n")}`;
 }
 
-/**
- * Helper: format follow-up question (if any) into markdown.
- */
 function formatFollowUp(categoryObj) {
   const fu = categoryObj.followUp;
   if (!fu) return null;
   const lines = (fu.options || []).map(opt => `${opt.label}`);
-  return `${fu.question}\n\n${lines.join("\n")}`;
+  return `**${fu.question}**\n\n${lines.join("\n")}`;
 }
 
-/**
- * Helper: extract letter (A-E) from user input, case-insensitive.
- */
 function extractChoiceLetter(input) {
   if (!input) return null;
   const m = String(input).trim().match(/^[\(\[\s]*([A-Ea-e])\b/);
   return m ? m[1].toUpperCase() : null;
 }
 
-/**
- * Returns the next GPT-generated prompt for each answer, or the final summary at the end.
- */
-export async function getNextPrompt(userInput) {
-  // First interaction (name & trade). Just greet and show first question.
-  if (currentIndex === 0 && responses.length === 0) {
-    if (userInput !== undefined) responses.push(userInput);
-    const firstQ = formatQuestion(quiz[currentIndex]);
-    return { done: false, prompt: `Got it! Let's jump in.\n\n${firstQ}` };
+async function getWelcomeInstructions() {
+  try {
+    const res = await fetch("/api/instructions");
+    const data = await res.json();
+    return data.text || "Let's jump in.";
+  } catch {
+    return "Let's jump in.";
   }
+}
 
-  // Record answer
-  if (userInput !== undefined) {
-    responses.push(userInput);
+// Stream helper: POST json to url and yield text chunks via onChunk
+async function streamPost(url, payload, onChunk) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let done, value;
+  while (true) {
+    ({ done, value } = await reader.read());
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    if (chunk) onChunk(chunk);
+  }
+}
+
+export async function getNextWithStreaming(userInput, onAssistantChunk) {
+  // Save user's raw input for final summary
+  if (userInput !== undefined) answersStore.push(userInput);
+
+  // First step: greet + show first question (not streamed; comes from file)
+  if (!greeted) {
+    greeted = true;
+    const welcome = await getWelcomeInstructions();
+    const firstQ = formatQuestion(quiz[currentIndex]);
+    onAssistantChunk(welcome + "\n\n" + firstQ);
+    return { done: false };
   }
 
   const thisCategory = quiz[currentIndex];
   const choice = extractChoiceLetter(userInput);
 
-  // Call GPT to produce a short acknowledgment + gold nugget for the user's answer
-  const gptComment = await getGPTReply({
-    answer: userInput,
-    category: thisCategory.category
-  });
-
-  // If we're waiting for the follow-up, then after user responds, advance to next category
+  // If we're in follow-up phase, after user answer we go to next category
   if (awaitingFollowUp) {
     awaitingFollowUp = false;
     currentIndex += 1;
 
-    // If finished, request final summary
     if (currentIndex >= quiz.length) {
-      const summary = await generateFinalSummary(responses);
+      // Stream final summary only
+      await streamPost("/api/summary-stream", { answers: answersStore }, onAssistantChunk);
       resetQuiz();
-      return { done: true, prompt: summary };
+      return { done: true };
+    } else {
+      // Stream a short acknowledgment then append next question
+      await streamPost("/api/followup-stream", { answer: userInput, category: thisCategory.category }, onAssistantChunk);
+      const nextQ = formatQuestion(quiz[currentIndex]);
+      onAssistantChunk("\n\n" + nextQ);
+      return { done: false };
     }
-
-    const nextQ = formatQuestion(quiz[currentIndex]);
-    return { done: false, prompt: `${gptComment}\n\n${nextQ}` };
   }
 
-  // Not awaiting follow-up yet -> decide if we should ask it based on choice
+  // Not awaiting follow-up yet: decide if we should ask it based on choice
   const fu = thisCategory.followUp;
   const needsFollowUp = fu && choice && fu.condition && fu.condition.includes(choice);
+
+  // Stream a concise comment + golden nugget about this category
+  await streamPost("/api/followup-stream", { answer: userInput, category: thisCategory.category }, onAssistantChunk);
 
   if (needsFollowUp) {
     awaitingFollowUp = true;
     const fuQ = formatFollowUp(thisCategory);
-    return { done: false, prompt: `${gptComment}\n\n${fuQ}` };
+    onAssistantChunk("\n\n" + fuQ);
+    return { done: false };
   }
 
-  // No follow-up -> move to next category
+  // Move to next category
   currentIndex += 1;
-
-  // If finished, request final summary
   if (currentIndex >= quiz.length) {
-    const summary = await generateFinalSummary(responses);
+    // Stream final summary only
+    await streamPost("/api/summary-stream", { answers: answersStore }, onAssistantChunk);
     resetQuiz();
-    return { done: true, prompt: summary };
+    return { done: true };
   }
 
   const nextQ = formatQuestion(quiz[currentIndex]);
-  return { done: false, prompt: `${gptComment}\n\n${nextQ}` };
+  onAssistantChunk("\n\n" + nextQ);
+  return { done: false };
 }
 
 export function resetQuiz() {
   currentIndex = 0;
   awaitingFollowUp = false;
-  responses = [];
-}
-
-async function getGPTReply({ answer, category }) {
-  try {
-    const res = await fetch("/api/followup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answer, category })
-    });
-    const data = await res.json();
-    // API now returns { prompt: "..." }
-    return data.prompt || "Thanks — noted. Let's keep going.";
-  } catch (error) {
-    console.error("Error getting GPT reply:", error);
-    return "Thanks — noted. Let's keep going.";
-  }
-}
-
-async function generateFinalSummary(answers) {
-  try {
-    const res = await fetch("/api/summary", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers })
-    });
-
-    const data = await res.json();
-    return data.summary || "⚠️ No summary generated.";
-  } catch (error) {
-    console.error("Error generating final summary:", error);
-    return "⚠️ GPT summary error.";
-  }
+  greeted = false;
+  answersStore = [];
 }
