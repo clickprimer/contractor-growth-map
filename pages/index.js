@@ -16,7 +16,7 @@ export default function Home() {
 🛠️ Recommendations to Fix Your Leaks & Grow Your Profits  
 💡 How ClickPrimer Can Help You
 
-It only takes a few minutes, and you’re free to skip or expand on answers as you go. So let’s get started!
+It only takes a few minutes, and you’re free to add your own answers as you go. So let’s get started!
 
 **First, what’s your name and what type of work do you do?**`
   }
