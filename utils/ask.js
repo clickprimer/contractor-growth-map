@@ -1,4 +1,6 @@
+// ask.js v2025-08-08-001
 import { quiz } from "./quiz";
+
 
 let currentIndex = 0;
 let awaitingFollowUp = false;
