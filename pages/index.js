@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import { getNextWithStreaming } from '../utils/ask';
 
 export default function Home() {
@@ -9,11 +10,10 @@ export default function Home() {
       content: `**Hello and welcome!** This interactive consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
 **Your Contractor Growth Map will include:**
-
-✅ Your Marketing & Operations Strengths  
-🚧 Your Bottlenecks & Missed Opportunities  
-🛠️ Recommendations to Fix Your Leaks & Grow Your Profits  
-💡 How ClickPrimer Can Help You
+- ✅ Your Marketing & Operations Strengths
+- 🚧 Your Bottlenecks & Missed Opportunities
+- 🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
+- 💡 How ClickPrimer Can Help You
 
 It only takes a few minutes, and you’re free to add your own answers as you go. So let’s get started!
 
@@ -23,6 +23,7 @@ It only takes a few minutes, and you’re free to add your own answers as you go
 
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
+  const placeholderIndexRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,27 +33,29 @@ It only takes a few minutes, and you’re free to add your own answers as you go
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Push user's message (no streaming for user)
-    const newUserMessage = { role: 'user', content: input.trim() };
-    setMessages(prev => [...prev, newUserMessage]);
-    setInput('');
+    const userMsg = { role: 'user', content: input.trim() };
+    const assistantPlaceholder = { role: 'assistant', content: '' };
 
-    // Create empty assistant message to stream into
-    const assistantIndex = messages.length + 1;
-    setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+    // Add user + placeholder in ONE update to get a stable index for streaming
+    setMessages(prev => {
+      const next = [...prev, userMsg, assistantPlaceholder];
+      placeholderIndexRef.current = next.length - 1; // index of placeholder
+      return next;
+    });
+    setInput('');
 
     const onAssistantChunk = (chunk) => {
       setMessages(prev => {
+        const idx = placeholderIndexRef.current;
+        if (idx == null || !prev[idx]) return prev;
         const copy = [...prev];
-        const existing = copy[assistantIndex];
-        if (!existing) return prev;
-        copy[assistantIndex] = { ...existing, content: (existing.content || '') + chunk };
+        copy[idx] = { ...copy[idx], content: (copy[idx].content || '') + chunk };
         return copy;
       });
     };
 
     try {
-      await getNextWithStreaming(newUserMessage.content, onAssistantChunk);
+      await getNextWithStreaming(userMsg.content, onAssistantChunk);
     } catch (err) {
       onAssistantChunk("\n\n⚠️ Sorry, something went wrong. Please try again.");
     }
@@ -65,7 +68,9 @@ It only takes a few minutes, and you’re free to add your own answers as you go
           {messages.map((msg, idx) => (
             <div key={idx} className={`chat-message ${msg.role === 'user' ? 'user' : 'ai'}`}>
               <div className={`bubble ${msg.role}`}>
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {msg.content}
+                </ReactMarkdown>
               </div>
             </div>
           ))}
