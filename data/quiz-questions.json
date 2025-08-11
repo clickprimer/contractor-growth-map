@@ -1,0 +1,511 @@
+{
+  "quiz_flow": [
+    {
+      "category": "Branding",
+      "weight": 1.0,
+      "screener": {
+        "question": "How recognizable is your business at a glance—especially compared to your competitors? Think about your trucks, signs, cards, website, and social media.",
+        "options": [
+          {
+            "label": "A. We stand out with a strong, consistent look",
+            "score": 4,
+            "tags": ["branding:strong", "foundation:solid"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "B. We have a logo, but our look isn't consistent or polished",
+            "score": 2,
+            "tags": ["branding:inconsistent", "needs:polish"],
+            "tier_signals": ["lite", "system"]
+          },
+          {
+            "label": "C. We're hard to tell apart from other contractors",
+            "score": 1,
+            "tags": ["branding:weak", "needs:differentiation"],
+            "tier_signals": ["lite"]
+          },
+          {
+            "label": "D. We don't really have any branding yet",
+            "score": 0,
+            "tags": ["branding:none", "needs:foundation"],
+            "tier_signals": ["lite"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "If you could upgrade one branding item next, what would it be?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Truck wraps",
+            "tags": ["priority:visibility", "investment:ready"]
+          },
+          {
+            "label": "B. Yard signs / uniforms",
+            "tags": ["priority:consistency", "team:growing"]
+          },
+          {
+            "label": "C. Website refresh",
+            "tags": ["priority:digital", "leads:online"]
+          },
+          {
+            "label": "D. Social media look",
+            "tags": ["priority:social", "marketing:active"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Strong branding can increase your close rate by 23% because customers trust contractors who look professional and established.**",
+        "B": "✨ **Consistent branding across all touchpoints makes you 3x more memorable to potential customers than competitors with mixed messaging.**",
+        "C": "✨ **78% of homeowners say they're more likely to call a contractor who stands out visually from the competition.**",
+        "D": "✨ **Professional branding can justify 15-20% higher pricing because customers associate polished presentation with quality work.**"
+      }
+    },
+    {
+      "category": "Local Visibility", 
+      "weight": 1.2,
+      "screener": {
+        "question": "When someone in your area searches for your services, how easily can they find you online?",
+        "options": [
+          {
+            "label": "A. We show up on the first page consistently",
+            "score": 4,
+            "tags": ["visibility:strong", "seo:working", "foundation:solid"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "B. We show up sometimes, but not consistently",
+            "score": 2,
+            "tags": ["visibility:inconsistent", "seo:needs_work"],
+            "tier_signals": ["system"]
+          },
+          {
+            "label": "C. We're buried on page 2 or beyond",
+            "score": 1,
+            "tags": ["visibility:poor", "seo:weak", "needs:foundation"],
+            "tier_signals": ["lite", "system"]
+          },
+          {
+            "label": "D. I'm not sure where we show up",
+            "score": 0,
+            "tags": ["visibility:unknown", "tracking:none", "needs:foundation"],
+            "tier_signals": ["lite"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "What's your biggest challenge with local visibility right now?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Google Business Profile needs work",
+            "tags": ["priority:gbp", "local:focus"]
+          },
+          {
+            "label": "B. Not enough online reviews",
+            "tags": ["priority:reviews", "reputation:focus"]
+          },
+          {
+            "label": "C. Website doesn't rank well",
+            "tags": ["priority:seo", "website:focus"]
+          },
+          {
+            "label": "D. Competition dominates search results",
+            "tags": ["market:competitive", "strategy:needed"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **75% of local searches result in calls within 24 hours—your strong visibility is a huge competitive advantage.**",
+        "B": "✨ **Businesses that show up consistently in local search get 70% more calls than those with sporadic visibility.**",
+        "C": "✨ **92% of consumers don't look past the first page of search results, so improving your ranking is critical.**",
+        "D": "✨ **Local contractors who track and optimize their online presence grow 40% faster than those who don't.**"
+      }
+    },
+    {
+      "category": "Lead Capture",
+      "weight": 1.3,
+      "screener": {
+        "question": "How reliably do you capture leads from calls, forms, and messages?",
+        "options": [
+          {
+            "label": "A. We capture and log almost everything",
+            "score": 4,
+            "tags": ["capture:excellent", "systems:working", "foundation:solid"],
+            "tier_signals": ["elite"]
+          },
+          {
+            "label": "B. We miss a few here and there",
+            "score": 2,
+            "tags": ["capture:good", "systems:partial", "needs:improvement"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "C. We miss a lot during busy times",
+            "score": 1,
+            "tags": ["capture:poor", "overwhelm:true", "systems:needed"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "D. We don't have a process",
+            "score": 0,
+            "tags": ["capture:none", "systems:none", "needs:foundation"],
+            "tier_signals": ["lite", "system"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "Where do most leads slip through?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Missed calls",
+            "tags": ["problem:calls", "priority:phone"]
+          },
+          {
+            "label": "B. Website forms",
+            "tags": ["problem:forms", "priority:web"]
+          },
+          {
+            "label": "C. Text / social DMs", 
+            "tags": ["problem:messaging", "priority:social"]
+          },
+          {
+            "label": "D. No central system",
+            "tags": ["problem:organization", "priority:system"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Contractors who capture 95%+ of leads typically convert 40% more prospects than those who miss calls and messages.**",
+        "B": "✨ **Every missed lead costs contractors an average of $847 in potential revenue—small leaks add up fast.**",
+        "C": "✨ **67% of leads will call your competitor if you don't respond within the first hour of their inquiry.**",
+        "D": "✨ **Systematic lead capture can increase your close rate by 25% because you never lose track of warm prospects.**"
+      }
+    },
+    {
+      "category": "Follow-Up",
+      "weight": 1.2,
+      "screener": {
+        "question": "What best describes your follow-up after an estimate is sent?",
+        "options": [
+          {
+            "label": "A. Automated + personal follow-up until closed",
+            "score": 4,
+            "tags": ["followup:excellent", "automation:working", "foundation:solid"],
+            "tier_signals": ["elite"]
+          },
+          {
+            "label": "B. We follow up once or twice",
+            "score": 2,
+            "tags": ["followup:basic", "manual:process", "needs:automation"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "C. We rarely follow up unless they reach out first",
+            "score": 1,
+            "tags": ["followup:poor", "passive:approach", "revenue:lost"],
+            "tier_signals": ["lite", "system"]
+          },
+          {
+            "label": "D. We don't have a process",
+            "score": 0,
+            "tags": ["followup:none", "systems:none", "needs:foundation"],
+            "tier_signals": ["lite"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "Which follow-up step would you most like to automate?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Day-1 reminder",
+            "tags": ["priority:immediate", "timing:critical"]
+          },
+          {
+            "label": "B. 3–5 day check-in",
+            "tags": ["priority:nurture", "relationship:building"]
+          },
+          {
+            "label": "C. 2-week nurture",
+            "tags": ["priority:longterm", "patience:strategic"]
+          },
+          {
+            "label": "D. Rehash for lost quotes",
+            "tags": ["priority:revival", "recovery:focused"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Systematic follow-up can increase your close rate by 50% because most contractors give up after one or two attempts.**",
+        "B": "✨ **80% of sales require 5+ follow-up touches, but most contractors stop after the second attempt.**",
+        "C": "✨ **Contractors who implement consistent follow-up systems typically see a 30% increase in revenue within 90 days.**",
+        "D": "✨ **The average contractor loses $45,000 annually by not having a follow-up system for estimates and quotes.**"
+      }
+    },
+    {
+      "category": "Reviews",
+      "weight": 1.1,
+      "screener": {
+        "question": "How consistent are you at getting new public reviews (Google, FB, etc.)?",
+        "options": [
+          {
+            "label": "A. Steady stream every month",
+            "score": 4,
+            "tags": ["reviews:excellent", "reputation:strong", "foundation:solid"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "B. Occasional bursts after big jobs",
+            "score": 2,
+            "tags": ["reviews:inconsistent", "manual:process", "needs:system"],
+            "tier_signals": ["lite", "system"]
+          },
+          {
+            "label": "C. Rarely, only when clients feel like it",
+            "score": 1,
+            "tags": ["reviews:poor", "passive:approach", "reputation:weak"],
+            "tier_signals": ["lite"]
+          },
+          {
+            "label": "D. We don't ask for reviews",
+            "score": 0,
+            "tags": ["reviews:none", "reputation:unknown", "needs:foundation"],
+            "tier_signals": ["lite"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "What's the biggest blocker to more reviews?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Team forgets to ask",
+            "tags": ["problem:team", "priority:training"]
+          },
+          {
+            "label": "B. No easy link / process",
+            "tags": ["problem:process", "priority:system"]
+          },
+          {
+            "label": "C. Afraid of bad reviews",
+            "tags": ["problem:fear", "priority:confidence"]
+          },
+          {
+            "label": "D. Not a priority",
+            "tags": ["problem:priorities", "education:needed"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Contractors with 50+ Google reviews typically charge 18% more than competitors with fewer than 10 reviews.**",
+        "B": "✨ **88% of consumers trust online reviews as much as personal recommendations from friends.**",
+        "C": "✨ **Just 5 new reviews per month can move you ahead of 70% of your local competition.**",
+        "D": "✨ **Systematic review collection can increase your lead volume by 35% because you'll rank higher and look more trustworthy.**"
+      }
+    },
+    {
+      "category": "Scheduling",
+      "weight": 1.0,
+      "screener": {
+        "question": "How quickly can a new lead get on your calendar (estimate or service)?",
+        "options": [
+          {
+            "label": "A. Same day or next day",
+            "score": 4,
+            "tags": ["scheduling:excellent", "capacity:good", "responsiveness:high"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "B. Within 3–5 days",
+            "score": 3,
+            "tags": ["scheduling:good", "capacity:adequate"],
+            "tier_signals": ["system"]
+          },
+          {
+            "label": "C. 1–2 weeks out",
+            "score": 2,
+            "tags": ["scheduling:slow", "capacity:limited", "growth:constrained"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "D. 2+ weeks out",
+            "score": 1,
+            "tags": ["scheduling:poor", "capacity:maxed", "overwhelm:true"],
+            "tier_signals": ["elite"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "What would most help you speed up scheduling?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Online scheduling",
+            "tags": ["priority:automation", "efficiency:focus"]
+          },
+          {
+            "label": "B. Better triage / qualification",
+            "tags": ["priority:filtering", "quality:focus"]
+          },
+          {
+            "label": "C. More crew capacity",
+            "tags": ["priority:scaling", "team:growth"]
+          },
+          {
+            "label": "D. Calendar integration",
+            "tags": ["priority:organization", "tools:needed"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Fast scheduling is a huge competitive advantage—leads are 5x more likely to choose contractors who can start quickly.**",
+        "B": "✨ **Same-week scheduling typically converts 40% better than contractors who are 2+ weeks out.**",
+        "C": "✨ **Long scheduling delays signal success, but they can cost you 25% of potential leads who need faster service.**",
+        "D": "✨ **Being booked solid is great, but smart scheduling systems help you capture leads for future availability.**"
+      }
+    },
+    {
+      "category": "Team & Systems",
+      "weight": 1.4,
+      "screener": {
+        "question": "How would you describe your current business operations and team management?",
+        "options": [
+          {
+            "label": "A. We have clear systems and processes that run smoothly",
+            "score": 4,
+            "tags": ["systems:excellent", "team:organized", "scalable:true"],
+            "tier_signals": ["elite"]
+          },
+          {
+            "label": "B. We have some systems but they need improvement",
+            "score": 2,
+            "tags": ["systems:partial", "improvement:needed", "growth:ready"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "C. Everything depends on me being involved",
+            "score": 1,
+            "tags": ["bottleneck:owner", "systems:weak", "burnout:risk"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "D. It's mostly chaos and we're just trying to keep up",
+            "score": 0,
+            "tags": ["chaos:true", "overwhelm:severe", "systems:none"],
+            "tier_signals": ["lite", "system"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "What's your biggest operational challenge right now?",
+        "condition": ["B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Keeping track of jobs and deadlines",
+            "tags": ["problem:tracking", "priority:project_mgmt"]
+          },
+          {
+            "label": "B. Team coordination and communication",
+            "tags": ["problem:communication", "priority:team_tools"]
+          },
+          {
+            "label": "C. Customer communication and updates",
+            "tags": ["problem:customer_service", "priority:client_relations"]
+          },
+          {
+            "label": "D. Paperwork and administrative tasks",
+            "tags": ["problem:admin", "priority:automation"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Contractors with systematized operations grow 3x faster and report 60% less stress than those without clear processes.**",
+        "B": "✨ **Improving your systems now will pay dividends—every hour spent on organization saves 5 hours of firefighting later.**",
+        "C": "✨ **Owner-dependent businesses hit a revenue ceiling around $500K—systems and delegation are the keys to breaking through.**",
+        "D": "✨ **Chaos might feel normal, but organized contractors typically earn 40% more while working 20% fewer hours.**"
+      }
+    },
+    {
+      "category": "Goals & Frustrations",
+      "weight": 1.1,
+      "screener": {
+        "question": "What's your biggest frustration or goal for your business right now?",
+        "options": [
+          {
+            "label": "A. I want to grow bigger and hire more people",
+            "score": 4,
+            "tags": ["goal:growth", "scaling:ready", "team:expansion"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "B. I want more consistent, higher-quality leads",
+            "score": 3,
+            "tags": ["goal:leads", "quality:focus", "marketing:needed"],
+            "tier_signals": ["system"]
+          },
+          {
+            "label": "C. I want to work less while maintaining income",
+            "score": 3,
+            "tags": ["goal:efficiency", "automation:needed", "burnout:prevention"],
+            "tier_signals": ["system", "elite"]
+          },
+          {
+            "label": "D. I just want to get more organized and professional",
+            "score": 2,
+            "tags": ["goal:organization", "professionalism:focus", "foundation:building"],
+            "tier_signals": ["lite", "system"]
+          }
+        ]
+      },
+      "followUp": {
+        "question": "What's the main thing holding you back from achieving that goal?",
+        "condition": ["A", "B", "C", "D"],
+        "options": [
+          {
+            "label": "A. Don't have enough time to work ON the business",
+            "tags": ["barrier:time", "trapped:daily_ops"]
+          },
+          {
+            "label": "B. Don't know which marketing actually works",
+            "tags": ["barrier:knowledge", "marketing:confused"]
+          },
+          {
+            "label": "C. Can't afford to hire help or buy tools",
+            "tags": ["barrier:money", "bootstrap:mode"]
+          },
+          {
+            "label": "D. Overwhelmed by all the options and don't know where to start",
+            "tags": ["barrier:overwhelm", "decision:paralysis"]
+          }
+        ]
+      },
+      "gold_nuggets": {
+        "A": "✨ **Contractors who systematically work ON their business (not just IN it) typically double their revenue within 18 months.**",
+        "B": "✨ **The most successful contractors focus on 2-3 marketing channels that actually work rather than trying everything at once.**",
+        "C": "✨ **Smart contractors invest in tools that pay for themselves—the right system can generate 5-10x ROI within the first year.**",
+        "D": "✨ **Starting with the basics (capture, follow-up, reviews) gives you 80% of the results with 20% of the complexity.**"
+      }
+    }
+  ],
+  "scoring_weights": {
+    "foundation_readiness": {
+      "branding": 0.8,
+      "visibility": 1.0,
+      "capture": 1.2,
+      "reviews": 0.9
+    },
+    "system_readiness": {
+      "followup": 1.3,
+      "scheduling": 1.0,
+      "team_systems": 1.4,
+      "goals": 1.1
+    },
+    "elite_readiness": {
+      "all_categories": 1.0,
+      "scaling_indicators": 1.5,
+      "team_size": 1.3
+    }
+  }
+}
