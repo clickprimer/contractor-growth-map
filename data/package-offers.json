@@ -1,0 +1,223 @@
+{
+  "packages": {
+    "lite": {
+      "name": "ClickPrimer Lite System",
+      "tagline": "For Brand New Contractors Only",
+      "price": "$150/month DIY",
+      "setup": "$600 DFY Setup (One-Time)",
+      "description": "When you're just starting your contracting business and need to get online fast, ClickPrimer Lite gives you the essential tools to look professional, attract local customers, and keep new leads organized from day one.",
+      "includes_usage": "Includes up to $10/mo of email usage",
+      "features": [
+        "🛠 1-Page Website Template – Simple, mobile-friendly, easy to customize",
+        "🎯 Basic Brand Board Tool – Keep your colors, fonts, and logo consistent",
+        "📆 Social Media Scheduler – Plan and post to your channels from one place",
+        "📍 GBP Optimization Kit – Step-by-step templates + quarterly reminders",
+        "🗺 Citation & NAP Sync Instructions – DIY your directory listings for local SEO",
+        "🔨 DIY Review Boost Kit – Email/SMS templates to manually request reviews",
+        "📋 Setup Flow & SOP Library – Follow simple checklists to get your presence up fast"
+      ],
+      "ideal_for": [
+        "Brand new contractors",
+        "Getting online fast",
+        "Limited budget",
+        "Basic foundation building"
+      ],
+      "qualifying_tags": [
+        "branding:none",
+        "branding:weak",
+        "foundation:building",
+        "needs:foundation",
+        "visibility:unknown",
+        "reviews:none",
+        "systems:none",
+        "goal:organization"
+      ],
+      "disqualifying_tags": [
+        "team:expansion",
+        "scaling:ready",
+        "systems:excellent",
+        "foundation:solid"
+      ]
+    },
+    "system": {
+      "name": "ClickPrimer System",
+      "tagline": "The System Built for Every Contractor's Success",
+      "price": "$350/month DIY",
+      "setup": "$1,500 DFY Setup (One-Time)",
+      "description": "The most powerful essentials from all our individual systems—streamlined into one affordable package. Get the tools you actually use every day to get found, capture every lead, follow up automatically, and keep work coming in year-round.",
+      "includes_usage": "Includes up to $25/mo of phone/text/email usage fees",
+      "features": [
+        "🛠 Polished Website Template – Upload your content or have us do it",
+        "📆 Social Media Scheduler – Post across all your channels from one dashboard",
+        "🏆 Review Request System – Build a 5-star reputation on autopilot",
+        "📬 Unified Inbox – All calls, texts, emails, and messages in one place",
+        "📈 Lead Pipeline & CRM – Track every lead from first contact to closed job",
+        "📞 Call Tracking – See exactly which ads and campaigns drive calls",
+        "💬 Missed Call Text Back – Never lose a lead to voicemail again",
+        "🔄 Reactivation Campaigns – Turn old quotes into booked jobs"
+      ],
+      "ideal_for": [
+        "Established contractors",
+        "Growing businesses",
+        "Need better systems",
+        "Ready for automation"
+      ],
+      "qualifying_tags": [
+        "improvement:needed",
+        "needs:automation",
+        "systems:partial",
+        "growth:ready",
+        "overwhelm:true",
+        "manual:process",
+        "goal:leads",
+        "goal:efficiency"
+      ],
+      "disqualifying_tags": [
+        "needs:foundation",
+        "branding:none",
+        "systems:none"
+      ]
+    },
+    "elite": {
+      "name": "ClickPrimer Elite System",
+      "tagline": "Ready to Go All-In & Take Your Business to the Next Level?",
+      "price": "$800/month DIY",
+      "setup": "$6,000 DFY Setup (One-Time)",
+      "description": "When you want everything — to get found, capture all the leads, follow up automatically, fully own your online presence, run automated marketing campaigns, prioritize lead quality with prequalification, and manage your team efficiently.",
+      "includes_usage": "Includes up to $75/mo of phone/text/email usage fees",
+      "modules": [
+        "📐 LocalLeader Blueprint – Get found online and build your reputation",
+        "🔧 LeadCatch Engine – Capture every lead so they don't fall through the cracks",
+        "🤝 ClientForLife Campaigns – Bring in repeat work automatically",
+        "💻 OnSite Architect – Own your custom, branded website, done for you",
+        "🪜 LeadFilter Machine – Prioritize the quality of your leads",
+        "👥 EliteCrew Toolset – Make sure your team operates at its best",
+        "🚀 Premium Done-For-You Services – When you want to grow faster"
+      ],
+      "ideal_for": [
+        "Scaling contractors",
+        "Team management needs",
+        "Ready for premium investment",
+        "Want complete system integration"
+      ],
+      "qualifying_tags": [
+        "scaling:ready",
+        "team:expansion",
+        "team:growing",
+        "capacity:maxed",
+        "overwhelm:severe",
+        "bottleneck:owner",
+        "goal:growth",
+        "systems:excellent"
+      ],
+      "disqualifying_tags": [
+        "bootstrap:mode",
+        "needs:foundation",
+        "branding:none"
+      ]
+    }
+  },
+  "individual_modules": {
+    "local_leader": {
+      "name": "LocalLeader Blueprint",
+      "price": "$150/month DIY",
+      "setup": "$600 DFY Setup",
+      "description": "Establish your professional online presence, reach more organic local leads, and set up automations to get more reviews",
+      "qualifying_tags": ["visibility:poor", "reviews:poor", "branding:weak"]
+    },
+    "lead_catch": {
+      "name": "LeadCatch Engine", 
+      "price": "$150/month DIY",
+      "setup": "$600 DFY Setup",
+      "description": "Capture every lead, respond instantly, and stop losing business to voicemail or faster competitors",
+      "qualifying_tags": ["capture:poor", "problem:calls", "problem:messaging"]
+    },
+    "client_for_life": {
+      "name": "ClientForLife Campaigns",
+      "price": "$150/month DIY", 
+      "setup": "$600 DFY Setup",
+      "description": "Bring in repeat work instead of always chasing expensive new leads",
+      "qualifying_tags": ["followup:poor", "goal:efficiency", "relationship:building"]
+    },
+    "onsite_architect": {
+      "name": "OnSite Architect",
+      "price": "$250/month or $4,000 one-time",
+      "description": "Professional, high-performing website that represents your business and helps customers find you",
+      "qualifying_tags": ["website:needs_work", "priority:digital", "website:focus"]
+    }
+  },
+  "dfy_services": {
+    "righthand_ai": {
+      "name": "RightHand AI Receptionist",
+      "price": "$600/month",
+      "setup": "$400",
+      "description": "24/7 virtual receptionist that answers, qualifies, and routes calls",
+      "qualifying_tags": ["problem:calls", "capacity:limited", "scaling:ready"]
+    },
+    "leadbuilder_ai": {
+      "name": "LeadBuilder AI Agent",
+      "price": "$500/month",
+      "setup": "$300", 
+      "description": "24/7 AI-powered chat assistant for your website, social media, and text messaging",
+      "qualifying_tags": ["problem:messaging", "automation:needed", "responsiveness:high"]
+    },
+    "social_media_mgmt": {
+      "name": "Social Media Management",
+      "price": "$600/month",
+      "setup": "$400",
+      "description": "Done-for-you posting on social media and Google Business Profile",
+      "qualifying_tags": ["priority:social", "marketing:active", "team:growing"]
+    },
+    "reputation_mgmt": {
+      "name": "Reputation Management",
+      "price": "$300/month",
+      "setup": "$200",
+      "description": "Proactive management of your online reviews to build trust",
+      "qualifying_tags": ["reviews:poor", "reputation:focus", "problem:fear"]
+    },
+    "ads_mgmt": {
+      "name": "Ads Management", 
+      "price": "$700/month + ad spend",
+      "setup": "$300",
+      "description": "Fully managed online advertising campaigns that bring qualified leads",
+      "qualifying_tags": ["goal:leads", "investment:ready", "scaling:ready"]
+    },
+    "seo_mgmt": {
+      "name": "SEO Management",
+      "price": "$700/month",
+      "setup": "$300", 
+      "description": "Ongoing search engine optimization to help you get found",
+      "qualifying_tags": ["visibility:poor", "seo:weak", "priority:seo"]
+    },
+    "brand_design": {
+      "name": "5-Star Brand Design",
+      "price": "$500 one-time",
+      "description": "Professional, polished visual identity",
+      "qualifying_tags": ["branding:weak", "branding:inconsistent", "priority:visibility"]
+    }
+  },
+  "recommendation_logic": {
+    "tier_scoring": {
+      "lite_threshold": 15,
+      "system_threshold": 25,
+      "elite_threshold": 35
+    },
+    "tag_weights": {
+      "needs:foundation": -5,
+      "branding:none": -3,
+      "systems:none": -3,
+      "scaling:ready": 8,
+      "team:expansion": 10,
+      "overwhelm:severe": 6,
+      "foundation:solid": 5,
+      "systems:excellent": 8,
+      "automation:needed": 4,
+      "growth:ready": 6
+    },
+    "disqualification_rules": {
+      "elite": ["needs:foundation", "branding:none", "bootstrap:mode"],
+      "system": ["needs:foundation", "branding:none"],
+      "lite": ["scaling:ready", "team:expansion", "systems:excellent"]
+    }
+  }
+}
