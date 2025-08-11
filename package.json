@@ -7,10 +7,7 @@
     "build": "next build",
     "start": "next start -p 3000"
   },
-  "engines": {
-    "node": "18.x"
-  },
-  "dependencies": {
+   "dependencies": {
     "next": "14.1.4",
     "openai": "^4.26.1",
     "react": "^18.2.0",
