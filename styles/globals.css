@@ -98,6 +98,20 @@ button {
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
+  border: none;
+  outline: none;
+}
+
+/* Primary Button */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -262,18 +276,4 @@ input:focus, textarea:focus, select:focus {
   .container {
     padding: 0 32px;
   }
-}.3s ease;
-  border: none;
-  outline: none;
 }
-
-/* Primary Button */
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-  box-shadow: var(--shadow-md);
-  transition: all 0
