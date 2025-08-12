@@ -1,0 +1,490 @@
+/* Enhanced Global Styles for Premium UI */
+
+/* CSS Custom Properties for Design System */
+:root {
+  /* Colors */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --purple-500: #8b5cf6;
+  --purple-600: #7c3aed;
+  
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  
+  --success-500: #10b981;
+  --success-600: #059669;
+  
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Glass effects */
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-backdrop: blur(20px);
+  
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Base styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-normal);
+  color: var(--gray-900);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Fill container hierarchy */
+#__next,
+.container,
+.chat-box.fixed {
+  height: 100%;
+  width: 100%;
+}
+
+/* Container and layout */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.chat-box.fixed {
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+  border-radius: 0;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Scrollable area */
+.chat-messages.scrollable {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-6) var(--space-4);
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+/* Enhanced scrollbar */
+.chat-messages.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages.scrollable::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.chat-messages.scrollable::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  transition: background var(--transition-fast);
+}
+
+.chat-messages.scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Chat message layout */
+.chat-message {
+  display: flex;
+  margin: var(--space-4) 0;
+  opacity: 0;
+  animation: slideInMessage var(--transition-slow) ease-out forwards;
+}
+
+.chat-message.user {
+  justify-content: flex-end;
+}
+
+.chat-message.ai {
+  justify-content: flex-start;
+}
+
+/* Message bubbles with enhanced glassmorphism */
+.bubble {
+  max-width: 85%;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-2xl);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  text-align: left;
+  position: relative;
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
+}
+
+.bubble::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.2) 0%, 
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%);
+  pointer-events: none;
+}
+
+.bubble.user {
+  background: linear-gradient(135deg, var(--primary-500), var(--purple-500));
+  color: white;
+  border-bottom-right-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xl), 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.bubble.ai {
+  background: var(--glass-bg);
+  color: var(--gray-800);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Typography within messages */
+.bubble p {
+  margin: 0 0 var(--space-3) 0;
+}
+
+.bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble strong {
+  font-weight: var(--font-weight-semibold);
+  color: inherit;
+}
+
+.bubble.ai strong {
+  color: var(--gray-900);
+}
+
+.bubble ul, .bubble ol {
+  margin: var(--space-3) 0;
+  padding-left: var(--space-5);
+}
+
+.bubble li {
+  margin: var(--space-2) 0;
+}
+
+/* Question styling for better hierarchy */
+.question-text {
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-4);
+}
+
+.question-text strong {
+  color: var(--primary-600);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Option letters with better visual treatment */
+.opt-letter {
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-500);
+  background: rgba(59, 130, 246, 0.1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.9em;
+}
+
+/* Gold nuggets with special styling */
+.bubble .gold-nugget {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+  padding: var(--space-3);
+  background: linear-gradient(135deg, 
+    rgba(255, 193, 7, 0.1), 
+    rgba(255, 152, 0, 0.1));
+  border-left: 3px solid #ffc107;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.bubble .gold-nugget::before {
+  content: '✨';
+  font-size: 1.2em;
+  flex-shrink: 0;
+}
+
+/* Input form enhancements */
+.chat-input {
+  width: 100%;
+  padding: var(--space-4) var(--space-5);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--gray-800);
+  transition: all var(--transition-normal);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.chat-input::placeholder {
+  color: var(--gray-400);
+}
+
+.chat-input:focus {
+  border-color: var(--primary-500);
+  box-shadow: 
+    0 0 0 4px rgba(59, 130, 246, 0.1),
+    var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.chat-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--gray-100);
+}
+
+/* Responsive design enhancements */
+@media (max-width: 768px) {
+  .chat-messages.scrollable {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .bubble {
+    max-width: 92%;
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.95rem;
+  }
+
+  .question-text {
+    font-size: 1.05rem;
+  }
+
+  .chat-input {
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-messages.scrollable {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .bubble {
+    max-width: 95%;
+    padding: var(--space-3);
+    font-size: 0.9rem;
+  }
+
+  .question-text {
+    font-size: 1rem;
+  }
+
+  .chat-input {
+    padding: var(--space-3);
+    font-size: 0.9rem;
+  }
+}
+
+/* Animation keyframes */
+@keyframes slideInMessage {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.2) 25%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .chat-messages.scrollable {
+    scroll-behavior: auto;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bubble {
+    border-width: 2px;
+  }
+
+  .chat-input:focus {
+    border-width: 3px;
+  }
+}
+
+/* Focus management for better accessibility */
+.bubble:focus-visible,
+.chat-input:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .chat-container {
+    background: white !important;
+  }
+  
+  .bubble {
+    background: white !important;
+    border: 1px solid var(--gray-300) !important;
+    box-shadow: none !important;
+  }
+  
+  .chat-input,
+  .send-button {
+    display: none !important;
+  }
+}
+
+/* Dark mode support (future-ready) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: rgba(15, 23, 42, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+  
+  body {
+    color: var(--gray-100);
+  }
+  
+  .bubble.ai {
+    background: rgba(15, 23, 42, 0.95);
+    color: var(--gray-200);
+  }
+  
+  .chat-input {
+    background: rgba(15, 23, 42, 0.95);
+    color: var(--gray-200);
+  }
+  
+  .chat-input::placeholder {
+    color: var(--gray-500);
+  }
+}
