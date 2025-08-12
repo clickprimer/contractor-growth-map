@@ -12,7 +12,7 @@ export default function Home() {
       await resetQuiz();
       setKey(prev => prev + 1);
     } catch (error) {
-      console.error('Failed to reset quiz:', error);
+      console.error('Failed to reset consultation:', error);
       setKey(prev => prev + 1);
     } finally {
       setTimeout(() => setIsResetting(false), 500);
@@ -25,18 +25,42 @@ export default function Home() {
         <header className="app-header">
           <div className="header-content">
             <div className="header-branding">
-              <h1 className="app-title">
-                <span className="brand">ClickPrimer</span>
-                <span className="subtitle">Contractor Growth Assessment</span>
-              </h1>
-              <div className="brand-highlight"></div>
+              <div className="logo-container">
+                <img 
+                  src="https://clickprimer.com/wp-content/uploads/clickprimer-logo-1.png" 
+                  alt="ClickPrimer" 
+                  className="brand-logo"
+                />
+              </div>
+              <div className="header-text">
+                <h1 className="app-title">
+                  <span className="main-title">Profit Leak Detector</span>
+                  <span className="subtitle">AI-Powered Consultation for Contractors</span>
+                </h1>
+                <div className="trust-indicators">
+                  <div className="trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <span>Secure & Confidential</span>
+                  </div>
+                  <div className="trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                    <span>5 Minutes</span>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <button 
               className={`reset-button ${isResetting ? 'resetting' : ''}`}
               onClick={handleReset}
               disabled={isResetting}
-              title="Start over"
+              title="Start new consultation"
             >
               <div className="reset-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -47,16 +71,16 @@ export default function Home() {
                 </svg>
               </div>
               <span className="reset-text">
-                {isResetting ? 'Restarting...' : 'Restart Quiz'}
+                {isResetting ? 'Restarting...' : 'Start Over'}
               </span>
             </button>
           </div>
           
           {/* Animated background elements */}
           <div className="header-bg-elements">
-            <div className="bg-circle bg-circle-1"></div>
-            <div className="bg-circle bg-circle-2"></div>
-            <div className="bg-circle bg-circle-3"></div>
+            <div className="bg-shape bg-shape-1"></div>
+            <div className="bg-shape bg-shape-2"></div>
+            <div className="bg-shape bg-shape-3"></div>
           </div>
         </header>
 
@@ -67,16 +91,24 @@ export default function Home() {
         <footer className="app-footer">
           <div className="footer-content">
             <div className="footer-brand">
-              <span>© 2024 ClickPrimer</span>
-              <span className="footer-tagline">Lead Systems for Contractors</span>
+              <div className="footer-logo">
+                <img 
+                  src="https://clickprimer.com/wp-content/uploads/clickprimer-logo-1.png" 
+                  alt="ClickPrimer" 
+                  className="footer-brand-logo"
+                />
+              </div>
+              <div className="footer-text">
+                <span className="copyright">© 2024 ClickPrimer</span>
+                <span className="tagline">Lead Systems That Actually Work</span>
+              </div>
             </div>
             <div className="footer-trust">
-              <div className="trust-badge">
+              <div className="professional-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  <path d="m9 12 2 2 4-4"/>
+                  <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26"/>
                 </svg>
-                <span>Secure & Private</span>
+                <span>Trusted by 1000+ Contractors</span>
               </div>
             </div>
           </div>
@@ -84,6 +116,8 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Open+Sans:wght@400;500;600;700&display=swap');
+
         * {
           margin: 0;
           padding: 0;
@@ -92,9 +126,9 @@ export default function Home() {
 
         html, body {
           height: 100%;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: #333;
+          font-family: 'Open Sans', sans-serif;
+          background: linear-gradient(135deg, #0068ff 0%, #2ea3f2 100%);
+          color: #002654;
           overflow-x: hidden;
         }
 
@@ -111,15 +145,16 @@ export default function Home() {
 
         /* Header Styles */
         .app-header {
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-          padding: 1rem 0;
+          border-bottom: 2px solid #e8eeff;
+          padding: 1.25rem 0;
           position: sticky;
           top: 0;
           z-index: 200;
           overflow: hidden;
           position: relative;
+          box-shadow: 0 4px 20px rgba(0, 38, 84, 0.1);
         }
 
         .header-content {
@@ -134,62 +169,91 @@ export default function Home() {
         }
 
         .header-branding {
-          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+        }
+
+        .logo-container {
+          flex-shrink: 0;
+        }
+
+        .brand-logo {
+          height: 50px;
+          width: auto;
+          filter: drop-shadow(0 2px 8px rgba(0, 38, 84, 0.1));
+        }
+
+        .header-text {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
         }
 
         .app-title {
           display: flex;
           flex-direction: column;
           gap: 0.25rem;
-          position: relative;
         }
 
-        .brand {
-          font-size: 1.75rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+        .main-title {
+          font-family: 'Roboto', sans-serif;
+          font-size: 1.875rem;
+          font-weight: 900;
+          color: #002654;
           letter-spacing: -0.025em;
-          position: relative;
+          line-height: 1.1;
         }
 
         .subtitle {
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #64748b;
+          font-size: 1rem;
+          font-weight: 600;
+          color: #0068ff;
           letter-spacing: 0.025em;
-          opacity: 0.8;
         }
 
-        .brand-highlight {
-          position: absolute;
-          bottom: -4px;
-          left: 0;
-          height: 3px;
-          width: 0;
-          background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-          border-radius: 2px;
-          animation: expandLine 2s ease-out 0.5s forwards;
+        .trust-indicators {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+        }
+
+        .trust-badge {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          color: #30d64f;
+          font-size: 0.875rem;
+          font-weight: 600;
+          background: rgba(48, 214, 79, 0.1);
+          padding: 0.375rem 0.75rem;
+          border-radius: 8px;
+          border: 1px solid rgba(48, 214, 79, 0.2);
+        }
+
+        .trust-badge svg {
+          width: 16px;
+          height: 16px;
+          stroke-width: 2.5;
         }
 
         .reset-button {
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(10px);
-          border: 2px solid rgba(59, 130, 246, 0.2);
-          color: #3b82f6;
-          padding: 0.75rem 1.25rem;
-          border-radius: 1rem;
+          background: white;
+          border: 2px solid #0068ff;
+          color: #0068ff;
+          padding: 0.875rem 1.5rem;
+          border-radius: 12px;
           cursor: pointer;
-          font-size: 0.9rem;
-          font-weight: 600;
+          font-family: 'Roboto', sans-serif;
+          font-size: 0.95rem;
+          font-weight: 700;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
           align-items: center;
           gap: 0.5rem;
           position: relative;
           overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0, 104, 255, 0.1);
         }
 
         .reset-button::before {
@@ -199,7 +263,7 @@ export default function Home() {
           left: -100%;
           width: 100%;
           height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+          background: linear-gradient(90deg, transparent, rgba(0, 104, 255, 0.1), transparent);
           transition: left 0.6s ease;
         }
 
@@ -208,10 +272,10 @@ export default function Home() {
         }
 
         .reset-button:hover {
-          background: rgba(59, 130, 246, 0.1);
-          border-color: #3b82f6;
+          background: #0068ff;
+          color: white;
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+          box-shadow: 0 8px 25px rgba(0, 104, 255, 0.25);
         }
 
         .reset-button:active {
@@ -219,7 +283,7 @@ export default function Home() {
         }
 
         .reset-button.resetting {
-          background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+          background: linear-gradient(135deg, #30d64f, #0068ff);
           color: white;
           border-color: transparent;
         }
@@ -244,7 +308,7 @@ export default function Home() {
         .reset-icon svg {
           width: 100%;
           height: 100%;
-          stroke-width: 2;
+          stroke-width: 2.5;
         }
 
         .reset-text {
@@ -263,35 +327,35 @@ export default function Home() {
           pointer-events: none;
         }
 
-        .bg-circle {
+        .bg-shape {
           position: absolute;
           border-radius: 50%;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-          animation: float 6s ease-in-out infinite;
+          background: linear-gradient(135deg, rgba(0, 104, 255, 0.05), rgba(46, 163, 242, 0.05));
+          animation: float 8s ease-in-out infinite;
         }
 
-        .bg-circle-1 {
-          width: 80px;
-          height: 80px;
-          top: -40px;
-          right: 10%;
+        .bg-shape-1 {
+          width: 120px;
+          height: 120px;
+          top: -60px;
+          right: 8%;
           animation-delay: 0s;
         }
 
-        .bg-circle-2 {
-          width: 60px;
-          height: 60px;
-          top: 50%;
-          right: 5%;
-          animation-delay: -2s;
+        .bg-shape-2 {
+          width: 80px;
+          height: 80px;
+          top: 60%;
+          right: 3%;
+          animation-delay: -3s;
         }
 
-        .bg-circle-3 {
-          width: 40px;
-          height: 40px;
-          top: 20%;
-          left: 5%;
-          animation-delay: -4s;
+        .bg-shape-3 {
+          width: 60px;
+          height: 60px;
+          top: 10%;
+          left: 3%;
+          animation-delay: -6s;
         }
 
         /* Main Content */
@@ -303,12 +367,13 @@ export default function Home() {
 
         /* Footer */
         .app-footer {
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
-          border-top: 1px solid rgba(255, 255, 255, 0.2);
-          padding: 1rem;
+          border-top: 2px solid #e8eeff;
+          padding: 1.25rem;
           position: relative;
           z-index: 100;
+          box-shadow: 0 -4px 20px rgba(0, 38, 84, 0.1);
         }
 
         .footer-content {
@@ -324,19 +389,32 @@ export default function Home() {
 
         .footer-brand {
           display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .footer-brand-logo {
+          height: 32px;
+          width: auto;
+          opacity: 0.8;
+        }
+
+        .footer-text {
+          display: flex;
           flex-direction: column;
           gap: 0.25rem;
         }
 
-        .footer-brand span:first-child {
-          color: #64748b;
+        .copyright {
+          color: #002654;
           font-size: 0.875rem;
-          font-weight: 500;
+          font-weight: 600;
         }
 
-        .footer-tagline {
-          color: #94a3b8;
+        .tagline {
+          color: #2ea3f2;
           font-size: 0.8rem;
+          font-weight: 500;
           letter-spacing: 0.025em;
         }
 
@@ -345,33 +423,28 @@ export default function Home() {
           align-items: center;
         }
 
-        .trust-badge {
+        .professional-badge {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          color: #64748b;
+          color: #002654;
           font-size: 0.875rem;
-          font-weight: 500;
-          background: rgba(16, 185, 129, 0.1);
-          padding: 0.5rem 0.75rem;
-          border-radius: 0.75rem;
-          border: 1px solid rgba(16, 185, 129, 0.2);
+          font-weight: 600;
+          background: rgba(232, 204, 0, 0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 10px;
+          border: 1px solid rgba(232, 204, 0, 0.3);
         }
 
-        .trust-badge svg {
+        .professional-badge svg {
           width: 16px;
           height: 16px;
           stroke-width: 2;
-          color: #10b981;
+          color: #e8cc00;
+          fill: #e8cc00;
         }
 
         /* Animations */
-        @keyframes expandLine {
-          to {
-            width: 100%;
-          }
-        }
-
         @keyframes spin {
           from {
             transform: rotate(0deg);
@@ -384,18 +457,30 @@ export default function Home() {
         @keyframes float {
           0%, 100% {
             transform: translateY(0px) rotate(0deg);
-            opacity: 0.5;
+            opacity: 0.3;
           }
           50% {
-            transform: translateY(-20px) rotate(180deg);
-            opacity: 0.8;
+            transform: translateY(-15px) rotate(180deg);
+            opacity: 0.6;
           }
         }
 
         /* Mobile Optimizations */
+        @media (max-width: 968px) {
+          .header-branding {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-start;
+          }
+
+          .trust-indicators {
+            justify-content: flex-start;
+          }
+        }
+
         @media (max-width: 768px) {
           .app-header {
-            padding: 0.75rem 0;
+            padding: 1rem 0;
           }
           
           .header-content {
@@ -407,19 +492,20 @@ export default function Home() {
           
           .header-branding {
             text-align: center;
+            align-items: center;
           }
           
-          .brand {
+          .main-title {
             font-size: 1.5rem;
           }
           
           .subtitle {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
           }
           
           .reset-button {
-            padding: 0.625rem 1rem;
-            font-size: 0.85rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
             align-self: center;
             min-width: 160px;
             justify-content: center;
@@ -432,9 +518,14 @@ export default function Home() {
             gap: 0.75rem;
           }
 
-          .bg-circle-1,
-          .bg-circle-2,
-          .bg-circle-3 {
+          .trust-indicators {
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+
+          .bg-shape-1,
+          .bg-shape-2,
+          .bg-shape-3 {
             display: none;
           }
         }
@@ -444,40 +535,53 @@ export default function Home() {
             padding: 0 0.75rem;
           }
 
-          .brand {
+          .brand-logo {
+            height: 40px;
+          }
+
+          .main-title {
             font-size: 1.35rem;
           }
 
           .subtitle {
+            font-size: 0.85rem;
+          }
+
+          .trust-badge {
             font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
           }
 
           .reset-button {
-            padding: 0.5rem 0.875rem;
-            font-size: 0.8rem;
+            padding: 0.625rem 1rem;
+            font-size: 0.85rem;
           }
 
           .footer-content {
             padding: 0 0.75rem;
           }
 
-          .footer-brand span:first-child {
+          .footer-brand-logo {
+            height: 28px;
+          }
+
+          .copyright {
             font-size: 0.8rem;
           }
 
-          .footer-tagline {
+          .tagline {
             font-size: 0.75rem;
           }
 
-          .trust-badge {
+          .professional-badge {
             font-size: 0.8rem;
-            padding: 0.375rem 0.625rem;
+            padding: 0.375rem 0.75rem;
           }
         }
 
         /* High DPI screens */
         @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-          .brand {
+          .main-title {
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
           }
@@ -485,8 +589,7 @@ export default function Home() {
 
         /* Reduced motion preferences */
         @media (prefers-reduced-motion: reduce) {
-          .bg-circle,
-          .brand-highlight,
+          .bg-shape,
           .reset-button,
           .reset-icon {
             animation: none;
@@ -499,7 +602,7 @@ export default function Home() {
 
         /* Focus styles for accessibility */
         .reset-button:focus-visible {
-          outline: 2px solid #3b82f6;
+          outline: 3px solid #30d64f;
           outline-offset: 2px;
         }
 
@@ -509,36 +612,16 @@ export default function Home() {
         }
 
         ::-webkit-scrollbar-track {
-          background: rgba(241, 245, 249, 0.5);
+          background: rgba(232, 238, 255, 0.5);
         }
 
         ::-webkit-scrollbar-thumb {
-          background: rgba(203, 213, 225, 0.8);
+          background: rgba(0, 104, 255, 0.3);
           border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-          background: rgba(148, 163, 184, 0.9);
-        }
-
-        /* Dark mode support (if needed in future) */
-        @media (prefers-color-scheme: dark) {
-          .app-header {
-            background: rgba(15, 23, 42, 0.95);
-          }
-
-          .app-footer {
-            background: rgba(15, 23, 42, 0.95);
-          }
-
-          .footer-brand span:first-child,
-          .trust-badge {
-            color: #e2e8f0;
-          }
-
-          .footer-tagline {
-            color: #94a3b8;
-          }
+          background: rgba(0, 104, 255, 0.5);
         }
       `}</style>
     </>
