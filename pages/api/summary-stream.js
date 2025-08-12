@@ -1,166 +1,54 @@
-import { OpenAI } from "openai";
-import fs from "fs";
-import path from "path";
+import { OpenAI } from 'openai';
 
-export const config = {
-  api: {
-    bodyParser: true,
-  },
-};
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-
-function loadInstructions() {
-  const candidates = [
-    path.join(process.cwd(), "utils", "gpt-instructions.txt"),
-    path.join(process.cwd(), "utils", "gpt-instructions (1).txt"),
-    path.join(process.cwd(), "gpt-instructions.txt"),
-    path.join(process.cwd(), "gpt-instructions (1).txt"),
-  ];
-  
-  for (const p of candidates) {
-    try {
-      if (fs.existsSync(p)) {
-        const content = fs.readFileSync(p, "utf8");
-        // Extract the final summary section
-        const summaryMatch = content.match(/📊 Final Output: Contractor Growth Map[\s\S]*$/i);
-        if (summaryMatch) {
-          return summaryMatch[0];
-        }
-        return content;
-      }
-    } catch {}
-  }
-  
-  return `You are generating the final "Contractor Growth Map" summary.
-DO NOT restate or list the quiz questions. Do not ask more questions.
-Organize into exactly these sections (with these headers and emojis):
-
-📊 Contractor Growth Map
-
-✅ Your Marketing & Operations Strengths – 3–5 bullets of what they're doing well
-⚠️ Your Bottlenecks & Missed Opportunities – 3–5 bullets of areas needing improvement  
-🛠️ Recommendations to Fix Your Leaks & Grow Your Profits – 5 prioritized actionable suggestions
-💡 How ClickPrimer Can Help You – 3–5 relevant tools/services matched to their needs
-
-Tone: practical, blue-collar friendly, concise. Focus on insights, not restating answers.`;
-}
-
-// Get quiz flow with error handling
-let quizFlow = null;
-try {
-  // Try different possible import paths
-  if (!quizFlow) {
-    try {
-      const quizModule = require('./quiz-response.js');
-      quizFlow = quizModule.quizFlow;
-    } catch (e) {
-      try {
-        const quizModule = require('./quiz_response.js');
-        quizFlow = quizModule.quizFlow;
-      } catch (e2) {
-        console.log('Could not import quiz flow, using fallback');
-      }
-    }
-  }
-} catch (error) {
-  console.log('Quiz flow import failed, using fallback');
-}
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.status(405).end();
-    return;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const { answers } = req.body;
+
+  if (!answers) {
+    return res.status(400).json({ error: 'Answers are required' });
+  }
+
+  // Set up SSE headers
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+  });
+
   try {
-    // Set up streaming headers
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
-    res.flushHeaders?.();
-
-    // Get quiz data from the quiz flow instance or use fallback
-    const answers = req.body?.answers || quizFlow?.answersStore || [];
-    const userTags = quizFlow ? Array.from(quizFlow.userTags || []) : [];
-    const categoryScores = quizFlow?.categoryScores || {};
-    const tierSignals = quizFlow?.tierSignals || {};
-    const userProfile = quizFlow?.userProfile || {};
-    const recommendation = quizFlow?.calculateRecommendation ? quizFlow.calculateRecommendation() : {
-      tier: 'system',
-      score: 50,
-      tierSignals: { lite: 0, system: 1, elite: 0 },
-      tags: [],
-      categoryScores: {}
-    };
-
-    // Build comprehensive user context
-    const userContext = [
-      `Name: ${userProfile.name || 'Not provided'}`,
-      `Business Type: ${userProfile.job || 'General contractor'}`,
-      `Answers: ${answers.map((a, i) => `A${i + 1}: ${a}`).join(' | ')}`,
-      `User Tags: ${userTags.join(', ') || 'None'}`,
-      `Category Scores: ${Object.entries(categoryScores).map(([cat, score]) => `${cat}: ${score}`).join(', ')}`,
-      `Tier Signals: ${Object.entries(tierSignals).map(([tier, count]) => `${tier}: ${count}`).join(', ')}`,
-      `Recommended Tier: ${recommendation.tier}`,
-      `Overall Score: ${recommendation.score}%`
-    ].join('\n');
-
-    const systemPrompt = loadInstructions();
+    const systemPrompt = `You are a ClickPrimer AI consultant. Create a brief executive summary of the contractor's business situation based on their quiz answers.
+    Focus on key strengths, main challenges, and immediate opportunities. Keep it to 3-4 sentences.`;
 
     const stream = await openai.chat.completions.create({
-      model: MODEL,
-      temperature: 0.6,
-      stream: true,
+      model: 'gpt-4o-mini',
       messages: [
-        { 
-          role: "system", 
-          content: systemPrompt + "\n\nPersonalize based on their business type and tailor recommendations to their specific needs and readiness level."
-        },
-        {
-          role: "user",
-          content: `Here is the complete user data for generating their Contractor Growth Map:
-
-${userContext}
-
-Generate the final Contractor Growth Map now. Focus on actionable insights based on their specific situation, not just generic advice.`
-        },
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Create a brief summary for this contractor: ${JSON.stringify(answers)}` }
       ],
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 200,
     });
 
-    let hasStarted = false;
-    
-    for await (const part of stream) {
-      const delta = part.choices?.[0]?.delta?.content || "";
-      if (delta) {
-        // Add a brief pause before starting if this is the first chunk
-        if (!hasStarted) {
-          await new Promise(resolve => setTimeout(resolve, 300));
-          hasStarted = true;
-        }
-        
-        res.write(delta);
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || '';
+      if (content) {
+        res.write(`data: ${JSON.stringify({ content })}\n\n`);
       }
     }
 
-    // Add closing section
-    setTimeout(() => {
-      res.write(`
-
----
-
-**Who We Are**
-ClickPrimer builds lead systems for contractors who want real results. We'll help you grow smarter, faster, and with less stress using automated marketing systems made just for your trade. Whether you're just starting or scaling up, we're ready to help you reach the next level.
-
-⬇️ **Ready to get started?** Set up a meeting with us or give us a call. We look forward to speaking with you!`);
-      res.end();
-    }, 100);
-
-  } catch (e) {
-    console.error('Summary generation error:', e);
-    try {
-      res.write("⚠️ Error generating your growth map. Please try refreshing the page.");
-    } catch {}
+    res.write(`data: [DONE]\n\n`);
+    res.end();
+  } catch (error) {
+    console.error('Error in summary:', error);
+    res.write(`data: ${JSON.stringify({ error: 'Failed to generate summary' })}\n\n`);
     res.end();
   }
 }
