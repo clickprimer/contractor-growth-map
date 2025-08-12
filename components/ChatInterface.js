@@ -334,18 +334,18 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
           position: sticky;
           top: 0;
           z-index: 100;
-          padding: 1.25rem 1.5rem;
+          padding: 0.75rem 1rem;
           background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
-          border-bottom: 2px solid #e8eeff;
-          box-shadow: 0 4px 20px rgba(0, 38, 84, 0.1);
+          border-bottom: 1px solid #e8eeff;
+          box-shadow: 0 2px 10px rgba(0, 38, 84, 0.08);
         }
 
         .progress-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
         }
 
         .progress-title {
@@ -375,21 +375,21 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
         }
 
         .progress-bar {
-          height: 8px;
+          height: 4px;
           background: #e8eeff;
-          border-radius: 6px;
+          border-radius: 3px;
           overflow: hidden;
           position: relative;
-          box-shadow: inset 0 2px 4px rgba(0, 38, 84, 0.1);
+          box-shadow: inset 0 1px 2px rgba(0, 38, 84, 0.1);
         }
 
         .progress-fill {
           height: 100%;
           background: linear-gradient(90deg, #0068ff 0%, #2ea3f2 50%, #30d64f 100%);
-          border-radius: 6px;
+          border-radius: 3px;
           transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
-          box-shadow: 0 2px 8px rgba(0, 104, 255, 0.3);
+          box-shadow: 0 1px 4px rgba(0, 104, 255, 0.3);
         }
 
         .progress-fill::before {
@@ -408,9 +408,9 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
 
         .progress-glow {
           position: absolute;
-          top: -4px;
-          height: 16px;
-          width: 16px;
+          top: -2px;
+          height: 8px;
+          width: 8px;
           background: radial-gradient(circle, #30d64f 0%, transparent 70%);
           border-radius: 50%;
           transform: translateX(-50%);
@@ -463,7 +463,7 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
         .consultation-messages {
           flex: 1;
           overflow-y: auto;
-          padding: 2rem 1.5rem 1rem;
+          padding: 1.5rem 1rem 1rem;
           position: relative;
           z-index: 1;
         }
@@ -641,13 +641,13 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
 
         /* Input Form */
         .consultation-input-form {
-          padding: 1.5rem;
+          padding: 1rem;
           background: white;
-          border-top: 2px solid #e8eeff;
+          border-top: 1px solid #e8eeff;
           position: sticky;
           bottom: 0;
           z-index: 100;
-          box-shadow: 0 -4px 20px rgba(0, 38, 84, 0.1);
+          box-shadow: 0 -2px 10px rgba(0, 38, 84, 0.08);
         }
 
         .input-wrapper {
@@ -820,7 +820,7 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
         /* Mobile Optimization */
         @media (max-width: 768px) {
           .consultation-messages {
-            padding: 1.5rem 1rem;
+            padding: 1rem 0.75rem;
           }
 
           .message-bubble {
@@ -843,7 +843,7 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
           }
 
           .consultation-input-form {
-            padding: 1rem;
+            padding: 0.75rem;
           }
 
           .input-wrapper {
@@ -864,7 +864,7 @@ This consultation takes just a few minutes. Feel free to expand on any answer—
           }
 
           .progress-container {
-            padding: 1rem;
+            padding: 0.5rem 0.75rem;
           }
 
           .progress-label {
