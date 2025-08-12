@@ -8,14 +8,227 @@
   left: 0;
   right: 0;
   bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9f2ff 100%);
 }
 
-.main {
-  width: 100%;
+/* Header Styles */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: white;
+  border-bottom: 1px solid rgba(0, 104, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 100;
+}
+
+.headerContent {
   height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+}
+
+.logoText {
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #0068ff 0%, #2ea3f2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.divider {
+  color: #cbd5e0;
+  font-weight: 300;
+  font-size: 24px;
+  margin: 0 4px;
+}
+
+.appTitle {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #002654;
+}
+
+.restartButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #0068ff;
+  border-radius: 8px;
+  color: #0068ff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restartButton:hover {
+  background: #0068ff;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 104, 255, 0.2);
+}
+
+.restartButton span {
+  display: inline-block;
+}
+
+/* Main Content Area */
+.main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
+  width: 100%;
+  margin-top: 60px;
+  margin-bottom: 50px;
+  overflow: hidden;
+}
+
+/* Footer Styles */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: white;
+  border-top: 1px solid rgba(0, 104, 255, 0.1);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 100;
+}
+
+.footerContent {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 20px;
+}
+
+.copyright {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.footerDivider {
+  color: #cbd5e0;
+  font-size: 12px;
+}
+
+.trusted {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  color: #0068ff;
+  font-weight: 600;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .container {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+  
+  .header {
+    height: 56px;
+  }
+  
+  .logoSection {
+    gap: 8px;
+  }
+  
+  .logo {
+    height: 28px;
+  }
+  
+  .logoText {
+    font-size: 20px;
+  }
+  
+  .appTitle {
+    font-size: 16px;
+  }
+  
+  .divider {
+    font-size: 20px;
+    margin: 0 2px;
+  }
+  
+  .restartButton {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .restartButton span {
+    display: none; /* Hide text on mobile, show only icon */
+  }
+  
+  .main {
+    margin-top: 56px;
+    margin-bottom: 48px;
+  }
+  
+  .footer {
+    height: 48px;
+  }
+  
+  .footerContent {
+    gap: 8px;
+  }
+  
+  .copyright,
+  .trusted {
+    font-size: 12px;
+  }
+  
+  .footerDivider {
+    font-size: 10px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .headerContent {
+    max-width: 100%;
+    padding: 0 24px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1440px) {
+  .headerContent {
+    max-width: 1600px;
+  }
 }
