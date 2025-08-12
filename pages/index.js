@@ -50,7 +50,7 @@ export default function Home() {
                       <circle cx="12" cy="12" r="10"/>
                       <polyline points="12,6 12,12 16,14"/>
                     </svg>
-                    <span>5 Minutes</span>
+                    <span>10 Minutes</span>
                   </div>
                 </div>
               </div>
@@ -99,7 +99,7 @@ export default function Home() {
                 />
               </div>
               <div className="footer-text">
-                <span className="copyright">© 2024 ClickPrimer</span>
+                <span className="copyright">© 2025 ClickPrimer</span>
                 <span className="tagline">Lead Systems That Actually Work</span>
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function Home() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26"/>
                 </svg>
-                <span>Trusted by 1000+ Contractors</span>
+                <span>Trusted by Contractors</span>
               </div>
             </div>
           </div>
@@ -138,29 +138,31 @@ export default function Home() {
 
         .app-container {
           height: 100vh;
+          width: 100vw;
           display: flex;
           flex-direction: column;
           position: relative;
+          overflow: hidden;
         }
 
         /* Header Styles */
         .app-header {
           background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
-          border-bottom: 2px solid #e8eeff;
-          padding: 1.25rem 0;
+          border-bottom: 1px solid #e8eeff;
+          padding: 0.75rem 0;
           position: sticky;
           top: 0;
           z-index: 200;
           overflow: hidden;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 38, 84, 0.1);
+          box-shadow: 0 2px 10px rgba(0, 38, 84, 0.08);
         }
 
         .header-content {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 0 1.5rem;
+          padding: 0 1rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -369,22 +371,22 @@ export default function Home() {
         .app-footer {
           background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
-          border-top: 2px solid #e8eeff;
-          padding: 1.25rem;
+          border-top: 1px solid #e8eeff;
+          padding: 0.75rem;
           position: relative;
           z-index: 100;
-          box-shadow: 0 -4px 20px rgba(0, 38, 84, 0.1);
+          box-shadow: 0 -2px 10px rgba(0, 38, 84, 0.08);
         }
 
         .footer-content {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 0 1.5rem;
+          padding: 0 1rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
           flex-wrap: wrap;
-          gap: 1rem;
+          gap: 0.75rem;
         }
 
         .footer-brand {
@@ -469,7 +471,7 @@ export default function Home() {
         @media (max-width: 968px) {
           .header-branding {
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.5rem;
             align-items: flex-start;
           }
 
@@ -480,13 +482,13 @@ export default function Home() {
 
         @media (max-width: 768px) {
           .app-header {
-            padding: 1rem 0;
+            padding: 0.5rem 0;
           }
           
           .header-content {
-            padding: 0 1rem;
+            padding: 0 0.75rem;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
             align-items: stretch;
           }
           
@@ -512,10 +514,10 @@ export default function Home() {
           }
           
           .footer-content {
-            padding: 0 1rem;
+            padding: 0 0.75rem;
             flex-direction: column;
             text-align: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
           }
 
           .trust-indicators {
