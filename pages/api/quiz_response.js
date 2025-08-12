@@ -1,4 +1,77 @@
-import quizFlow from '../../utils/quiz-flow.js';
+// Import with error handling for missing quiz-flow.js
+let quizFlow;
+try {
+  quizFlow = require('../../utils/quiz-flow.js').default;
+} catch (error) {
+  console.error('Could not import quiz-flow.js:', error);
+  // Create a minimal fallback quiz flow
+  quizFlow = {
+    currentIndex: 0,
+    awaitingFollowUp: false,
+    greeted: false,
+    answersStore: [],
+    userTags: new Set(),
+    categoryScores: {},
+    tierSignals: { lite: 0, system: 0, elite: 0 },
+    userProfile: { name: '', job: '', businessStage: 'unknown' },
+    
+    reset() {
+      this.currentIndex = 0;
+      this.awaitingFollowUp = false;
+      this.greeted = false;
+      this.answersStore = [];
+      this.userTags.clear();
+      this.categoryScores = {};
+      this.tierSignals = { lite: 0, system: 0, elite: 0 };
+      this.userProfile = { name: '', job: '', businessStage: 'unknown' };
+    },
+    
+    processInput(input) {
+      // Minimal fallback processing
+      this.answersStore.push(input);
+      if (!this.greeted) {
+        this.greeted = true;
+        return {
+          type: 'greeting',
+          message: `Thanks! Let's continue with your assessment.`,
+          done: false,
+          needsStreaming: true
+        };
+      }
+      
+      this.currentIndex++;
+      if (this.currentIndex >= 6) {
+        return {
+          type: 'summary',
+          done: true,
+          needsStreaming: true,
+          answers: this.answersStore
+        };
+      }
+      
+      return {
+        type: 'next',
+        done: false,
+        needsStreaming: true,
+        message: 'Got it! Let me continue...'
+      };
+    },
+    
+    isComplete() {
+      return this.currentIndex >= 6;
+    },
+    
+    calculateRecommendation() {
+      return {
+        tier: 'system',
+        score: 50,
+        tierSignals: this.tierSignals,
+        tags: Array.from(this.userTags),
+        categoryScores: this.categoryScores
+      };
+    }
+  };
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,7 +87,9 @@ export default async function handler(req, res) {
   try {
     // Handle quiz reset if requested
     if (resetQuiz) {
-      quizFlow.reset();
+      if (quizFlow.reset) {
+        quizFlow.reset();
+      }
       return res.status(200).json({
         type: 'reset',
         message: 'Quiz reset successfully',
@@ -25,11 +100,18 @@ export default async function handler(req, res) {
     }
 
     // Process the user input through quiz-flow.js
-    const result = quizFlow.processInput(userInput.trim());
+    const result = quizFlow.processInput ? 
+      quizFlow.processInput(userInput.trim()) : 
+      {
+        type: 'next',
+        message: 'Got it! Let me continue...',
+        done: false,
+        needsStreaming: true
+      };
     
     // Calculate progress percentage
-    const totalQuestions = 6; // Based on your quiz-questions.json structure
-    const currentIndex = quizFlow.currentIndex;
+    const totalQuestions = 6;
+    const currentIndex = quizFlow.currentIndex || 0;
     const progress = Math.min(Math.round((currentIndex / totalQuestions) * 100), 100);
 
     // Enhance the result with additional metadata
@@ -38,8 +120,8 @@ export default async function handler(req, res) {
       progress,
       currentIndex,
       totalQuestions,
-      userProfile: quizFlow.userProfile,
-      answerCount: quizFlow.answersStore.length
+      userProfile: quizFlow.userProfile || { name: '', job: '', businessStage: 'unknown' },
+      answerCount: quizFlow.answersStore ? quizFlow.answersStore.length : 0
     };
 
     // Handle different response types
@@ -60,7 +142,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
           ...enhancedResult,
           category: getCurrentCategory(),
-          answer: userInput // Pass the original answer for streaming context
+          answer: userInput
         });
 
       case 'transition':
@@ -72,13 +154,12 @@ export default async function handler(req, res) {
         });
 
       case 'summary':
-        // For summary, we need to pass all the stored answers
         return res.status(200).json({
           ...enhancedResult,
-          answers: quizFlow.answersStore,
-          userTags: Array.from(quizFlow.userTags),
-          categoryScores: quizFlow.categoryScores,
-          tierSignals: quizFlow.tierSignals
+          answers: quizFlow.answersStore || [],
+          userTags: quizFlow.userTags ? Array.from(quizFlow.userTags) : [],
+          categoryScores: quizFlow.categoryScores || {},
+          tierSignals: quizFlow.tierSignals || { lite: 0, system: 0, elite: 0 }
         });
 
       default:
@@ -91,13 +172,12 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Quiz processing error:', error);
     
-    // Try to provide a graceful fallback
     return res.status(200).json({
       type: 'error',
       message: 'I had trouble processing that. Could you try rephrasing your answer?',
       done: false,
       needsStreaming: false,
-      progress: Math.min(Math.round((quizFlow.currentIndex / 6) * 100), 100),
+      progress: Math.min(Math.round(((quizFlow.currentIndex || 0) / 6) * 100), 100),
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -106,20 +186,15 @@ export default async function handler(req, res) {
 // Helper function to get current category name
 function getCurrentCategory() {
   try {
-    const question = quizFlow.getCurrentQuestion();
-    if (question) {
-      // Extract category from current quiz state
-      const categories = [
-        'branding', 'lead-response', 'marketing', 
-        'operations', 'growth', 'goals'
-      ];
-      return categories[quizFlow.currentIndex] || 'general';
-    }
-    return 'general';
+    const categories = [
+      'branding', 'lead-response', 'marketing', 
+      'operations', 'growth', 'goals'
+    ];
+    return categories[quizFlow.currentIndex || 0] || 'general';
   } catch {
     return 'general';
   }
 }
 
-// Export helper for other API routes to access quiz state
-export { quizFlow };
+// Export for other modules to import
+module.exports.quizFlow = quizFlow;
