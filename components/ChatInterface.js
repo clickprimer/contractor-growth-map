@@ -3,7 +3,7 @@ import quizData from '../data/quiz-questions.json';
 
 const ChatInterface = ({ onQuizComplete }) => {
   const [messages, setMessages] = useState([]);
-  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(-1); // Start at -1 for name collection
+  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(-1);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [answers, setAnswers] = useState({});
   const [selectedOption, setSelectedOption] = useState(null);
@@ -11,6 +11,7 @@ const ChatInterface = ({ onQuizComplete }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [userName, setUserName] = useState('');
+  const [userTrade, setUserTrade] = useState('');
   const [awaitingNameInput, setAwaitingNameInput] = useState(false);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -55,7 +56,6 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         setAwaitingNameInput(true);
         setShowIntro(false);
         
-        // Focus input after intro
         setTimeout(() => {
           inputRef.current?.focus();
         }, 1000);
@@ -69,7 +69,6 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     e.preventDefault();
     if (!inputValue.trim()) return;
     
-    // Add user message
     const userMessage = {
       type: 'user',
       content: inputValue,
@@ -79,34 +78,60 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     setMessages(prev => [...prev, userMessage]);
     
     if (awaitingNameInput) {
-      // Store name and contractor type
-      setUserName(inputValue);
+      // Parse name and trade from input
+      let name = inputValue;
+      let trade = '';
+      
+      // Try to parse different formats
+      if (inputValue.includes(',')) {
+        const parts = inputValue.split(',').map(s => s.trim());
+        name = parts[0];
+        trade = parts[1] || '';
+      } else if (inputValue.toLowerCase().includes(' from ')) {
+        const parts = inputValue.split(/ from /i);
+        name = parts[0].trim();
+        trade = parts[1] ? parts[1].trim() : '';
+      }
+      
+      setUserName(name);
+      setUserTrade(trade);
       setAnswers(prev => ({
         ...prev,
-        introduction: inputValue
+        introduction: inputValue,
+        name: name,
+        trade: trade
       }));
       
       setAwaitingNameInput(false);
       setInputValue('');
       
-      // Thank them and start quiz
+      // Personalized response using their name and trade
       setTimeout(() => {
+        let responseText = `Great to meet you, **${name}**! `;
+        if (trade) {
+          responseText += `I see you're in the **${trade}** business. That's fantastic - `;
+          responseText += `the ${trade} industry has huge opportunities for growth right now. `;
+        } else {
+          responseText += `Thanks for being here! `;
+        }
+        responseText += `Let's dive into some quick questions to identify where your ${trade || 'contracting'} business might be leaving money on the table.`;
+        
         const thankYouMessage = {
           type: 'ai',
-          content: `Great to meet you! Thanks for sharing that with me. Now let's dive into some quick questions to identify where your business might be leaving money on the table.`,
+          content: responseText,
           timestamp: new Date()
         };
         
         setMessages(prev => [...prev, thankYouMessage]);
         
-        // Start first question
+        // Start first question after delay
         setTimeout(() => {
           setCurrentCategoryIndex(0);
           showNextQuestion();
-        }, 1500);
+        }, 2000);
       }, 800);
     } else {
-      // Handle any other text input during quiz if needed
+      // Handle other text input if needed
       setInputValue('');
     }
     
@@ -143,7 +168,6 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     const currentCategory = categories[currentCategoryIndex];
     const { option, label } = selectedOption;
     
-    // Add user message
     const userMessage = {
       type: 'user',
       content: label,
@@ -152,7 +176,6 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     
     setMessages(prev => [...prev, userMessage]);
     
-    // Store answer
     const answerKey = showFollowUp ? 
       `${currentCategory.category}_followup` : 
       currentCategory.category;
@@ -166,7 +189,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
       }
     }));
     
-    // Show gold nugget insight
+    // Show gold nugget
     if (!showFollowUp && currentCategory.gold_nuggets) {
       const nuggetKey = label.charAt(0);
       const goldNugget = currentCategory.gold_nuggets[nuggetKey];
@@ -185,7 +208,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
       }
     }
     
-    // Check if we should show follow-up
+    // Check for follow-up
     if (!showFollowUp && currentCategory.followUp) {
       const optionLetter = label.charAt(0);
       if (currentCategory.followUp.condition.includes(optionLetter)) {
@@ -207,7 +230,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
       }
     }
     
-    // Move to next category or complete
+    // Move to next or complete
     if (showFollowUp || !currentCategory.followUp || 
         (currentCategory.followUp && !currentCategory.followUp.condition.includes(label.charAt(0)))) {
       
@@ -237,13 +260,13 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     
     let resultMessage = '';
     if (scorePercentage >= 75) {
-      resultMessage = `🎯 **Outstanding!** Your business is in the top 10% of contractors. You're ready for advanced growth strategies.`;
+      resultMessage = `🎯 **Outstanding, ${userName}!** Your ${userTrade || 'contracting'} business is in the top 10% of contractors.`;
     } else if (scorePercentage >= 50) {
-      resultMessage = `💪 **Good foundation!** You have solid systems in place but there are significant profit opportunities we've identified.`;
+      resultMessage = `💪 **Good foundation, ${userName}!** Your ${userTrade || 'contracting'} business has solid systems but significant profit opportunities.`;
     } else if (scorePercentage >= 25) {
-      resultMessage = `🔧 **Major potential!** You're leaving substantial money on the table, but the good news is we can fix this quickly.`;
+      resultMessage = `🔧 **Major potential, ${userName}!** Your ${userTrade || 'contracting'} business is leaving money on the table.`;
     } else {
-      resultMessage = `🚀 **Huge opportunity!** You have the most to gain—implementing just a few changes could double your revenue.`;
+      resultMessage = `🚀 **Huge opportunity, ${userName}!** Your ${userTrade || 'contracting'} business has the most to gain.`;
     }
     
     const completionMessage = {
@@ -254,13 +277,7 @@ ${resultMessage}
 
 **Your Profit Leak Score: ${totalScore}/${maxScore}**
 
-Based on your answers, I'm generating your personalized **Contractor Growth Map** with:
-• Your top 3-5 profit leaks
-• Estimated revenue you're losing
-• Specific action steps to fix each leak
-• Priority order for maximum impact
-
-*Preparing your results...*`,
+Generating your personalized **Contractor Growth Map**...`,
       timestamp: new Date()
     };
     
@@ -269,11 +286,11 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
     setTimeout(() => {
       onQuizComplete({
         userName,
+        userTrade,
         answers,
         score: totalScore,
         maxScore,
-        percentage: scorePercentage,
-        categories: categories.map(c => c.category)
+        percentage: scorePercentage
       });
     }, 3000);
   };
@@ -332,7 +349,7 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
               ))}
             </div>
             
-            {/* Show options for current question */}
+            {/* Options */}
             {message.question && index === messages.length - 1 && !isComplete && (
               <div className="options-container">
                 {message.question.options.map((option, optIndex) => (
@@ -466,6 +483,10 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
 
+        .ai-message .message-content p {
+          color: #333333;
+        }
+
         .message-content.gold-nugget {
           background: linear-gradient(135deg, #fffbeb, #fef3c7);
           border: 2px solid #fbbf24;
@@ -474,9 +495,12 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
 
         .user-message .message-content {
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          color: white;
           border-bottom-right-radius: 6px;
           box-shadow: 0 2px 12px rgba(0, 104, 255, 0.3);
+        }
+
+        .user-message .message-content p {
+          color: white !important;
         }
 
         .message-content p {
@@ -489,8 +513,8 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
         }
 
         .message-content strong {
-          font-weight: 600;
-          color: #002654;
+          font-weight: 700;
+          color: #0068ff;
         }
 
         .gold-nugget strong {
@@ -498,7 +522,7 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
         }
 
         .user-message .message-content strong {
-          color: white;
+          color: white !important;
         }
 
         :global(.sparkle) {
@@ -527,7 +551,7 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           font-family: 'Open Sans', sans-serif;
           font-size: 15px;
           font-weight: 500;
-          color: #334155;
+          color: #333333;
           cursor: pointer;
           transition: all 0.2s ease;
           text-align: left;
@@ -573,10 +597,6 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
         .submit-button:hover {
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(48, 214, 79, 0.4);
-        }
-
-        .submit-button:active {
-          transform: translateY(0);
         }
 
         .arrow {
@@ -628,11 +648,7 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           box-shadow: 0 4px 12px rgba(0, 104, 255, 0.4);
         }
 
-        .send-button:active {
-          transform: translateY(0);
-        }
-
-        /* Mobile Optimizations */
+        /* Mobile */
         @media (max-width: 768px) {
           .progress-container {
             top: 56px;
@@ -653,12 +669,9 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           .option-button {
             padding: 14px 16px;
             font-size: 14px;
-            margin-bottom: 10px;
           }
 
           .submit-button {
-            padding: 16px 24px;
-            font-size: 16px;
             width: 100%;
             justify-content: center;
           }
@@ -672,11 +685,10 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           }
 
           .message-input {
-            font-size: 16px; /* Prevent zoom on iOS */
+            font-size: 16px;
           }
         }
 
-        /* Ensure no scroll on the outer page */
         :global(body) {
           overflow: hidden !important;
           position: fixed !important;
