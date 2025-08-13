@@ -353,17 +353,6 @@ Generating your personalized **Contractor Growth Map**...`,
                 }} />
               ))}
             </div>
-            
-            {/* Options */}
-            {message.question && index === messages.length - 1 && !isComplete && (
-              <div className="options-container">
-                {message.question.options.map((option, optIndex) => (
-                  <button
-                    key={optIndex}
-                    className={`option-button ${
-                      selectedOption?.label === option.label ? 'selected' : ''
-                    }`}
-                    onClick={() => handleOptionSelect(option, option.label)}
                   >
                     {option.label}
                   </button>
@@ -375,28 +364,9 @@ Generating your personalized **Contractor Growth Map**...`,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Options Panel (persistent, below messages, above input) */}
-      {currentCategoryIndex >= 0 && !isComplete && (
-        <div className="options-panel">
-          {(showFollowUp 
-            ? categories[currentCategoryIndex]?.followUp?.options 
-            : categories[currentCategoryIndex]?.screener?.options
-          )?.map((opt, i) => (
-            <button 
-              key={i} 
-              className={`option-chip ${selectedOption?.label === opt.label ? 'selected' : ''}`}
-              onClick={() => handleOptionSelect(opt, opt.label || String.fromCharCode(65 + i))}
-            >
-              {(opt.label || String.fromCharCode(65 + i))}. {opt.text || opt.value || ''}
-            </button>
-          ))}
-          <div className="options-hint">Prefer to type a custom answer? Use the box below to enter your own response for this question.</div>
-        </div>
-      )}
-
       {/* Input Bar Hint */}
       {!isComplete && currentCategoryIndex >= 0 && (
-        <div className="custom-answer-hint"><strong><em>(Optional) Type Your Own Answer Here:</em></strong></div>
+        <div className="custom-answer-hint"><strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong></div>
       )}
 
       {/* Input Bar */}
@@ -787,9 +757,27 @@ Generating your personalized **Contractor Growth Map**...`,
           }
         }
 
+        @media (min-width: 769px) {
+          .custom-answer-hint { font-size: 14px; }
+        }
       `}</style>
     </div>
   );
 };
 
-export default ChatInterface;
+export default ChatInterface
+              {/* Options */}
+              {message.question && index === messages.length - 1 && !isComplete && (
+                <div className="options-container">
+                  {message.question.options.map((option, optIndex) => (
+                    <button
+                      key={optIndex}
+                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`}
+                      onClick={() => handleOptionSelect(option, option.label)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+        ;
