@@ -25,7 +25,6 @@ const ChatInterface = ({ onQuizComplete }) => {
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
-    
     return () => {
       document.body.style.overflow = 'unset';
       document.body.style.position = 'unset';
@@ -51,16 +50,13 @@ It only takes a few minutes, and you're free to add your own details as you go. 
 **First, what's your name, and what type of work do you do?**`,
           timestamp: new Date()
         };
-        
         setMessages([introMessage]);
         setAwaitingNameInput(true);
         setShowIntro(false);
-        
         setTimeout(() => {
           inputRef.current?.focus();
         }, 1000);
       }, 500);
-      
       return () => clearTimeout(timer);
     }
   }, [showIntro]);
@@ -68,21 +64,19 @@ It only takes a few minutes, and you're free to add your own details as you go. 
   const handleInputSubmit = (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
-    
+
     const userMessage = {
       type: 'user',
       content: inputValue,
       timestamp: new Date()
     };
-    
     setMessages(prev => [...prev, userMessage]);
-    
+
     if (awaitingNameInput) {
       // Parse name and trade from input
       let name = inputValue;
       let trade = '';
-      
-      // Try to parse different formats
+
       if (inputValue.includes(',')) {
         const parts = inputValue.split(',').map(s => s.trim());
         name = parts[0];
@@ -92,7 +86,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         name = parts[0].trim();
         trade = parts[1] ? parts[1].trim() : '';
       }
-      
+
       setUserName(name);
       setUserTrade(trade);
       setAnswers(prev => ({
@@ -101,10 +95,10 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         name: name,
         trade: trade
       }));
-      
+
       setAwaitingNameInput(false);
       setInputValue('');
-      
+
       // Personalized response using their name and trade
       setTimeout(() => {
         let responseText = `Great to meet you, **${name}**! `;
@@ -115,15 +109,15 @@ It only takes a few minutes, and you're free to add your own details as you go. 
           responseText += `Thanks for being here! `;
         }
         responseText += `Let's dive into some quick questions to identify where your ${trade || 'contracting'} business might be leaving money on the table.`;
-        
+
         const thankYouMessage = {
           type: 'ai',
           content: responseText,
           timestamp: new Date()
         };
-        
+
         setMessages(prev => [...prev, thankYouMessage]);
-        
+
         // Start first question after delay
         setTimeout(() => {
           setCurrentCategoryIndex(0);
@@ -131,10 +125,9 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         }, 2000);
       }, 800);
     } else {
-      // Handle other text input if needed
       setInputValue('');
     }
-    
+
     scrollToBottom();
   };
 
@@ -142,7 +135,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     if (idx >= 0 && idx < categories.length) {
       const category = categories[idx];
       const questionNum = idx + 1;
-      
+
       const questionMessage = {
         type: 'ai',
         content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**\n\n${category.screener.question}`,
@@ -151,7 +144,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         categoryName: category.category,
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, questionMessage]);
       setSelectedOption(null);
       setShowFollowUp(false);
@@ -159,27 +152,28 @@ It only takes a few minutes, and you're free to add your own details as you go. 
   };
 
   const handleOptionSelect = (option, optionLabel) => {
+    // Select + auto-submit so users don't need a "Continue" button
     setSelectedOption({ option, label: optionLabel });
+    setTimeout(() => submitAnswer(), 60);
   };
 
   const submitAnswer = () => {
     if (!selectedOption) return;
-    
+
     const currentCategory = categories[currentCategoryIndex];
     const { option, label } = selectedOption;
-    
+
     const userMessage = {
       type: 'user',
       content: label,
       timestamp: new Date()
     };
-    
     setMessages(prev => [...prev, userMessage]);
-    
-    const answerKey = showFollowUp ? 
-      `${currentCategory.category}_followup` : 
-      currentCategory.category;
-    
+
+    const answerKey = showFollowUp
+      ? `${currentCategory.category}_followup`
+      : currentCategory.category;
+
     setAnswers(prev => ({
       ...prev,
       [answerKey]: {
@@ -188,12 +182,11 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         tags: option.tags || []
       }
     }));
-    
+
     // Show gold nugget
     if (!showFollowUp && currentCategory.gold_nuggets) {
       const nuggetKey = label.charAt(0);
       const goldNugget = currentCategory.gold_nuggets[nuggetKey];
-      
       if (goldNugget) {
         const nuggetMessage = {
           type: 'ai',
@@ -201,14 +194,13 @@ It only takes a few minutes, and you're free to add your own details as you go. 
           isNugget: true,
           timestamp: new Date()
         };
-        
         setTimeout(() => {
           setMessages(prev => [...prev, nuggetMessage]);
         }, 800);
       }
     }
-    
-    // Check for follow-up
+
+    // Follow-up?
     if (!showFollowUp && currentCategory.followUp) {
       const optionLetter = label.charAt(0);
       if (currentCategory.followUp.condition.includes(optionLetter)) {
@@ -220,44 +212,62 @@ It only takes a few minutes, and you're free to add your own details as you go. 
             isFollowUp: true,
             timestamp: new Date()
           };
-          
           setMessages(prev => [...prev, followUpMessage]);
           setShowFollowUp(true);
           setSelectedOption(null);
         }, 2000);
-        
         return;
       }
     }
-    
+
     // Move to next or complete
-    if (showFollowUp || !currentCategory.followUp || 
-        (currentCategory.followUp && !currentCategory.followUp.condition.includes(label.charAt(0)))) {
-      
+    if (
+      showFollowUp ||
+      !currentCategory.followUp ||
+      (currentCategory.followUp && !currentCategory.followUp.condition.includes(label.charAt(0)))
+    ) {
       if (currentCategoryIndex < categories.length - 1) {
-  setCurrentCategoryIndex(prev => {
-    const next = prev + 1;
-    setTimeout(() => { showNextQuestion(next); }, showFollowUp ? 1500 : 2500);
-    return next;
-  });
+        setCurrentCategoryIndex(prev => {
+          const next = prev + 1;
+          setTimeout(() => {
+            showNextQuestion(next);
+          }, showFollowUp ? 1500 : 2500);
+          return next;
+        });
       } else {
         completeQuiz();
       }
     }
-    
+
     scrollToBottom();
+  };
+
+  const handleRestart = () => {
+    if (typeof window !== 'undefined' && !window.confirm('Restart the consultation?')) return;
+    setMessages([]);
+    setCurrentCategoryIndex(-1);
+    setShowFollowUp(false);
+    setAnswers({});
+    setSelectedOption(null);
+    setIsComplete(false);
+    setShowIntro(true);
+    setInputValue('');
+    setUserName('');
+    setUserTrade('');
+    setAwaitingNameInput(false);
+    // after intro re-renders, input will be focused by the intro effect
   };
 
   const completeQuiz = () => {
     setIsComplete(true);
-    
+
     const totalScore = Object.values(answers).reduce((sum, answer) => {
       return sum + (answer.score || 0);
     }, 0);
-    
+
     const maxScore = categories.length * 4;
     const scorePercentage = Math.round((totalScore / maxScore) * 100);
-    
+
     let resultMessage = '';
     if (scorePercentage >= 75) {
       resultMessage = `🎯 **Outstanding, ${userName}!** Your ${userTrade || 'contracting'} business is in the top 10% of contractors.`;
@@ -268,7 +278,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     } else {
       resultMessage = `🚀 **Huge opportunity, ${userName}!** Your ${userTrade || 'contracting'} business has the most to gain.`;
     }
-    
+
     const completionMessage = {
       type: 'ai',
       content: `🎉 **Assessment Complete!**
@@ -280,9 +290,9 @@ ${resultMessage}
 Generating your personalized **Contractor Growth Map**...`,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, completionMessage]);
-    
+
     setTimeout(() => {
       onQuizComplete({
         userName,
@@ -321,23 +331,34 @@ Generating your personalized **Contractor Growth Map**...`,
     }
   }, [messages]);
 
-  const progress = currentCategoryIndex >= 0 ? 
-    ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100 : 0;
-  const displayNumberRaw = currentCategoryIndex >= 0 
+  const progress = currentCategoryIndex >= 0
+    ? ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100
+    : 0;
+  const displayNumberRaw = currentCategoryIndex >= 0
     ? (currentCategoryIndex + 1 + (showFollowUp ? 0.5 : 0))
     : 0;
-  const displayNumber = Number.isInteger(displayNumberRaw) 
-    ? String(displayNumberRaw) 
+  const displayNumber = Number.isInteger(displayNumberRaw)
+    ? String(displayNumberRaw)
     : displayNumberRaw.toFixed(1);
-
 
   return (
     <div className="chat-container">
-      {/* Thin Progress Bar */}
-        <div className="progress-container">
+      {/* Progress row: count | bar | Restart */}
+      <div className="progress-row">
+        <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
+        <div className="progress-track" aria-hidden="true">
           <div className="progress-bar" style={{ width: `${progress}%` }} />
-          <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
         </div>
+        <button
+          type="button"
+          className="restart-inline"
+          onClick={handleRestart}
+          aria-label="Restart consultation"
+          title="Restart"
+        >
+          Restart
+        </button>
+      </div>
 
       {/* Messages with Gradient Background */}
       <div className="messages-container" ref={chatContainerRef}>
@@ -345,33 +366,42 @@ Generating your personalized **Contractor Growth Map**...`,
           <div key={index} className={`message ${message.type}-message`}>
             <div className={`message-content ${message.isNugget ? 'gold-nugget' : ''}`}>
               {message.content.split('\n').map((line, i) => (
-                <p key={i} dangerouslySetInnerHTML={{ 
-                  __html: line
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/✨/g, '<span class="sparkle">✨</span>')
-                }} />
+                <p
+                  key={i}
+                  dangerouslySetInnerHTML={{
+                    __html: line
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                      .replace(/✨/g, '<span class="sparkle">✨</span>')
+                  }}
+                />
               ))}
-            
-              {/* Options */}
+
+              {/* Options inside bubble, below question */}
               {message.question && index === messages.length - 1 && !isComplete && (
                 <div className="options-container">
                   {message.question.options.map((option, optIndex) => (
-                    <button key={optIndex} className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} onClick={() => handleOptionSelect(option, option.label)}>
+                    <button
+                      key={optIndex}
+                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`}
+                      onClick={() => handleOptionSelect(option, option.label)}
+                    >
                       {option.label}
                     </button>
                   ))}
                 </div>
               )}
-</div>
-</div>
+            </div>
+          </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input Bar Hint */}
       {!isComplete && currentCategoryIndex >= 0 && (
-        <div className="custom-answer-hint"><strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong></div>
+        <div className="custom-answer-hint">
+          <strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong>
+        </div>
       )}
 
       {/* Input Bar */}
@@ -402,23 +432,56 @@ Generating your personalized **Contractor Growth Map**...`,
           background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #d9edff 100%);
         }
 
-        .progress-container {
-          position: fixed;
-          top: 60px;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: rgba(0, 104, 255, 0.1);
-          z-index: 100;
-        }
+        /* Hide the old header Restart button so we don't have two */
+        :global(header .restartButton) { display: none !important; }
 
+        /* Progress row (sticky under header) */
+        .progress-row {
+          position: sticky;
+          top: 8px;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 6px 12px;
+          background: transparent;
+        }
+        .progress-count {
+          font-size: 12px;
+          color: #334155;
+          font-family: 'Open Sans', sans-serif;
+          white-space: nowrap;
+        }
+        .progress-track {
+          position: relative;
+          height: 3px;
+          flex: 1 1 auto;
+          background: rgba(0, 104, 255, 0.12);
+          border-radius: 2px;
+          overflow: hidden;
+        }
         .progress-bar {
-          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          height: 3px;
           background: linear-gradient(90deg, #0068ff, #2ea3f2);
           transition: width 0.5s ease;
-          border-radius: 0 3px 3px 0;
           box-shadow: 0 0 10px rgba(0, 104, 255, 0.4);
         }
+        .restart-inline {
+          padding: 8px 12px;
+          font-size: 13px;
+          border: none;
+          border-radius: 10px;
+          background: #0068ff;
+          color: #fff;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0, 104, 255, 0.25);
+        }
+        .restart-inline:hover { background: #0056d6; }
 
         .messages-container {
           flex: 1;
@@ -428,8 +491,8 @@ Generating your personalized **Contractor Growth Map**...`,
           padding-bottom: 80px;
           scroll-behavior: smooth;
           -webkit-overflow-scrolling: touch;
-          background: linear-gradient(135deg, 
-            rgba(0, 104, 255, 0.03) 0%, 
+          background: linear-gradient(135deg,
+            rgba(0, 104, 255, 0.03) 0%,
             rgba(46, 163, 242, 0.03) 100%);
         }
 
@@ -439,25 +502,12 @@ Generating your personalized **Contractor Growth Map**...`,
         }
 
         @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
-        .ai-message {
-          display: flex;
-          justify-content: flex-start;
-        }
-
-        .user-message {
-          display: flex;
-          justify-content: flex-end;
-        }
+        .ai-message { display: flex; justify-content: flex-start; }
+        .user-message { display: flex; justify-content: flex-end; }
 
         .message-content {
           max-width: 85%;
@@ -474,10 +524,7 @@ Generating your personalized **Contractor Growth Map**...`,
           border-bottom-left-radius: 6px;
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
-
-        .ai-message .message-content p {
-          color: #333333;
-        }
+        .ai-message .message-content p { color: #333333; }
 
         .message-content.gold-nugget {
           background: linear-gradient(135deg, #fffbeb, #fef3c7);
@@ -490,40 +537,28 @@ Generating your personalized **Contractor Growth Map**...`,
           border-bottom-right-radius: 6px;
           box-shadow: 0 2px 12px rgba(0, 104, 255, 0.3);
         }
+        .user-message .message-content p { color: white !important; }
 
-        .user-message .message-content p {
-          color: white !important;
-        }
+        .message-content p { margin: 0 0 8px 0; }
+        .message-content p:last-child { margin-bottom: 0; }
 
-        .message-content p {
-          margin: 0;
-          margin-bottom: 8px;
-        }
-
-        .message-content p:last-child {
-          margin-bottom: 0;
-        }
-
-        .message-content strong, .message-content b, .message-content strong em, .message-content em strong, .message-content b em {
+        .message-content strong,
+        .message-content b,
+        .message-content strong em,
+        .message-content em strong,
+        .message-content b em {
           font-weight: 700;
           color: #0068ff;
         }
+        .gold-nugget strong { color: #92400e; }
+        .user-message .message-content strong,
+        .message-content b,
+        .message-content strong em,
+        .message-content em strong,
+        .message-content b em { color: #0068ff !important; }
 
-        .gold-nugget strong {
-          color: #92400e;
-        }
-
-        .user-message .message-content strong, .message-content b, .message-content strong em, .message-content em strong, .message-content b em { color: #0068ff !important; }
-
-        :global(.sparkle) {
-          display: inline-block;
-          animation: sparkle 2s infinite;
-        }
-
-        @keyframes sparkle {
-          0%, 100% { transform: scale(1) rotate(0deg); }
-          50% { transform: scale(1.2) rotate(180deg); }
-        }
+        :global(.sparkle) { display: inline-block; animation: sparkle 2s infinite; }
+        @keyframes sparkle { 0%,100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.2) rotate(180deg); } }
 
         .options-container {
           display: flex;
@@ -531,7 +566,6 @@ Generating your personalized **Contractor Growth Map**...`,
           gap: 8px;
           margin-top: 10px;
         }
-
         .option-button {
           padding: 10px 14px;
           border-radius: 999px;
@@ -542,50 +576,14 @@ Generating your personalized **Contractor Growth Map**...`,
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
         .option-button:hover {
-          border-color: #0068ff;
-          background: #f1f8ff;
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15);
         }
-
         .option-button.selected {
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          border-color: #0068ff;
-          color: white;
+          color: #fff;
           font-weight: 600;
-        }
-
-        .submit-container {
-          margin-top: 20px;
-          text-align: center;
-        }
-
-        .submit-button {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 14px 28px;
-          background: linear-gradient(135deg, #30d64f, #28a745);
-          color: white;
-          border: none;
-          border-radius: 12px;
-          font-family: 'Roboto', sans-serif;
-          font-weight: 700;
-          font-size: 16px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 4px 12px rgba(48, 214, 79, 0.3);
-        }
-
-        .submit-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(48, 214, 79, 0.4);
-        }
-
-        .arrow {
-          font-size: 18px;
         }
 
         /* Input Container */
@@ -597,7 +595,6 @@ Generating your personalized **Contractor Growth Map**...`,
           border-top: 1px solid rgba(0, 104, 255, 0.1);
           box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
         }
-
         .message-input {
           flex: 1;
           padding: 12px 16px;
@@ -608,12 +605,7 @@ Generating your personalized **Contractor Growth Map**...`,
           transition: all 0.2s ease;
           outline: none;
         }
-
-        .message-input:focus {
-          border-color: #0068ff;
-          box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.1);
-        }
-
+        .message-input:focus { border-color: #0068ff; box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.1); }
         .send-button {
           padding: 12px 24px;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
@@ -627,147 +619,28 @@ Generating your personalized **Contractor Growth Map**...`,
           transition: all 0.2s ease;
           box-shadow: 0 2px 8px rgba(0, 104, 255, 0.3);
         }
-
-        .send-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 104, 255, 0.4);
-        }
+        .send-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.4); }
 
         /* Mobile */
         @media (max-width: 768px) {
-          .progress-container {
-            top: 56px;
-          }
+          .progress-row { top: 6px; padding: 6px 10px; gap: 10px; }
+          .progress-count { font-size: 12px; }
+          .messages-container { padding: 16px; padding-top: 66px; padding-bottom: 76px; }
 
-          .messages-container {
-            padding: 16px;
-            padding-top: 66px;
-            padding-bottom: 76px;
-          }
+          .message-content { max-width: 90%; padding: 14px 16px; font-size: 15px; }
+          .submit-button { width: 100%; justify-content: center; }
 
-          .message-content {
-            max-width: 90%;
-            padding: 14px 16px;
-            font-size: 15px;
-          }
-
-          .option-button {
-          padding: 10px 14px;
-          border-radius: 999px;
-          border: none;
-          background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          color: #fff;
-          font-weight: 600;
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          .options-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+          .message-input { font-size: 16px; }
         }
 
-          .submit-button {
-            width: 100%;
-            justify-content: center;
-          }
+        :global(body) { overflow: hidden !important; position: fixed !important; width: 100% !important; }
+        :global(html) { overflow: hidden !important; }
 
-          .options-container {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 10px;
-        }
-
-          .input-container {
-            padding: 12px 16px;
-          }
-
-          .message-input {
-            font-size: 16px;
-          }
-        }
-
-        :global(body) {
-          overflow: hidden !important;
-          position: fixed !important;
-          width: 100% !important;
-        }
-
-        :global(html) {
-          overflow: hidden !important;
-        }
-        /* Progress count inline with bar */
-        .progress-container {
-          position: sticky;
-          top: 8px;
-          height: 24px;
-        }
-        .progress-bar {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          height: 3px;
-          background: #0068ff;
-          border-radius: 2px;
-        }
-        .progress-count {
-          position: absolute;
-          right: 8px;
-          top: 2px;
-          font-size: 12px;
-          color: #334155;
-          font-family: 'Open Sans', sans-serif;
-        }
-
-        /* Persistent options panel */
-        .options-panel {
-          position: relative;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding: 8px 16px;
-          border-top: 1px solid rgba(0,0,0,0.06);
-          background: rgba(255,255,255,0.8);
-          backdrop-filter: blur(4px);
-        }
-        .option-chip {
-          padding: 8px 12px;
-          border-radius: 999px;
-          border: 1px solid #cbd5e1;
-          background: white;
-          font-size: 14px;
-          cursor: pointer;
-        }
-        .option-chip.selected {
-          background: #e8f0ff;
-          border-color: #93c5fd;
-        }
-        .option-chip:hover {
-          transform: translateY(-1px);
-        }
-        .options-hint {
-          flex-basis: 100%;
-          font-size: 12px;
-          color: #64748b;
-          margin-top: 4px;
-        }
-
-        /* Mobile header tweaks for balance */
-        @media (max-width: 768px) {
-          :global(header .logo) {
-            margin-left: 4px !important;
-          }
-          :global(header .mobile-tagline) {
-            display: block !important;
-            font-size: 12px;
-            color: #475569;
-            margin-top: 2px;
-            white-space: nowrap;
-          }
-        }
-
-        @media (min-width: 769px) {
-          .custom-answer-hint { font-size: 14px; }
-        }
+        @media (min-width: 769px) { .custom-answer-hint { font-size: 14px; } }
       `}</style>
     </div>
   );
 };
 
-export default ChatInterface
+export default ChatInterface;
