@@ -323,13 +323,21 @@ Generating your personalized **Contractor Growth Map**...`,
 
   const progress = currentCategoryIndex >= 0 ? 
     ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100 : 0;
+  const displayNumberRaw = currentCategoryIndex >= 0 
+    ? (currentCategoryIndex + 1 + (showFollowUp ? 0.5 : 0))
+    : 0;
+  const displayNumber = Number.isInteger(displayNumberRaw) 
+    ? String(displayNumberRaw) 
+    : displayNumberRaw.toFixed(1);
+
 
   return (
     <div className="chat-container">
       {/* Thin Progress Bar */}
-      \1
-        <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
-    </div>
+        <div className="progress-container">
+          <div className="progress-bar" style={{ width: `${progress}%` }} />
+          <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
+        </div>
 
       {/* Messages with Gradient Background */}
       <div className="messages-container" ref={chatContainerRef}>
