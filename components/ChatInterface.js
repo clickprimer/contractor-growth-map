@@ -352,14 +352,19 @@ Generating your personalized **Contractor Growth Map**...`,
                     .replace(/✨/g, '<span class="sparkle">✨</span>')
                 }} />
               ))}
-            </div>
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+            
+              {/* Options */}
+              {message.question && index === messages.length - 1 && !isComplete && (
+                <div className="options-container">
+                  {message.question.options.map((option, optIndex) => (
+                    <button key={optIndex} className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} onClick={() => handleOptionSelect(option, option.label)}>
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+</div>
+</div>
         ))}
         <div ref={messagesEndRef} />
       </div>
@@ -766,18 +771,3 @@ Generating your personalized **Contractor Growth Map**...`,
 };
 
 export default ChatInterface
-              {/* Options */}
-              {message.question && index === messages.length - 1 && !isComplete && (
-                <div className="options-container">
-                  {message.question.options.map((option, optIndex) => (
-                    <button
-                      key={optIndex}
-                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`}
-                      onClick={() => handleOptionSelect(option, option.label)}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-        ;
