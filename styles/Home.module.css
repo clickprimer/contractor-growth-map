@@ -37,15 +37,13 @@
 }
 
 .logoSection {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
 }
 
-.logo {
-  height: 32px;
-  width: auto;
-}
+.logo { height: 40px; width: auto; }
 
 .logoText {
   font-family: 'Roboto', sans-serif;
@@ -65,20 +63,9 @@
   margin: 0 4px;
 }
 
-.appTitle {
-  font-family: 'Roboto', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: #002654;
-}
+.appTitle { color: #0068ff; font-weight: 800; font-size: 24px; line-height: 1.1; }
 
-.tagline {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #64748b;
-  margin-left: 4px;
-}
+.tagline { color: #002654; font-size: 14px; font-weight: 600; line-height: 1.2; }
 
 .restartButton {
   display: flex;
@@ -178,8 +165,8 @@
 
 /* Mobile Responsive */
 
-  .mobileTagline { display: none; }
-
+  .mobileTagline { display: none !important; }
+}
   
   .header {
     height: 56px;
@@ -190,27 +177,21 @@
   }
   
   .logoSection {
-    gap: 6px;
-    flex: 1;
-    justify-content: center;
-    text-align: center;
-  }
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
   
-  .logo {
-    height: 24px;
-  }
+  .logo { height: 40px; width: auto; }
   
   .logoText {
     font-size: 18px;
   }
   
-  .appTitle {
-    display: none; /* Hide on mobile to save space */
-  }
+  .appTitle { color: #0068ff; font-weight: 800; font-size: 24px; line-height: 1.1; }
   
-  .tagline {
-    display: none; /* Hide on mobile to save space */
-  }
+  .tagline { color: #002654; font-size: 14px; font-weight: 600; line-height: 1.2; }
   
   .divider {
     display: none; /* Hide on mobile */
@@ -265,7 +246,7 @@
   .footerDivider {
     font-size: 10px;
   }
-
+}
 
 /* Tablet */
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -282,70 +263,45 @@
   }
 }
 
+/* Mobile header balancing */
+
   .mobileTagline { display: none !important; }
+}
 
 
 /* Mobile overrides to center tagline under logo and prevent duplicates */
 
   .mobileTagline { display: block !important; text-align: center; font-size: 12px; color: #475569; margin-top: 4px; white-space: nowrap; line-height: 1.2; }
-  .tagline { display: none !important; }
+  .tagline { color: #002654; font-size: 14px; font-weight: 600; line-height: 1.2; }
   .divider { display: none !important; }
+}
 
+
+/* Title block next to logo */
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
 
 /* Mobile (≤768px) */
 @media (max-width: 768px) {
-  .container {
-    height: 100vh;
-    height: -webkit-fill-available;
-  }
-
   .header { height: 56px; }
   .headerContent { padding: 0 12px; }
 
+  .logo { height: 28px; }
   .logoSection { 
-    gap: 6px; 
-    flex: 1; 
-    justify-content: center; 
-    text-align: center; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
   }
+  .titleBlock { align-items: center; }
+  .appTitle { font-size: 18px; }
+  .tagline { font-size: 12px; }
 
-  .mobileTagline { 
-    display: block !important; 
-    text-align: center; 
-    font-size: 12px; 
-    color: #475569; 
-    margin-top: 4px; 
-    white-space: nowrap; 
-    line-height: 1.2; 
-  }
-
-  .logo { height: 24px; }
-  .logoText { font-size: 18px; }
-  .appTitle { display: none; }
-  .tagline { display: none; }
+  /* Hide desktop-only elements on mobile if any */
   .divider { display: none; }
-
-  .restartButton {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 8px 12px;
-    font-size: 13px;
-    background: #0068ff;
-    color: white;
-    border: none;
-  }
-  .restartButton:hover { background: #0056d6; border: none; }
-  .restartButton span:first-child { font-size: 18px; margin-right: 4px; }
-  .restartButton span:last-child { display: inline; }
-
-  .main { margin-top: 56px; margin-bottom: 48px; }
-  .footer { height: 48px; }
-  .footerContent { gap: 8px; font-size: 11px; }
-  .copyright, .trusted, .footerLink { font-size: 11px; }
-  .footerDivider { font-size: 10px; }
 }
