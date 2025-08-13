@@ -127,7 +127,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         // Start first question after delay
         setTimeout(() => {
           setCurrentCategoryIndex(0);
-          showNextQuestion();
+          showNextQuestion(0);
         }, 2000);
       }, 800);
     } else {
@@ -138,9 +138,9 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     scrollToBottom();
   };
 
-  const showNextQuestion = () => {
-    if (currentCategoryIndex >= 0 && currentCategoryIndex < categories.length) {
-      const category = categories[currentCategoryIndex];
+  const showNextQuestion = (idx = currentCategoryIndex) => {
+    if (idx >= 0 && idx < categories.length) {
+      const category = categories[idx];
       const questionNum = currentCategoryIndex + 1;
       
       const questionMessage = {
@@ -235,11 +235,12 @@ It only takes a few minutes, and you're free to add your own details as you go. 
         (currentCategory.followUp && !currentCategory.followUp.condition.includes(label.charAt(0)))) {
       
       if (currentCategoryIndex < categories.length - 1) {
-        setCurrentCategoryIndex(prev => prev + 1);
-        
-        setTimeout(() => {
-          showNextQuestion();
-        }, showFollowUp ? 1500 : 2500);
+  setCurrentCategoryIndex(prev => {
+    const next = prev + 1;
+    showNextQuestion(next);
+    return next;
+  });
+}, showFollowUp ? 1500 : 2500);
       } else {
         completeQuiz();
       }
