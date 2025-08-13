@@ -179,7 +179,7 @@
 /* Mobile Responsive */
 
   .mobileTagline { display: none; }
-}
+
   
   .header {
     height: 56px;
@@ -265,7 +265,7 @@
   .footerDivider {
     font-size: 10px;
   }
-}
+
 
 /* Tablet */
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -282,9 +282,7 @@
   }
 }
 
-
   .mobileTagline { display: none !important; }
-}
 
 
 /* Mobile overrides to center tagline under logo and prevent duplicates */
@@ -292,7 +290,7 @@
   .mobileTagline { display: block !important; text-align: center; font-size: 12px; color: #475569; margin-top: 4px; white-space: nowrap; line-height: 1.2; }
   .tagline { display: none !important; }
   .divider { display: none !important; }
-}
+
 
 /* Mobile (≤768px) */
 @media (max-width: 768px) {
