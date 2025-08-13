@@ -368,10 +368,6 @@ Generating your personalized **Contractor Growth Map**...`,
                     {option.label}
                   </button>
                 ))}
-                
-                {selectedOption && (
-                  
-                )}
               </div>
             )}
           </div>
