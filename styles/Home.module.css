@@ -1,305 +1,141 @@
+/* ====== Layout Shell ====== */
 .container {
   width: 100vw;
-  height: 100vh;
-  height: calc(var(--vh, 1vh) * 100);
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9f2ff 100%);
 }
 
-/* Header Styles */
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: white;
-  border-bottom: 1px solid rgba(0, 104, 255, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  z-index: 100;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .headerContent {
-  height: 100%;
-  max-width: 1400px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logoSection {
+  padding: 0 16px;
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* ====== Header: Logo + Title Block ====== */
+.logoSection {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
 }
 
 .logo {
-  height: 32px;
+  height: 40px;
   width: auto;
-}
-
-.logoText {
-  font-family: 'Roboto', sans-serif;
-  font-size: 24px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #0068ff 0%, #2ea3f2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-}
-
-.divider {
-  color: #cbd5e0;
-  font-weight: 300;
-  font-size: 24px;
-  margin: 0 4px;
-}
-
-.appTitle {
-  font-family: 'Roboto', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: #002654;
-}
-
-.tagline {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #64748b;
-  margin-left: 4px;
-}
-
-.restartButton {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: white;
-  border: 2px solid #0068ff;
-  border-radius: 8px;
-  color: #0068ff;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.restartButton:hover {
-  background: #0068ff;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 104, 255, 0.2);
-}
-
-.restartButton span {
   display: inline-block;
 }
 
-/* Main Content Area */
-.main {
-  flex: 1;
+.titleBlock {
   display: flex;
   flex-direction: column;
+  align-items: center; /* center within the text block */
   justify-content: center;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  margin-top: 60px;
-  margin-bottom: 50px;
-  overflow: hidden;
 }
 
-/* Footer Styles */
+.appTitle {
+  color: #0068ff;         /* brand blue */
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.tagline {
+  color: #002654;         /* deep brand blue for subheadline */
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.divider {
+  color: #cbd5e1;
+  user-select: none;
+}
+
+.mobileTagline { display: none !important; } /* ensure any legacy mobile tagline is hidden */
+
+/* (Header restart button is now hidden via :global in ChatInterface) */
+.restartButton {
+  display: none;
+}
+
+/* ====== Main/Footer ====== */
+.main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow child scrolling areas */
+}
+
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50px;
-  background: white;
-  border-top: 1px solid rgba(0, 104, 255, 0.1);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
-  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-top: 1px solid rgba(0,0,0,0.06);
 }
 
 .footerContent {
-  height: 100%;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 0 20px;
-}
-
-.copyright {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 13px;
+  gap: 10px;
   color: #64748b;
-  font-weight: 500;
-}
-
-.footerDivider {
-  color: #cbd5e0;
   font-size: 12px;
 }
 
-.trusted {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 13px;
-  color: #0068ff;
-  font-weight: 600;
-}
+.footerDivider { color: #cbd5e1; font-size: 12px; }
+.footerLink { color: #334155; text-decoration: none; }
+.footerLink:hover { text-decoration: underline; }
 
-.footerLink {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 13px;
-  color: #0068ff;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.footerLink:hover {
-  color: #2ea3f2;
-  text-decoration: underline;
-}
-
-/* Mobile Responsive */
+/* ====== Mobile (≤768px) ====== */
 @media (max-width: 768px) {
+  .header { height: 60px; }
+  .headerContent { padding: 0 12px; }
 
-  .container {
-    height: 100vh;
-    height: -webkit-fill-available;
-  
-  .logoSection { display: flex; flex-direction: column; align-items: center; }
-  .mobileTagline { display: block !important; text-align: center; font-size: 12px; color: #475569; margin-top: 4px; white-space: nowrap; line-height: 1.2; }
-}
-  
-  .header {
-    height: 56px;
-  }
-  
-  .headerContent {
-    padding: 0 12px;
-  }
-  
+  .logo { height: 28px; }
   .logoSection {
-    gap: 6px;
-    flex: 1;
-    justify-content: center;
-    text-align: center;
-  }
-  
-  .logo {
-    height: 24px;
-  }
-  
-  .logoText {
-    font-size: 18px;
-  }
-  
-  .appTitle {
-    display: none; /* Hide on mobile to save space */
-  }
-  
-  .tagline {
-    display: none; /* Hide on mobile to save space */
-  }
-  
-  .divider {
-    display: none; /* Hide on mobile */
-  }
-  
-  .restartButton {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 8px 12px;
-    font-size: 13px;
-    background: #0068ff;
-    color: white;
-    border: none;
-  }
-  
-  .restartButton:hover {
-    background: #0056d6;
-    border: none;
-  }
-  
-  .restartButton span:first-child {
-    font-size: 18px;
-    margin-right: 4px;
-  }
-  
-  .restartButton span:last-child {
-    display: inline; /* Show "Restart" text */
-  }
-  
-  .main {
-    margin-top: 56px;
-    margin-bottom: 48px;
-  }
-  
-  .footer {
-    height: 48px;
-  }
-  
-  .footerContent {
+    grid-template-columns: auto 1fr; /* logo | text block */
     gap: 8px;
-    font-size: 11px;
   }
-  
-  .copyright,
-  .trusted,
-  .footerLink {
-    font-size: 11px;
-  }
-  
-  .footerDivider {
-    font-size: 10px;
-  }
+  .titleBlock { align-items: center; } /* center headline/subheadline inside text block */
+  .appTitle { font-size: 18px; }
+  .tagline { font-size: 12px; }
+
+  .divider { display: none; } /* keep header clean on mobile */
+
+  .footer { height: 48px; }
+  .footerContent { font-size: 11px; gap: 8px; }
+  .footerDivider { font-size: 10px; }
 }
 
-/* Tablet */
+/* ====== Tablet (769–1024px) ====== */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .headerContent {
-    max-width: 100%;
-    padding: 0 24px;
-  }
+  .headerContent { max-width: 100%; padding: 0 24px; }
 }
 
-/* Large screens */
+/* ====== Large screens (≥1440px) ====== */
 @media (min-width: 1440px) {
-  .headerContent {
-    max-width: 1600px;
-  }
-}
-
-/* Mobile header balancing */
-@media (max-width: 768px) {
-  .logo {
-    margin-left: 4px;
-  }
-  .mobileTagline { display: none !important; }
-
-
-/* Mobile overrides to center tagline under logo and prevent duplicates */
-@media (max-width: 768px) {
-  .logoSection { display: flex; flex-direction: column; align-items: center; }
-  .mobileTagline { display: block !important; text-align: center; font-size: 12px; color: #475569; margin-top: 4px; white-space: nowrap; line-height: 1.2; }
-  .tagline { display: none !important; }
-  .divider { display: none !important; }
+  .headerContent { max-width: 1600px; }
+  .appTitle { font-size: 26px; }
+  .tagline { font-size: 15px; }
 }
