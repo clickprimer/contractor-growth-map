@@ -327,12 +327,9 @@ Generating your personalized **Contractor Growth Map**...`,
   return (
     <div className="chat-container">
       {/* Thin Progress Bar */}
-      <div className="progress-container">
-        <div 
-          className="progress-bar" 
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+      \1
+        <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
+    </div>
 
       {/* Messages with Gradient Background */}
       <div className="messages-container" ref={chatContainerRef}>
@@ -365,15 +362,7 @@ Generating your personalized **Contractor Growth Map**...`,
                 ))}
                 
                 {selectedOption && (
-                  <div className="submit-container">
-                    <button 
-                      className="submit-button"
-                      onClick={submitAnswer}
-                    >
-                      <span className="arrow">→</span>
-                      Continue
-                    </button>
-                  </div>
+                  
                 )}
               </div>
             )}
@@ -381,6 +370,25 @@ Generating your personalized **Contractor Growth Map**...`,
         ))}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Options Panel (persistent, below messages, above input) */}
+      {currentCategoryIndex >= 0 && !isComplete && (
+        <div className="options-panel">
+          {(showFollowUp 
+            ? categories[currentCategoryIndex]?.followUp?.options 
+            : categories[currentCategoryIndex]?.screener?.options
+          )?.map((opt, i) => (
+            <button 
+              key={i} 
+              className={`option-chip ${selectedOption?.label === opt.label ? 'selected' : ''}`}
+              onClick={() => handleOptionSelect(opt, opt.label || String.fromCharCode(65 + i))}
+            >
+              {(opt.label || String.fromCharCode(65 + i))}. {opt.text || opt.value || ''}
+            </button>
+          ))}
+          <div className="options-hint">Prefer to type a custom answer? Use the box below to enter your own response for this question.</div>
+        </div>
+      )}
 
       {/* Input Bar */}
       {!isComplete && (
@@ -512,7 +520,7 @@ Generating your personalized **Contractor Growth Map**...`,
           margin-bottom: 0;
         }
 
-        .message-content strong {
+        .message-content strong, .message-content b, .message-content strong em, .message-content em strong, .message-content b em {
           font-weight: 700;
           color: #0068ff;
         }
@@ -521,9 +529,7 @@ Generating your personalized **Contractor Growth Map**...`,
           color: #92400e;
         }
 
-        .user-message .message-content strong {
-          color: white !important;
-        }
+        .user-message .message-content strong, .message-content b, .message-content strong em, .message-content em strong, .message-content b em { color: #0068ff !important; }
 
         :global(.sparkle) {
           display: inline-block;
@@ -698,6 +704,76 @@ Generating your personalized **Contractor Growth Map**...`,
         :global(html) {
           overflow: hidden !important;
         }
+        /* Progress count inline with bar */
+        .progress-container {
+          position: sticky;
+          top: 8px;
+          height: 24px;
+        }
+        .progress-bar {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          height: 3px;
+          background: #0068ff;
+          border-radius: 2px;
+        }
+        .progress-count {
+          position: absolute;
+          right: 8px;
+          top: 2px;
+          font-size: 12px;
+          color: #334155;
+          font-family: 'Open Sans', sans-serif;
+        }
+
+        /* Persistent options panel */
+        .options-panel {
+          position: relative;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 8px 16px;
+          border-top: 1px solid rgba(0,0,0,0.06);
+          background: rgba(255,255,255,0.8);
+          backdrop-filter: blur(4px);
+        }
+        .option-chip {
+          padding: 8px 12px;
+          border-radius: 999px;
+          border: 1px solid #cbd5e1;
+          background: white;
+          font-size: 14px;
+          cursor: pointer;
+        }
+        .option-chip.selected {
+          background: #e8f0ff;
+          border-color: #93c5fd;
+        }
+        .option-chip:hover {
+          transform: translateY(-1px);
+        }
+        .options-hint {
+          flex-basis: 100%;
+          font-size: 12px;
+          color: #64748b;
+          margin-top: 4px;
+        }
+
+        /* Mobile header tweaks for balance */
+        @media (max-width: 768px) {
+          :global(header .logo) {
+            margin-left: 4px !important;
+          }
+          :global(header .mobile-tagline) {
+            display: block !important;
+            font-size: 12px;
+            color: #475569;
+            margin-top: 2px;
+            white-space: nowrap;
+          }
+        }
+
       `}</style>
     </div>
   );
