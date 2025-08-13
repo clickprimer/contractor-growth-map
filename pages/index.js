@@ -51,16 +51,12 @@ export default function Home() {
               ClickPrimer
             </h1>
             <span className={styles.divider}>|</span>
-            <span className={styles.appTitle}>Profit Leak Detector</span>
-            <span className={styles.tagline}>- AI-Powered Consultation for Contractors</span>
-          
+            <div className={styles.titleBlock}>
+              <span className={styles.appTitle}>Profit Leak Detector</span>
+              <span className={styles.tagline}>AI-Powered Consultation for Contractors</span>
+            </div>
             
-
-            
-            {/* Mobile-only tagline under logo (mobile only) */}
-            <div className={styles.mobileTagline} aria-hidden="true">
-              AI-Powered Consultation for Contractors
-            </div></div>
+</div>
 
           <button 
             className={styles.restartButton}
