@@ -141,7 +141,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
   const showNextQuestion = (idx = currentCategoryIndex) => {
     if (idx >= 0 && idx < categories.length) {
       const category = categories[idx];
-      const questionNum = currentCategoryIndex + 1;
+      const questionNum = idx + 1;
       
       const questionMessage = {
         type: 'ai',
@@ -394,6 +394,11 @@ Generating your personalized **Contractor Growth Map**...`,
         </div>
       )}
 
+      {/* Input Bar Hint */}
+      {!isComplete && currentCategoryIndex >= 0 && (
+        <div className="custom-answer-hint"><strong><em>(Optional) Type Your Own Answer Here:</em></strong></div>
+      )}
+
       {/* Input Bar */}
       {!isComplete && (
         <form onSubmit={handleInputSubmit} className="input-container">
@@ -546,26 +551,21 @@ Generating your personalized **Contractor Growth Map**...`,
         }
 
         .options-container {
-          max-width: 85%;
-          margin-top: 16px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 10px;
         }
 
         .option-button {
-          display: block;
-          width: 100%;
-          padding: 14px 18px;
-          margin-bottom: 10px;
-          background: white;
-          border: 2px solid #e2e8f0;
-          border-radius: 12px;
-          font-family: 'Open Sans', sans-serif;
-          font-size: 15px;
-          font-weight: 500;
-          color: #333333;
+          padding: 10px 14px;
+          border-radius: 999px;
+          border: none;
+          background: linear-gradient(135deg, #0068ff, #2ea3f2);
+          color: #fff;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: left;
-          line-height: 1.4;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .option-button:hover {
@@ -677,9 +677,15 @@ Generating your personalized **Contractor Growth Map**...`,
           }
 
           .option-button {
-            padding: 14px 16px;
-            font-size: 14px;
-          }
+          padding: 10px 14px;
+          border-radius: 999px;
+          border: none;
+          background: linear-gradient(135deg, #0068ff, #2ea3f2);
+          color: #fff;
+          font-weight: 600;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
 
           .submit-button {
             width: 100%;
@@ -687,8 +693,11 @@ Generating your personalized **Contractor Growth Map**...`,
           }
 
           .options-container {
-            max-width: 90%;
-          }
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 10px;
+        }
 
           .input-container {
             padding: 12px 16px;
