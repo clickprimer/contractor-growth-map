@@ -39,7 +39,7 @@ export default function Home() {
         <div className={styles.headerContent}>
           <div className={styles.logoSection}>
             <img 
-              src="/clickprimer-logo.png" 
+              src="https://clickprimer.com/wp-content/uploads/clickprimer-logo-1.png" 
               alt="ClickPrimer" 
               className={styles.logo}
               onError={(e) => {
@@ -52,6 +52,7 @@ export default function Home() {
             </h1>
             <span className={styles.divider}>|</span>
             <span className={styles.appTitle}>Profit Leak Detector</span>
+            <span className={styles.tagline}>- AI-Powered Consultation for Contractors</span>
           </div>
           <button 
             className={styles.restartButton}
@@ -72,9 +73,13 @@ export default function Home() {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <span className={styles.copyright}>© 2024 ClickPrimer</span>
+          <span className={styles.copyright}>© 2025 ClickPrimer</span>
           <span className={styles.footerDivider}>•</span>
-          <span className={styles.trusted}>Trusted by 500+ Contractors</span>
+          <a href="https://www.clickprimer.com" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
+            www.ClickPrimer.com
+          </a>
+          <span className={styles.footerDivider}>•</span>
+          <span className={styles.trusted}>Trusted by Contractors</span>
         </div>
       </footer>
 
