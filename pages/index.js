@@ -56,11 +56,11 @@ export default function Home() {
           
             
 
+            
             {/* Mobile-only tagline under logo (mobile only) */}
             <div className={styles.mobileTagline} aria-hidden="true">
               AI-Powered Consultation for Contractors
-            </div>
-    </div>
+            </div></div>
 
           <button 
             className={styles.restartButton}
