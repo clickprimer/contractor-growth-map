@@ -54,6 +54,11 @@ export default function Home() {
             <span className={styles.appTitle}>Profit Leak Detector</span>
             <span className={styles.tagline}>- AI-Powered Consultation for Contractors</span>
           </div>
+        {/* Mobile-only tagline under header row */}
+        <div className={styles.mobileTagline} aria-hidden="true">
+          AI Consultation for Contractors
+        </div>
+
           <button 
             className={styles.restartButton}
             onClick={handleRestart}
