@@ -187,34 +187,61 @@
     height: 56px;
   }
   
+  .headerContent {
+    padding: 0 12px;
+  }
+  
   .logoSection {
-    gap: 8px;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+    text-align: center;
   }
   
   .logo {
-    height: 28px;
+    height: 24px;
   }
   
   .logoText {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .appTitle {
-    font-size: 16px;
+    display: none; /* Hide on mobile to save space */
+  }
+  
+  .tagline {
+    display: none; /* Hide on mobile to save space */
   }
   
   .divider {
-    font-size: 20px;
-    margin: 0 2px;
+    display: none; /* Hide on mobile */
   }
   
   .restartButton {
-    padding: 6px 12px;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 12px;
     font-size: 13px;
+    background: #0068ff;
+    color: white;
+    border: none;
   }
   
-  .restartButton span {
-    display: none; /* Hide text on mobile, show only icon */
+  .restartButton:hover {
+    background: #0056d6;
+    border: none;
+  }
+  
+  .restartButton span:first-child {
+    font-size: 18px;
+    margin-right: 4px;
+  }
+  
+  .restartButton span:last-child {
+    display: inline; /* Show "Restart" text */
   }
   
   .main {
@@ -228,11 +255,13 @@
   
   .footerContent {
     gap: 8px;
+    font-size: 11px;
   }
   
   .copyright,
-  .trusted {
-    font-size: 12px;
+  .trusted,
+  .footerLink {
+    font-size: 11px;
   }
   
   .footerDivider {
