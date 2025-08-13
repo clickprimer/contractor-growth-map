@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import { useState } from 'react';
 import ChatInterface from '../components/ChatInterface';
-import { RotateCcw } from 'lucide-react';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {
@@ -13,9 +12,10 @@ export default function Home() {
     }
   };
 
-  const handleQuizComplete = (answers) => {
-    console.log('Quiz completed with answers:', answers);
+  const handleQuizComplete = (results) => {
+    console.log('Quiz completed with results:', results);
     // Handle quiz completion - could redirect or show results
+    // Results now include: answers, score, maxScore, percentage, categories
   };
 
   return (
@@ -58,7 +58,7 @@ export default function Home() {
             onClick={handleRestart}
             title="Restart Assessment"
           >
-            <RotateCcw size={18} />
+            <span style={{ fontSize: '16px', marginRight: '4px' }}>↻</span>
             <span>Restart</span>
           </button>
         </div>
