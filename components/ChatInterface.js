@@ -3,14 +3,18 @@ import quizData from '../data/quiz-questions.json';
 
 const ChatInterface = ({ onQuizComplete }) => {
   const [messages, setMessages] = useState([]);
-  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
+  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(-1); // Start at -1 for name collection
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [answers, setAnswers] = useState({});
   const [selectedOption, setSelectedOption] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  const [inputValue, setInputValue] = useState('');
+  const [userName, setUserName] = useState('');
+  const [awaitingNameInput, setAwaitingNameInput] = useState(false);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const categories = quizData.quiz_flow;
   const totalQuestions = categories.length;
@@ -33,35 +37,84 @@ const ChatInterface = ({ onQuizComplete }) => {
       const timer = setTimeout(() => {
         const introMessage = {
           type: 'ai',
-          content: `👋 **Welcome to the ClickPrimer Profit Leak Detector!**
+          content: `**Hello and welcome to your Profit Leak Detector!** This AI consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
-I'm going to help you identify exactly where your contracting business is leaving money on the table. This isn't just another generic quiz—it's a strategic assessment designed specifically for contractors like you.
+**At the end, you'll get a Contractor Growth Map. It will include:**
+✅ Your Marketing & Operations Strengths
+🚧 Your Bottlenecks & Missed Opportunities
+🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
+💡 How ClickPrimer Can Help You
 
-**Here's what we'll uncover:**
-• Hidden profit leaks costing you thousands
-• Quick wins you can implement today
-• Your personalized Contractor Growth Map
+It only takes a few minutes, and you're free to add your own details as you go. It will help us give you the best advice for your business. **So let's get started!**
 
-This takes less than 3 minutes, and you'll get actionable insights after every question.
-
-**Ready to plug those profit leaks?** Let's dive in! 🚀`,
+**First, what's your name, and what type of work do you do?**`,
           timestamp: new Date()
         };
         
         setMessages([introMessage]);
+        setAwaitingNameInput(true);
+        setShowIntro(false);
         
-        // Show first question after intro
+        // Focus input after intro
         setTimeout(() => {
-          showNextQuestion();
-        }, 2500);
+          inputRef.current?.focus();
+        }, 1000);
       }, 500);
       
       return () => clearTimeout(timer);
     }
   }, [showIntro]);
 
+  const handleInputSubmit = (e) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+    
+    // Add user message
+    const userMessage = {
+      type: 'user',
+      content: inputValue,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    
+    if (awaitingNameInput) {
+      // Store name and contractor type
+      setUserName(inputValue);
+      setAnswers(prev => ({
+        ...prev,
+        introduction: inputValue
+      }));
+      
+      setAwaitingNameInput(false);
+      setInputValue('');
+      
+      // Thank them and start quiz
+      setTimeout(() => {
+        const thankYouMessage = {
+          type: 'ai',
+          content: `Great to meet you! Thanks for sharing that with me. Now let's dive into some quick questions to identify where your business might be leaving money on the table.`,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, thankYouMessage]);
+        
+        // Start first question
+        setTimeout(() => {
+          setCurrentCategoryIndex(0);
+          showNextQuestion();
+        }, 1500);
+      }, 800);
+    } else {
+      // Handle any other text input during quiz if needed
+      setInputValue('');
+    }
+    
+    scrollToBottom();
+  };
+
   const showNextQuestion = () => {
-    if (currentCategoryIndex < categories.length) {
+    if (currentCategoryIndex >= 0 && currentCategoryIndex < categories.length) {
       const category = categories[currentCategoryIndex];
       const questionNum = currentCategoryIndex + 1;
       
@@ -76,7 +129,6 @@ This takes less than 3 minutes, and you'll get actionable insights after every q
       
       setMessages(prev => [...prev, questionMessage]);
       setSelectedOption(null);
-      setShowIntro(false);
       setShowFollowUp(false);
     }
   };
@@ -116,7 +168,7 @@ This takes less than 3 minutes, and you'll get actionable insights after every q
     
     // Show gold nugget insight
     if (!showFollowUp && currentCategory.gold_nuggets) {
-      const nuggetKey = label.charAt(0); // Get the letter (A, B, C, or D)
+      const nuggetKey = label.charAt(0);
       const goldNugget = currentCategory.gold_nuggets[nuggetKey];
       
       if (goldNugget) {
@@ -137,7 +189,6 @@ This takes less than 3 minutes, and you'll get actionable insights after every q
     if (!showFollowUp && currentCategory.followUp) {
       const optionLetter = label.charAt(0);
       if (currentCategory.followUp.condition.includes(optionLetter)) {
-        // Show follow-up question
         setTimeout(() => {
           const followUpMessage = {
             type: 'ai',
@@ -152,7 +203,7 @@ This takes less than 3 minutes, and you'll get actionable insights after every q
           setSelectedOption(null);
         }, 2000);
         
-        return; // Don't move to next category yet
+        return;
       }
     }
     
@@ -163,31 +214,25 @@ This takes less than 3 minutes, and you'll get actionable insights after every q
       if (currentCategoryIndex < categories.length - 1) {
         setCurrentCategoryIndex(prev => prev + 1);
         
-        // Show next question after brief delay
         setTimeout(() => {
           showNextQuestion();
-        }, showFollowUp ? 1500 : 2500); // Longer delay if gold nugget was shown
+        }, showFollowUp ? 1500 : 2500);
       } else {
-        // Quiz complete
         completeQuiz();
       }
     }
     
-    // Scroll to bottom for user messages
-    setTimeout(() => {
-      scrollToBottom();
-    }, 100);
+    scrollToBottom();
   };
 
   const completeQuiz = () => {
     setIsComplete(true);
     
-    // Calculate total score
     const totalScore = Object.values(answers).reduce((sum, answer) => {
       return sum + (answer.score || 0);
     }, 0);
     
-    const maxScore = categories.length * 4; // Max 4 points per category
+    const maxScore = categories.length * 4;
     const scorePercentage = Math.round((totalScore / maxScore) * 100);
     
     let resultMessage = '';
@@ -221,9 +266,9 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
     
     setMessages(prev => [...prev, completionMessage]);
     
-    // Trigger completion callback with enriched data
     setTimeout(() => {
       onQuizComplete({
+        userName,
         answers,
         score: totalScore,
         maxScore,
@@ -234,7 +279,9 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const scrollToTopOfLastMessage = () => {
@@ -244,19 +291,21 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
     }
   };
 
-  // Auto-scroll behavior for AI messages
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage.type === 'ai') {
+      if (lastMessage.type === 'ai' && !lastMessage.isNugget) {
         setTimeout(() => {
           scrollToTopOfLastMessage();
         }, 100);
+      } else {
+        scrollToBottom();
       }
     }
   }, [messages]);
 
-  const progress = ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100;
+  const progress = currentCategoryIndex >= 0 ? 
+    ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100 : 0;
 
   return (
     <div className="chat-container">
@@ -268,7 +317,7 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
         />
       </div>
 
-      {/* Messages */}
+      {/* Messages with Gradient Background */}
       <div className="messages-container" ref={chatContainerRef}>
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.type}-message`}>
@@ -316,6 +365,23 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input Bar */}
+      {!isComplete && (
+        <form onSubmit={handleInputSubmit} className="input-container">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={awaitingNameInput ? "Type your name and trade (e.g., 'John, Roofing')..." : "Type your message..."}
+            className="message-input"
+          />
+          <button type="submit" className="send-button">
+            SEND
+          </button>
+        </form>
+      )}
+
       <style jsx>{`
         .chat-container {
           display: flex;
@@ -324,17 +390,17 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           max-height: 100vh;
           overflow: hidden;
           position: relative;
-          background: #f8fafc;
+          background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #d9edff 100%);
         }
 
         .progress-container {
           position: fixed;
-          top: 0;
+          top: 60px;
           left: 0;
           right: 0;
           height: 3px;
           background: rgba(0, 104, 255, 0.1);
-          z-index: 1000;
+          z-index: 100;
         }
 
         .progress-bar {
@@ -349,9 +415,13 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           flex: 1;
           overflow-y: auto;
           padding: 20px;
-          padding-top: 23px;
+          padding-top: 70px;
+          padding-bottom: 80px;
           scroll-behavior: smooth;
           -webkit-overflow-scrolling: touch;
+          background: linear-gradient(135deg, 
+            rgba(0, 104, 255, 0.03) 0%, 
+            rgba(46, 163, 242, 0.03) 100%);
         }
 
         .message {
@@ -391,9 +461,9 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
 
         .ai-message .message-content {
           background: white;
-          border: 1px solid #e2e8f0;
+          border: 1px solid rgba(0, 104, 255, 0.1);
           border-bottom-left-radius: 6px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
 
         .message-content.gold-nugget {
@@ -406,6 +476,7 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: white;
           border-bottom-right-radius: 6px;
+          box-shadow: 0 2px 12px rgba(0, 104, 255, 0.3);
         }
 
         .message-content p {
@@ -512,11 +583,65 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
           font-size: 18px;
         }
 
+        /* Input Container */
+        .input-container {
+          display: flex;
+          gap: 12px;
+          padding: 16px 20px;
+          background: white;
+          border-top: 1px solid rgba(0, 104, 255, 0.1);
+          box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-input {
+          flex: 1;
+          padding: 12px 16px;
+          border: 2px solid #e2e8f0;
+          border-radius: 8px;
+          font-family: 'Open Sans', sans-serif;
+          font-size: 15px;
+          transition: all 0.2s ease;
+          outline: none;
+        }
+
+        .message-input:focus {
+          border-color: #0068ff;
+          box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.1);
+        }
+
+        .send-button {
+          padding: 12px 24px;
+          background: linear-gradient(135deg, #0068ff, #2ea3f2);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-family: 'Roboto', sans-serif;
+          font-weight: 700;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 8px rgba(0, 104, 255, 0.3);
+        }
+
+        .send-button:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 104, 255, 0.4);
+        }
+
+        .send-button:active {
+          transform: translateY(0);
+        }
+
         /* Mobile Optimizations */
         @media (max-width: 768px) {
+          .progress-container {
+            top: 56px;
+          }
+
           .messages-container {
             padding: 16px;
-            padding-top: 19px;
+            padding-top: 66px;
+            padding-bottom: 76px;
           }
 
           .message-content {
@@ -540,6 +665,14 @@ Based on your answers, I'm generating your personalized **Contractor Growth Map*
 
           .options-container {
             max-width: 90%;
+          }
+
+          .input-container {
+            padding: 12px 16px;
+          }
+
+          .message-input {
+            font-size: 16px; /* Prevent zoom on iOS */
           }
         }
 
