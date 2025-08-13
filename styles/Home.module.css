@@ -72,6 +72,14 @@
   color: #002654;
 }
 
+.tagline {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #64748b;
+  margin-left: 4px;
+}
+
 .restartButton {
   display: flex;
   align-items: center;
@@ -152,6 +160,20 @@
   font-size: 13px;
   color: #0068ff;
   font-weight: 600;
+}
+
+.footerLink {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  color: #0068ff;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footerLink:hover {
+  color: #2ea3f2;
+  text-decoration: underline;
 }
 
 /* Mobile Responsive */
