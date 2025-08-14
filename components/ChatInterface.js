@@ -246,7 +246,7 @@ It only takes a few minutes, so let's get started.
   };
 
   const handleRestart = () => {
-    if (typeof window !== 'undefined' && !window.confirm('Restart the consultation?')) return;
+    if (typeof window !== 'undefined' && !window.confirm('Do you really want to restart your Profit Leak Detector Consultation?')) return;
     setMessages([]);
     setCurrentCategoryIndex(-1);
     setShowFollowUp(false);
