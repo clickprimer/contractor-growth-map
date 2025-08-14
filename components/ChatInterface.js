@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import quizData from '../data/quiz-questions.json';
+import ConfirmModal from './ConfirmModal';
 
 /** Safe, minimal markdown: **bold** and *italic* only */
 function formatLine(line) {
@@ -23,6 +24,7 @@ const ChatInterface = ({ onQuizComplete }) => {
   const [userName, setUserName] = useState('');
   const [userTrade, setUserTrade] = useState('');
   const [awaitingNameInput, setAwaitingNameInput] = useState(false);
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
 
   const chatContainerRef = useRef(null);
   const messagesPaneRef = useRef(null);
@@ -245,8 +247,7 @@ It only takes a few minutes, so let's get started.
     setInputValue('');
   };
 
-  const handleRestart = () => {
-    if (typeof window !== 'undefined' && !window.confirm('Do you really want to restart your Profit Leak Detector Consultation?')) return;
+  const doRestart = () => {
     setMessages([]);
     setCurrentCategoryIndex(-1);
     setShowFollowUp(false);
@@ -258,6 +259,11 @@ It only takes a few minutes, so let's get started.
     setUserName('');
     setUserTrade('');
     setAwaitingNameInput(false);
+  };
+
+  const handleRestart = () => {
+    // Open custom modal (no native URL header)
+    setShowRestartConfirm(true);
   };
 
   const completeQuiz = () => {
@@ -365,6 +371,17 @@ Generating your personalized **Contractor Growth Map**...`,
           <button type="submit" className="send-button">SEND</button>
         </form>
       )}
+
+      {/* Confirm modal for Restart (no URL header) */}
+      <ConfirmModal
+        open={showRestartConfirm}
+        title="Restart consultation?"
+        message="Do you really want to restart your Profit Leak Detector Consultation?"
+        confirmText="Restart"
+        cancelText="Cancel"
+        onConfirm={() => { setShowRestartConfirm(false); doRestart(); }}
+        onCancel={() => setShowRestartConfirm(false)}
+      />
 
       <style jsx>{`
         .chat-container {
