@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Head from 'next/head';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
@@ -21,7 +22,15 @@ function MyApp({ Component, pageProps }) {
     }
   }, []);
   
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Head>
+        {/* On-brand PNG favicon in /public */}
+        <link rel="icon" href="/favicon.png" type="image/png" />
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
 }
 
 export default MyApp;
