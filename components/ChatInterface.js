@@ -103,14 +103,29 @@ It only takes a few minutes, so let's get started.
   }, [messages]);
 
   // Helpers
-  const showNextQuestion = (idx = currentCategoryIndex) => {
+  
+const showNextQuestion = (idx = currentCategoryIndex) => {
+
     if (idx < 0 || idx >= categories.length) return;
     const category = categories[idx];
+
     const questionNum = idx + 1;
 
-    const questionMessage = {
+    
+// Split the screener question at the first sentence boundary (.?!)
+const fullQ = category.screener.question || "";
+let qBold = fullQ;
+let qRest = "";
+const mSplit = fullQ.match(/(.+?[?.!])(.*)$/s);
+if (mSplit) { qBold = mSplit[1]; qRest = mSplit[2] || ""; }
+
+const questionMessage = {
+
       type: 'ai',
-      content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**\n\n${category.screener.question}`,
+      content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**
+
+<strong class="question-strong">${qBold}</strong>${qRest}`,
+
       question: category.screener,
       isScreener: true,
       categoryName: category.category,
@@ -168,7 +183,7 @@ It only takes a few minutes, so let's get started.
         setTimeout(() => {
           setMessages(prev => [...prev, {
             type: 'ai',
-            content: `**Follow-up:** ${currentCategory.followUp.question}`,
+            content: `**Follow-up:** <strong class="question-strong">${currentCategory.followUp.question}</strong>`,
             question: currentCategory.followUp,
             isFollowUp: true,
             timestamp: new Date()
@@ -337,7 +352,7 @@ Generating your personalized **Contractor Growth Map**...`,
                   {message.question.options.map((option, optIndex) => (
                     <button
                       key={optIndex}
-                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} style={{ marginTop: optIndex === 0 ? 0 : 8 }} style={{ marginTop: optIndex === 0 ? 0 : 8 }}
+                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} style={{ marginTop: optIndex === 0 ? 0 : 8 }}
                       onClick={() => handleOptionSelect(option, option.label)}
                     >
                       {option.label}
@@ -495,14 +510,26 @@ Generating your personalized **Contractor Growth Map**...`,
 
         .message-content p { margin: 0 0 8px 0; }
 /* Use class so bold always renders brand blue (except gold nuggets which already override strong) */
-:global(.brand-strong) { color: #0068ff !important; font-weight: 700; }
-.user-message :global(.brand-strong) { color: white !important; }
-.gold-nugget :global(.brand-strong) { color: #92400e !important; }
+.brand-strong { color: #0068ff; font-weight: 700; }
 
 
-
+.user-message .message-content strong,
+.user-message .message-content b,
+.user-message .message-content strong em,
+.user-message .message-content em strong,
+.user-message .message-content b em {
+  color: white !important;
+  font-weight: 700;
+}
 /* ALL bold text in messages uses brand blue — except gold nuggets */
-
+.message-content:not(.gold-nugget) strong,
+.message-content:not(.gold-nugget) b,
+.message-content:not(.gold-nugget) strong em,
+.message-content:not(.gold-nugget) em strong,
+.message-content:not(.gold-nugget) b em {
+  font-weight: 700;
+  color: #0068ff !important;
+}
         .message-content p:last-child { margin-bottom: 0; }
 
         
@@ -527,22 +554,12 @@ Generating your personalized **Contractor Growth Map**...`,
           border: none;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: #fff;
-          font-size: 14px;
           font-weight: 600;
-          line-height: 1.2;
-          padding: 12px 16px;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
-        @media (min-width: 768px) {
-  .option-button {
-    font-size: 16px;      /* desktop size */
-  }
-}
         .option-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
         .option-button.selected { outline: 2px solid rgba(48,214,79,0.35); }
-.option-button + .option-button { margin-top: 8px; }
 
         /* Input */
         .custom-answer-hint { padding: 6px 16px 0; font-size: 13px; color: #334155; }
