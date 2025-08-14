@@ -334,8 +334,8 @@ Generating your personalized **Contractor Growth Map**...`,
         ))}
       </div>
 
-      {/* Custom input hint */}
-      {!isComplete && currentCategoryIndex >= 0 && (
+      {/* Custom input hint — ALWAYS show while not complete */}
+      {!isComplete && (
         <div className="custom-answer-hint">
           <strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong>
         </div>
