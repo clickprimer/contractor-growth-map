@@ -600,12 +600,10 @@ Generating your personalized **Contractor Growth Map**...`,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Bar Hint */}
-      {!isComplete && currentCategoryIndex >= 0 && !showTypingIndicator && (
-        <div className="custom-answer-hint">
-          <strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong>
-        </div>
-      )}
+      {/* Custom Answer Hint - Always Visible */}
+      <div className="custom-answer-hint">
+        <strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong>
+      </div>
 
       {/* Input Bar */}
       {!isComplete && (
@@ -647,10 +645,9 @@ Generating your personalized **Contractor Growth Map**...`,
         /* Hide the old header Restart button so we don't have two */
         :global(header .restartButton) { display: none !important; }
 
-        /* Progress row (sticky under header) */
+        /* Progress row (static below header, not sticky) */
         .progress-row {
-          position: sticky;
-          top: 0;
+          position: relative;
           z-index: 15;
           display: flex;
           align-items: center;
@@ -660,6 +657,7 @@ Generating your personalized **Contractor Growth Map**...`,
           backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(0, 104, 255, 0.1);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          flex-shrink: 0;
         }
         
         .progress-count {
@@ -770,6 +768,7 @@ Generating your personalized **Contractor Growth Map**...`,
         .messages-container {
           flex: 1;
           overflow-y: auto;
+          overflow-x: hidden;
           padding: 20px;
           padding-top: 20px;
           padding-bottom: 80px;
@@ -778,6 +777,28 @@ Generating your personalized **Contractor Growth Map**...`,
           background: linear-gradient(135deg,
             rgba(0, 104, 255, 0.02) 0%,
             rgba(46, 163, 242, 0.02) 100%);
+          /* Show scrollbar */
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 104, 255, 0.3) rgba(0, 104, 255, 0.1);
+        }
+
+        .messages-container::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+          background: rgba(0, 104, 255, 0.05);
+          border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+          background: rgba(0, 104, 255, 0.3);
+          border-radius: 4px;
+          transition: background 0.2s ease;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 104, 255, 0.5);
         }
 
         .message {
@@ -862,12 +883,12 @@ Generating your personalized **Contractor Growth Map**...`,
         .message-content strong,
         .message-content b {
           font-weight: 700;
-          color: #0068ff;
+          color: #0068ff !important;
         }
         
         .gold-nugget strong,
         .gold-nugget b { 
-          color: #92400e; 
+          color: #92400e !important; 
         }
         
         .user-message .message-content strong,
@@ -887,36 +908,36 @@ Generating your personalized **Contractor Growth Map**...`,
 
         .options-container {
           display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
+          flex-direction: column;
+          gap: 8px;
           margin-top: 12px;
         }
         
         .option-button {
-          padding: 12px 16px;
+          padding: 14px 18px;
           border-radius: 8px;
           border: 2px solid #e2e8f0;
-          background: white;
-          color: #334155;
+          background: linear-gradient(135deg, #0068ff, #2ea3f2);
+          color: white;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          font-size: 14px;
-          min-width: 120px;
+          font-size: 15px;
+          text-align: left;
+          width: 100%;
+          box-shadow: 0 2px 8px rgba(0, 104, 255, 0.2);
         }
         
         .option-button:hover:not(:disabled) {
-          border-color: #0068ff;
-          background: rgba(0, 104, 255, 0.05);
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15);
+          box-shadow: 0 4px 12px rgba(0, 104, 255, 0.3);
         }
         
         .option-button.selected {
-          background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          color: white;
-          border-color: #0068ff;
-          box-shadow: 0 4px 12px rgba(0, 104, 255, 0.3);
+          background: linear-gradient(135deg, #002654, #0068ff);
+          border-color: #002654;
+          box-shadow: 0 4px 16px rgba(0, 38, 84, 0.4);
+          transform: translateY(-1px);
         }
         
         .option-button:disabled {
@@ -982,14 +1003,15 @@ Generating your personalized **Contractor Growth Map**...`,
           }
         }
 
-        /* Custom Answer Hint */
+        /* Custom Answer Hint - Always visible and left-aligned */
         .custom-answer-hint {
-          padding: 8px 16px;
+          padding: 10px 16px;
           background: rgba(255, 255, 255, 0.9);
           border-top: 1px solid rgba(0, 104, 255, 0.1);
-          text-align: center;
+          text-align: left;
           font-size: 13px;
           color: #64748b;
+          flex-shrink: 0;
         }
 
         /* Input Container */
@@ -1107,8 +1129,8 @@ Generating your personalized **Contractor Growth Map**...`,
           
           .option-button {
             width: 100%;
-            min-width: auto;
             text-align: left;
+            padding: 12px 16px;
           }
           
           .message-input { 
