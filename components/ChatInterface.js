@@ -494,15 +494,7 @@ Generating your personalized **Contractor Growth Map**...`,
         .user-message .message-content p { color: white !important; }
 
         .message-content p { margin: 0 0 8px 0; }
-/* BRAND BOLD COLORS */
-.ai-message .message-content:not(.gold-nugget) strong,
-.ai-message .message-content:not(.gold-nugget) b,
-.ai-message .message-content:not(.gold-nugget) strong em,
-.ai-message .message-content:not(.gold-nugget) em strong,
-.ai-message .message-content:not(.gold-nugget) b em {
-  color: #0068ff;
-  font-weight: 700;
-}
+
 
 .user-message .message-content strong,
 .user-message .message-content b,
