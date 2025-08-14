@@ -375,8 +375,8 @@ Generating your personalized **Contractor Growth Map**...`,
       {/* Confirm modal for Restart (no URL header) */}
       <ConfirmModal
         open={showRestartConfirm}
-        title="Profit Leak Detector"
-        message="Do you really want to restart your consultation?"
+        title="Restart consultation?"
+        message="Do you really want to restart your Profit Leak Detector Consultation?"
         confirmText="Restart"
         cancelText="Cancel"
         onConfirm={() => { setShowRestartConfirm(false); doRestart(); }}
