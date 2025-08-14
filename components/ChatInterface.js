@@ -539,7 +539,9 @@ Generating your personalized **Contractor Growth Map**...`,
           border: none;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: #fff;
+          font-size: 14px;
           font-weight: 600;
+          line-height: 1.3;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
