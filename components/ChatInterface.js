@@ -25,12 +25,23 @@ const ChatInterface = ({ onQuizComplete }) => {
   const categories = quizData.quiz_flow;
   const totalQuestions = categories.length;
 
-  // Prevent body scroll on mobile - but keep header visible
+  // Mobile viewport handling - prevent header from being pushed up
   useEffect(() => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      // Only prevent pull-to-refresh, don't hide header
+      // Prevent any body manipulation that could hide header
+      document.body.style.position = 'static';
+      document.body.style.overflow = 'visible';
+      document.body.style.height = 'auto';
       document.body.style.overscrollBehavior = 'none';
+      
+      // Ensure container doesn't take full viewport height on mobile
+      const container = document.querySelector('.chat-container');
+      if (container) {
+        container.style.height = 'auto';
+        container.style.minHeight = 'calc(100vh - 120px)'; // Account for header/footer
+      }
+      
       return () => {
         document.body.style.overscrollBehavior = 'auto';
       };
@@ -258,8 +269,9 @@ It only takes a few minutes, and you're free to add your own details as you go. 
   };
 
   const handleOptionSelect = (option, optionLabel) => {
-    // Allow changing selection before submitting
+    // Auto-submit immediately when option is selected
     setSelectedOption({ option, label: optionLabel });
+    setTimeout(() => submitAnswer(), 100); // Small delay for visual feedback
   };
 
   const submitAnswer = () => {
@@ -567,15 +579,6 @@ Generating your personalized **Contractor Growth Map**...`,
                       {option.label}
                     </button>
                   ))}
-                  {selectedOption && (
-                    <button
-                      className="continue-button"
-                      onClick={submitAnswer}
-                      disabled={isLoading}
-                    >
-                      Continue →
-                    </button>
-                  )}
                 </div>
               )}
             </div>
@@ -628,6 +631,15 @@ Generating your personalized **Contractor Growth Map**...`,
           overflow: hidden;
           position: relative;
           background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #d9edff 100%);
+        }
+
+        /* Mobile height adjustment */
+        @media (max-width: 768px) {
+          .chat-container {
+            height: auto;
+            min-height: calc(100vh - 120px);
+            max-height: none;
+          }
         }
 
         /* Hide the old header Restart button so we don't have two */
@@ -828,13 +840,19 @@ Generating your personalized **Contractor Growth Map**...`,
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
         
-        .ai-message .message-content p { color: #333333; }
+        .ai-message .message-content p { 
+          color: #002654; 
+        }
 
         .message-content.gold-nugget {
           background: linear-gradient(135deg, #fffbeb, #fef3c7);
           border: 2px solid #fbbf24;
           box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
           animation: goldNuggetAppear 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gold-nugget p {
+          color: #92400e !important;
         }
         
         @keyframes goldNuggetAppear {
@@ -943,16 +961,7 @@ Generating your personalized **Contractor Growth Map**...`,
           cursor: pointer;
           transition: all 0.3s ease;
           box-shadow: 0 4px 12px rgba(48, 214, 79, 0.3);
-        }
-        
-        .continue-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(48, 214, 79, 0.4);
-        }
-        
-        .continue-button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
+          display: none; /* Hide continue button - auto-advance instead */
         }
 
         /* Typing Indicator */
