@@ -52,7 +52,7 @@ const ChatInterface = ({ onQuizComplete }) => {
         type: 'ai',
         content: `**Hello and welcome to your Profit Leak Detector!** This AI consultation will help uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
-**You'll get a Contractor Growth Map with:**
+**You'll get a Profit & Growth Map with:**
 ✅ Your Marketing Strengths
 🚧 Your Business Bottlenecks
 🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
