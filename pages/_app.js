@@ -3,15 +3,8 @@ import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
-    // Prevent body scrolling when chat is active
+    // Handle iOS viewport height without breaking desktop layout
     if (typeof window !== 'undefined') {
-      // Set body styles to prevent scrolling
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-      
-      // Handle iOS viewport height
       const setVH = () => {
         const vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -21,9 +14,20 @@ function MyApp({ Component, pageProps }) {
       window.addEventListener('resize', setVH);
       window.addEventListener('orientationchange', setVH);
       
+      // Only prevent body scroll on mobile devices
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isMobile) {
+        document.body.style.touchAction = 'none';
+        document.body.style.overscrollBehavior = 'none';
+      }
+      
       return () => {
         window.removeEventListener('resize', setVH);
         window.removeEventListener('orientationchange', setVH);
+        if (isMobile) {
+          document.body.style.touchAction = 'auto';
+          document.body.style.overscrollBehavior = 'auto';
+        }
       };
     }
   }, []);
