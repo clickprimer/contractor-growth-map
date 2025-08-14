@@ -87,14 +87,16 @@ export default function Home() {
         </div>
       </footer>
 
+      
       <style jsx>{`
-        :global(body) {
+        :global(html, body, #__next) {
           margin: 0;
           padding: 0;
+          height: 100%;
           overflow: hidden;
-          height: 100vh;
         }
       `}</style>
+
     </div>
   );
 }
