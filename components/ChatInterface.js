@@ -67,7 +67,7 @@ It only takes a few minutes, and you're free to add your own details as you go. 
       setAwaitingNameInput(true);
       setShowIntro(false);
 
-      // Explicitly anchor to the TOP of the intro bubble and do NOT auto-scroll away.
+      // Anchor to the top of the intro bubble
       setTimeout(() => {
         const pane = messagesPaneRef.current;
         if (pane) {
@@ -322,7 +322,7 @@ Generating your personalized **Contractor Growth Map**...`,
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.type}-message`}>
             <div className={`message-content ${message.isNugget ? 'gold-nugget' : ''}`}>
-              {String(message.content).split('\\n').map((line, i) => (
+              {String(message.content).split('\n').map((line, i) => (
                 <p key={i} dangerouslySetInnerHTML={{ __html: formatLine(line) }} />
               ))}
               {/* Options inline inside the AI bubble for the CURRENT question only */}
