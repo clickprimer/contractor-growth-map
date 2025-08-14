@@ -527,9 +527,9 @@ Generating your personalized **Contractor Growth Map**...`,
           border: none;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: #fff;
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
-          line-height: 1.3;
+          line-height: 1.2;
           padding: 12px 16px;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -537,7 +537,7 @@ Generating your personalized **Contractor Growth Map**...`,
 
         @media (min-width: 768px) {
   .option-button {
-    font-size: 18px;      /* desktop size */
+    font-size: 16px;      /* desktop size */
   }
 }
         .option-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
