@@ -527,10 +527,19 @@ Generating your personalized **Contractor Growth Map**...`,
           border: none;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: #fff;
+          font-size: 16px;
           font-weight: 600;
+          line-height: 1.3;
+          padding: 12px 16px;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
+
+        @media (min-width: 768px) {
+  .option-button {
+    font-size: 18px;      /* desktop size */
+  }
+}
         .option-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
         .option-button.selected { outline: 2px solid rgba(48,214,79,0.35); }
 .option-button + .option-button { margin-top: 8px; }
