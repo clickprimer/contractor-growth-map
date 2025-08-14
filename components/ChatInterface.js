@@ -282,9 +282,7 @@ Generating your personalized **Contractor Growth Map**...`,
       </div>
 
       {!isComplete && (
-        <div className="custom-answer-hint">
-          <strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong>
-        </div>
+        <div className="custom-answer-hint">Don't like your choices? Type your own response below.</div>
       )}
 
       {!isComplete && (
