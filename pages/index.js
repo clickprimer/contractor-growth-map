@@ -7,7 +7,7 @@ export default function Home() {
   const [key, setKey] = useState(0);
 
   const handleRestart = () => {
-    if (confirm('Are you sure you want to restart the assessment?')) {
+   if (confirm('Do you really want to restart your Profit Leak Detector Consultation?')) {
       setKey(prev => prev + 1);
     }
   };
