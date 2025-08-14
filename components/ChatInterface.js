@@ -373,6 +373,20 @@ Generating your personalized **Contractor Growth Map**...`,
           .message-input { font-size: 16px; }
         }
 
+
+        /* Hint alignment and size */
+        .custom-answer-hint {
+          padding: 4px 20px 0 20px;  /* align with input bar's left padding */
+          margin: 0;
+          color: #002654;
+          font-size: 11px;
+          font-style: italic;
+          font-weight: 400;
+        }
+        @media (min-width: 769px) {
+          .custom-answer-hint { font-size: 12px; }
+        }
+
         /* Global overrides for injected HTML (styled-jsx scope safe) */
         .ai-message .message-content :global(.brand-strong) { color: #0068ff !important; font-weight: 700; }
         .user-message .message-content :global(.brand-strong) { color: white !important; font-weight: 700; }
