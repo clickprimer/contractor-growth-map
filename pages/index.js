@@ -23,8 +23,6 @@ export default function Home() {
         <title>Profit Leak Detector | ClickPrimer</title>
         <meta name="description" content="Discover where your contracting business is leaving money on the table. Get your personalized Contractor Growth Map in 2 minutes." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="icon" href="/favicon.ico" />
-        
         {/* Open Graph */}
         <meta property="og:title" content="Profit Leak Detector | ClickPrimer" />
         <meta property="og:description" content="Find hidden revenue in your contracting business" />
