@@ -37,15 +37,15 @@ const ChatInterface = ({ onQuizComplete }) => {
     const t = setTimeout(() => {
       const introMessage = {
         type: 'ai',
-        content: `**Hello and welcome to your Profit Leak Detector!** This AI consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+        content: `**Hello and welcome to your Profit Leak Detector!** This AI consultation will help uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
 
-**At the end, you'll get a Contractor Growth Map. It will include:**
-✅ Your Marketing & Operations Strengths
-🚧 Your Bottlenecks & Missed Opportunities
+**At the end, you'll get a Contractor Growth Map with:**
+✅ Your Marketing Strengths
+🚧 Your Business Bottlenecks
 🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
 💡 How ClickPrimer Can Help You
 
-It only takes a few minutes, and you're free to add your own details as you go. It will help us give you the best advice for your business. **So let's get started!**
+It only takes a few minutes, so let's get started.
 
 **First, what's your name, and what type of work do you do?**`,
         timestamp: new Date()
