@@ -310,8 +310,8 @@ Generating your personalized **Contractor Growth Map**...`,
           type="button"
           className="restart-inline"
           onClick={handleRestart}
-          aria-label="Restart consultation"
-          title="Restart"
+          aria-label="Restart Profit Leak Detector Consultation"
+          title="Restart Profit Leak Detector Consultation"
         >
           Restart
         </button>
