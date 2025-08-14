@@ -1,20 +1,21 @@
 /* ====== Layout Shell ====== */
 .container {
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* Mobile layout fixes */
 @media (max-width: 768px) {
   .container {
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
-    position: relative;
-  }
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 }
 
 .header {
@@ -130,20 +131,30 @@
 
 /* Main Chat Area */
 .main {
-  flex: 1 1 auto;
+  position: fixed;
+  top: 72px;   /* header height */
+  bottom: 56px; /* footer height */
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  overflow: visible;
+  min-height: 0; /* allow children to shrink for scroll */
+  overflow: hidden;
 }
 
 /* Mobile main area adjustments */
 @media (max-width: 768px) {
   .main {
-    overflow: visible;
-    min-height: auto;
-    flex: 1 1 auto;
-  }
+  position: fixed;
+  top: 72px;   /* header height */
+  bottom: 56px; /* footer height */
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow children to shrink for scroll */
+  overflow: hidden;
+}
 }
 
 /* Footer */
@@ -199,9 +210,12 @@
 /* ====== Mobile (≤768px) ====== */
 @media (max-width: 768px) {
   .container {
-    min-height: 100vh;
-    position: relative;
-  }
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
   .header { 
     height: 68px;
@@ -235,9 +249,16 @@
   }
 
   .main {
-    min-height: calc(100vh - 68px - 48px);
-    flex: 1;
-  }
+  position: fixed;
+  top: 72px;   /* header height */
+  bottom: 56px; /* footer height */
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow children to shrink for scroll */
+  overflow: hidden;
+}
 
   .footer { 
     height: 48px;
@@ -286,5 +307,12 @@
   
   .tagline { 
     font-size: 15px; 
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    top: 72px;
+    bottom: 56px;
   }
 }
