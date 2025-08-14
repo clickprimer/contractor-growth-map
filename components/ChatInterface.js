@@ -103,29 +103,14 @@ It only takes a few minutes, so let's get started.
   }, [messages]);
 
   // Helpers
-  
-const showNextQuestion = (idx = currentCategoryIndex) => {
-
+  const showNextQuestion = (idx = currentCategoryIndex) => {
     if (idx < 0 || idx >= categories.length) return;
     const category = categories[idx];
-
     const questionNum = idx + 1;
 
-    
-// Split the screener question at the first sentence boundary (.?!)
-const fullQ = category.screener.question || "";
-let qBold = fullQ;
-let qRest = "";
-const mSplit = fullQ.match(/(.+?[?.!])(.*)$/s);
-if (mSplit) { qBold = mSplit[1]; qRest = mSplit[2] || ""; }
-
-const questionMessage = {
-
+    const questionMessage = {
       type: 'ai',
-      content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**
-
-<strong class="question-strong">${qBold}</strong>${qRest}`,
-
+      content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**\n\n${category.screener.question}`,
       question: category.screener,
       isScreener: true,
       categoryName: category.category,
@@ -183,7 +168,7 @@ const questionMessage = {
         setTimeout(() => {
           setMessages(prev => [...prev, {
             type: 'ai',
-            content: `**Follow-up:** <strong class="question-strong">${currentCategory.followUp.question}</strong>`,
+            content: `**Follow-up:** ${currentCategory.followUp.question}`,
             question: currentCategory.followUp,
             isFollowUp: true,
             timestamp: new Date()
@@ -607,7 +592,38 @@ Generating your personalized **Contractor Growth Map**...`,
           .message-content { max-width: 90%; padding: 14px 16px; font-size: 15px; }
           .message-input { font-size: 16px; }
         }
-      `}</style>
+      
+/* Readability: larger option buttons */
+.option-button {
+  font-size: 16px;
+  line-height: 1.3;
+  padding: 12px 16px;
+}
+@media (min-width: 768px) {
+  .option-button { font-size: 18px; }
+}
+/* Spacing fallback (in addition to inline marginTop) */
+.option-button + .option-button { margin-top: 8px; }
+/* ---- BRAND BOLD COLORS (global + high specificity) ---- */
+.ai-message .message-content :global(.brand-strong) {
+  color: #0068ff !important;
+  font-weight: 700;
+}
+.user-message .message-content :global(.brand-strong) {
+  color: white !important;
+  font-weight: 700;
+}
+.gold-nugget :global(.brand-strong) {
+  /* preserve your nugget styling */
+  color: #92400e !important;
+  font-weight: 700;
+}
+
+/* Only the actual question sentence uses dark bold */
+:global(.question-strong) {
+  color: #002654 !important;
+  font-weight: 700;
+}`}</style>
     </div>
   );
 };
