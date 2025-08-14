@@ -25,23 +25,12 @@ const ChatInterface = ({ onQuizComplete }) => {
   const categories = quizData.quiz_flow;
   const totalQuestions = categories.length;
 
-  // Mobile viewport handling - prevent header from being pushed up
+  // Remove problematic mobile viewport manipulation
   useEffect(() => {
+    // Simple mobile optimization without breaking layout
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      // Prevent any body manipulation that could hide header
-      document.body.style.position = 'static';
-      document.body.style.overflow = 'visible';
-      document.body.style.height = 'auto';
       document.body.style.overscrollBehavior = 'none';
-      
-      // Ensure container doesn't take full viewport height on mobile
-      const container = document.querySelector('.chat-container');
-      if (container) {
-        container.style.height = 'auto';
-        container.style.minHeight = 'calc(100vh - 120px)'; // Account for header/footer
-      }
-      
       return () => {
         document.body.style.overscrollBehavior = 'auto';
       };
@@ -627,19 +616,8 @@ Generating your personalized **Contractor Growth Map**...`,
           display: flex;
           flex-direction: column;
           height: 100%;
-          max-height: 100%;
-          overflow: hidden;
-          position: relative;
           background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #d9edff 100%);
-        }
-
-        /* Mobile height adjustment */
-        @media (max-width: 768px) {
-          .chat-container {
-            height: auto;
-            min-height: calc(100vh - 120px);
-            max-height: none;
-          }
+          position: relative;
         }
 
         /* Hide the old header Restart button so we don't have two */
