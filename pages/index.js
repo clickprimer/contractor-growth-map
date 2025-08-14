@@ -1,21 +1,20 @@
 import Head from 'next/head';
 import { useState } from 'react';
 import ChatInterface from '../components/ChatInterface';
+import ConfirmModal from '../components/ConfirmModal';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {
   const [key, setKey] = useState(0);
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
 
   const handleRestart = () => {
-   if (confirm('Do you really want to restart your Profit Leak Detector Consultation?')) {
-      setKey(prev => prev + 1);
-    }
+    setShowRestartConfirm(true);
   };
 
   const handleQuizComplete = (results) => {
     console.log('Quiz completed with results:', results);
     // Handle quiz completion - could redirect or show results
-    // Results now include: answers, score, maxScore, percentage, categories
   };
 
   return (
@@ -55,8 +54,7 @@ export default function Home() {
               <span className={styles.appTitle}>Profit Leak Detector</span>
               <span className={styles.tagline}>AI-Powered Consultation for Contractors</span>
             </div>
-            
-</div>
+          </div>
 
           <button 
             className={styles.restartButton}
@@ -87,7 +85,17 @@ export default function Home() {
         </div>
       </footer>
 
-      
+      {/* Confirm Modal (no URL header) */}
+      <ConfirmModal
+        open={showRestartConfirm}
+        title="Restart consultation?"
+        message="Do you really want to restart your Profit Leak Detector Consultation?"
+        confirmText="Restart"
+        cancelText="Cancel"
+        onConfirm={() => { setShowRestartConfirm(false); setKey(prev => prev + 1); }}
+        onCancel={() => setShowRestartConfirm(false)}
+      />
+
       <style jsx>{`
         :global(html, body, #__next) {
           margin: 0;
