@@ -375,8 +375,8 @@ Generating your personalized **Contractor Growth Map**...`,
       {/* Confirm modal for Restart (no URL header) */}
       <ConfirmModal
         open={showRestartConfirm}
-        title="Restart consultation?"
-        message="Do you really want to restart your Profit Leak Detector Consultation?"
+        title="Profit Leak Detector"
+        message="Do you really want to restart your consultation?"
         confirmText="Restart"
         cancelText="Cancel"
         onConfirm={() => { setShowRestartConfirm(false); doRestart(); }}
@@ -490,26 +490,42 @@ Generating your personalized **Contractor Growth Map**...`,
           border-bottom-right-radius: 6px;
           box-shadow: 0 2px 12px rgba(0, 104, 255, 0.3);
         }
-        .ai-message .message-content p { color: #333; }
+        .ai-message .message-content p { color: #002654; }
         .user-message .message-content p { color: white !important; }
 
         .message-content p { margin: 0 0 8px 0; }
+/* BRAND BOLD COLORS */
+.ai-message .message-content:not(.gold-nugget) strong,
+.ai-message .message-content:not(.gold-nugget) b,
+.ai-message .message-content:not(.gold-nugget) strong em,
+.ai-message .message-content:not(.gold-nugget) em strong,
+.ai-message .message-content:not(.gold-nugget) b em {
+  color: #0068ff;
+  font-weight: 700;
+}
+
+.user-message .message-content strong,
+.user-message .message-content b,
+.user-message .message-content strong em,
+.user-message .message-content em strong,
+.user-message .message-content b em {
+  color: white !important;
+  font-weight: 700;
+}
+/* ALL bold text in messages uses brand blue — except gold nuggets */
+.message-content:not(.gold-nugget) strong,
+.message-content:not(.gold-nugget) b,
+.message-content:not(.gold-nugget) strong em,
+.message-content:not(.gold-nugget) em strong,
+.message-content:not(.gold-nugget) b em {
+  font-weight: 700;
+  color: #0068ff !important;
+}
         .message-content p:last-child { margin-bottom: 0; }
 
-        .message-content strong,
-        .message-content b,
-        .message-content strong em,
-        .message-content em strong,
-        .message-content b em {
-          font-weight: 700;
-          color: #0068ff;
-        }
+        
         .gold-nugget strong { color: #92400e; }
-        .user-message .message-content strong,
-        .message-content b,
-        .message-content strong em,
-        .message-content em strong,
-        .message-content b em { color: #0068ff !important; }
+        .user-message 
 
         /* OPTIONS: one per line, left-aligned */
         .options-container {
