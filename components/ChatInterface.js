@@ -337,7 +337,7 @@ Generating your personalized **Contractor Growth Map**...`,
                   {message.question.options.map((option, optIndex) => (
                     <button
                       key={optIndex}
-                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} style={{ marginTop: optIndex === 0 ? 0 : 8 }}
+                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} style={{ marginTop: optIndex === 0 ? 0 : 8 }} style={{ marginTop: optIndex === 0 ? 0 : 8 }}
                       onClick={() => handleOptionSelect(option, option.label)}
                     >
                       {option.label}
@@ -495,26 +495,14 @@ Generating your personalized **Contractor Growth Map**...`,
 
         .message-content p { margin: 0 0 8px 0; }
 /* Use class so bold always renders brand blue (except gold nuggets which already override strong) */
-.brand-strong { color: #0068ff; font-weight: 700; }
+:global(.brand-strong) { color: #0068ff !important; font-weight: 700; }
+.user-message :global(.brand-strong) { color: white !important; }
+.gold-nugget :global(.brand-strong) { color: #92400e !important; }
 
 
-.user-message .message-content strong,
-.user-message .message-content b,
-.user-message .message-content strong em,
-.user-message .message-content em strong,
-.user-message .message-content b em {
-  color: white !important;
-  font-weight: 700;
-}
+
 /* ALL bold text in messages uses brand blue — except gold nuggets */
-.message-content:not(.gold-nugget) strong,
-.message-content:not(.gold-nugget) b,
-.message-content:not(.gold-nugget) strong em,
-.message-content:not(.gold-nugget) em strong,
-.message-content:not(.gold-nugget) b em {
-  font-weight: 700;
-  color: #0068ff !important;
-}
+
         .message-content p:last-child { margin-bottom: 0; }
 
         
@@ -545,6 +533,7 @@ Generating your personalized **Contractor Growth Map**...`,
         }
         .option-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
         .option-button.selected { outline: 2px solid rgba(48,214,79,0.35); }
+.option-button + .option-button { margin-top: 8px; }
 
         /* Input */
         .custom-answer-hint { padding: 6px 16px 0; font-size: 13px; color: #334155; }
