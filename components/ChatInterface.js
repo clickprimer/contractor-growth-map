@@ -21,15 +21,20 @@ const ChatInterface = ({ onQuizComplete }) => {
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
-  const goldNuggetAudio = useRef(null);
 
   const categories = quizData.quiz_flow;
   const totalQuestions = categories.length;
 
-  // Initialize audio
+  // Prevent body scroll on mobile - but keep header visible
   useEffect(() => {
-    goldNuggetAudio.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+vzmW8gCjiT1/LNeSsFJXfH8N2QQAoUXrTp66hVFApGn+vzmW8gCjiT1/LNeSsFJXfH8N2QQAoUXrTp66hVFApGn+vzmW8gCg==');
-    goldNuggetAudio.current.volume = 0.3;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Only prevent pull-to-refresh, don't hide header
+      document.body.style.overscrollBehavior = 'none';
+      return () => {
+        document.body.style.overscrollBehavior = 'auto';
+      };
+    }
   }, []);
 
   // Load quiz progress from localStorage
@@ -86,27 +91,19 @@ const ChatInterface = ({ onQuizComplete }) => {
     </div>
   );
 
-  // Play sound effect
+  // Play sound effect (removed since no sound needed)
   const playSound = () => {
-    if (soundEnabled && goldNuggetAudio.current) {
-      goldNuggetAudio.current.currentTime = 0;
-      goldNuggetAudio.current.play().catch(() => {
-        // Ignore autoplay restrictions
-      });
-    }
+    // Sound functionality removed
   };
 
-  // Prevent body scroll on mobile
+  // Prevent body scroll on mobile - but keep header visible
   useEffect(() => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
+      // Only prevent pull-to-refresh, don't hide header
+      document.body.style.overscrollBehavior = 'none';
       return () => {
-        document.body.style.overflow = 'unset';
-        document.body.style.position = 'unset';
-        document.body.style.width = 'unset';
+        document.body.style.overscrollBehavior = 'auto';
       };
     }
   }, []);
@@ -529,15 +526,6 @@ Generating your personalized **Contractor Growth Map**...`,
           )}
           <button
             type="button"
-            className="sound-toggle"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            aria-label="Toggle sound"
-            title={soundEnabled ? "Sound On" : "Sound Off"}
-          >
-            {soundEnabled ? "🔊" : "🔇"}
-          </button>
-          <button
-            type="button"
             className="restart-inline"
             onClick={handleRestart}
             aria-label="Restart consultation"
@@ -737,10 +725,7 @@ Generating your personalized **Contractor Growth Map**...`,
           background: transparent;
           cursor: pointer;
           transition: all 0.2s ease;
-        }
-        
-        .sound-toggle:hover {
-          background: rgba(0, 104, 255, 0.1);
+          display: none; /* Hide sound toggle since no sound needed */
         }
         
         .restart-inline {
