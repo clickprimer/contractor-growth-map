@@ -31,35 +31,6 @@ const ChatInterface = ({ onQuizComplete }) => {
   const categories = quizData.quiz_flow;
   const totalQuestions = categories.length;
 
-  // Intro
-  useEffect(() => {
-    if (!showIntro) return;
-    const t = setTimeout(() => {
-      const introMessage = {
-        type: 'ai',
-        content: `**Hello and welcome to your Profit Leak Detector!** This AI consultation will help uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
-
-**At the end, you'll get a Contractor Growth Map with:**
-✅ Your Marketing Strengths
-🚧 Your Business Bottlenecks
-🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
-💡 How ClickPrimer Can Help You
-
-It only takes a few minutes, so let's get started.
-
-**First, what's your name, and what type of work do you do?**`,
-        timestamp: new Date()
-      };
-      setMessages([introMessage]);
-      setAwaitingNameInput(true);
-      setShowIntro(false);
-      setTimeout(() => {
-        try { inputRef.current?.focus({ preventScroll: true }); } catch {}
-      }, 150);
-    }, 250);
-    return () => clearTimeout(t);
-  }, [showIntro]);
-
   // Scroll helpers within pane
   const scrollToBottom = () => {
     const pane = messagesPaneRef.current;
@@ -72,6 +43,45 @@ It only takes a few minutes, so let's get started.
     const last = pane.querySelector('.message:last-child');
     if (last) pane.scrollTo({ top: last.offsetTop, behavior: 'smooth' });
   };
+
+  // Intro
+  useEffect(() => {
+    if (!showIntro) return;
+    const t = setTimeout(() => {
+      const introMessage = {
+        type: 'ai',
+        content: `**Hello and welcome to your Profit Leak Detector!** This AI consultation will help you uncover where your trade business may be leaking leads or leaving money on the table—and how to fix it.
+
+**At the end, you'll get a Contractor Growth Map. It will include:**
+✅ Your Marketing & Operations Strengths
+🚧 Your Bottlenecks & Missed Opportunities
+🛠️ Recommendations to Fix Your Leaks & Grow Your Profits
+💡 How ClickPrimer Can Help You
+
+It only takes a few minutes, and you're free to add your own details as you go. It will help us give you the best advice for your business. **So let's get started!**
+
+**First, what's your name, and what type of work do you do?**`,
+        timestamp: new Date()
+      };
+      setMessages([introMessage]);
+      setAwaitingNameInput(true);
+      setShowIntro(false);
+
+      // Explicitly anchor to the TOP of the intro bubble and do NOT auto-scroll away.
+      setTimeout(() => {
+        const pane = messagesPaneRef.current;
+        if (pane) {
+          const first = pane.querySelector('.message:first-child');
+          pane.scrollTo({ top: first ? first.offsetTop : 0, behavior: 'auto' });
+        }
+      }, 50);
+
+      setTimeout(() => {
+        try { inputRef.current?.focus({ preventScroll: true }); } catch {}
+      }, 150);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [showIntro]);
 
   useEffect(() => {
     if (!messages.length) return;
@@ -312,7 +322,7 @@ Generating your personalized **Contractor Growth Map**...`,
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.type}-message`}>
             <div className={`message-content ${message.isNugget ? 'gold-nugget' : ''}`}>
-              {String(message.content).split('\n').map((line, i) => (
+              {String(message.content).split('\\n').map((line, i) => (
                 <p key={i} dangerouslySetInnerHTML={{ __html: formatLine(line) }} />
               ))}
               {/* Options inline inside the AI bubble for the CURRENT question only */}
