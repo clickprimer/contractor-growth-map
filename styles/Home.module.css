@@ -198,8 +198,15 @@
 
 /* ====== Mobile (≤768px) ====== */
 @media (max-width: 768px) {
+  .container {
+    min-height: 100vh;
+    position: relative;
+  }
+
   .header { 
-    height: 68px; 
+    height: 68px;
+    position: relative;
+    flex-shrink: 0;
   }
   
   .headerContent { 
@@ -227,8 +234,14 @@
     display: none; 
   }
 
+  .main {
+    min-height: calc(100vh - 68px - 48px);
+    flex: 1;
+  }
+
   .footer { 
-    height: 48px; 
+    height: 48px;
+    flex-shrink: 0;
   }
   
   .footerContent { 
