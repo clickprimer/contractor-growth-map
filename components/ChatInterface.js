@@ -5,7 +5,7 @@ import ConfirmModal from './ConfirmModal';
 /** Safe, minimal markdown: **bold** and *italic* only */
 function formatLine(line) {
   if (!line) return '';
-  // Bold
+  // Bold -> brand blue by default
   line = line.replace(/(\*\*)([^*\n][^*]*?)\1/g, '<strong class="brand-strong">$2</strong>');
   // Italic (won't eat **bold**)
   line = line.replace(/(^|[^*])\*([^*\n][^*]*?)\*/g, '$1<em>$2</em>');
@@ -33,7 +33,6 @@ const ChatInterface = ({ onQuizComplete }) => {
   const categories = quizData.quiz_flow;
   const totalQuestions = categories.length;
 
-  // Scroll helpers within pane
   const scrollToBottom = () => {
     const pane = messagesPaneRef.current;
     if (!pane) return;
@@ -69,7 +68,6 @@ It only takes a few minutes, so let's get started.
       setAwaitingNameInput(true);
       setShowIntro(false);
 
-      // Anchor to the top of the intro bubble
       setTimeout(() => {
         const pane = messagesPaneRef.current;
         if (pane) {
@@ -89,20 +87,12 @@ It only takes a few minutes, so let's get started.
     if (!messages.length) return;
     const last = messages[messages.length - 1];
     const prev = messages[messages.length - 2];
-
-    // If AI sends multiple messages back-to-back, stay anchored on the FIRST of that sequence.
-    if (last?.type === 'ai' && prev?.type === 'ai') {
-      return; // keep current position (anchored at the first AI bubble)
-    }
-
-    // AI messages: scroll to TOP of the new AI bubble
-    // User messages: scroll to BOTTOM (show what they just sent)
+    if (last?.type === 'ai' && prev?.type === 'ai') return;
     const fn = last.type === 'ai' && !last.isNugget ? scrollToTopOfLastMessage : scrollToBottom;
     const id = setTimeout(fn, 80);
     return () => clearTimeout(id);
   }, [messages]);
 
-  // Helpers
   const showNextQuestion = (idx = currentCategoryIndex) => {
     if (idx < 0 || idx >= categories.length) return;
     const category = categories[idx];
@@ -116,7 +106,6 @@ It only takes a few minutes, so let's get started.
       categoryName: category.category,
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, questionMessage]);
     setSelectedOption(null);
     setShowFollowUp(false);
@@ -134,7 +123,6 @@ It only takes a few minutes, so let's get started.
     }
   };
 
-  // Option click -> auto advance (no "Continue" button)
   const handleOptionSelect = (option, optionLabel) => {
     setSelectedOption({ option, label: optionLabel });
     setTimeout(() => submitOptionAnswer(option, optionLabel), 40);
@@ -142,15 +130,10 @@ It only takes a few minutes, so let's get started.
 
   const submitOptionAnswer = (option, label) => {
     const currentCategory = categories[currentCategoryIndex];
-
-    // Echo user choice
     setMessages(prev => [...prev, { type: 'user', content: label, timestamp: new Date() }]);
-
-    // Save
     const answerKey = showFollowUp ? `${currentCategory.category}_followup` : currentCategory.category;
     setAnswers(prev => ({ ...prev, [answerKey]: { answer: label, score: option.score || 0, tags: option.tags || [] } }));
 
-    // Gold nugget (only for screener)
     if (!showFollowUp && currentCategory.gold_nuggets) {
       const nuggetKey = label.charAt(0);
       const goldNugget = currentCategory.gold_nuggets[nuggetKey];
@@ -161,7 +144,6 @@ It only takes a few minutes, so let's get started.
       }
     }
 
-    // Follow-up?
     if (!showFollowUp && currentCategory.followUp) {
       const letter = label.charAt(0);
       if (currentCategory.followUp.condition.includes(letter)) {
@@ -176,74 +158,43 @@ It only takes a few minutes, so let's get started.
           setShowFollowUp(true);
           setSelectedOption(null);
         }, 900);
-        return; // Wait for follow-up answer
+        return;
       }
     }
-
-    // Otherwise go next / complete
     goNextOrComplete();
   };
 
-  // Typed input submit
   const handleInputSubmit = (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
-
     const typed = inputValue.trim();
     setMessages(prev => [...prev, { type: 'user', content: typed, timestamp: new Date() }]);
 
     if (awaitingNameInput) {
-      let name = typed;
-      let trade = '';
-
-      if (typed.includes(',')) {
-        const parts = typed.split(',').map(s => s.trim());
-        name = parts[0];
-        trade = parts[1] || '';
-      } else if (typed.toLowerCase().includes(' from ')) {
-        const parts = typed.split(/ from /i);
-        name = parts[0].trim();
-        trade = parts[1] ? parts[1].trim() : '';
-      }
-
-      setUserName(name);
-      setUserTrade(trade);
+      let name = typed; let trade = '';
+      if (typed.includes(',')) { const parts = typed.split(',').map(s => s.trim()); name = parts[0]; trade = parts[1] || ''; }
+      else if (typed.toLowerCase().includes(' from ')) { const parts = typed.split(/ from /i); name = parts[0].trim(); trade = parts[1] ? parts[1].trim() : ''; }
+      setUserName(name); setUserTrade(trade);
       setAnswers(prev => ({ ...prev, introduction: typed, name, trade }));
-      setAwaitingNameInput(false);
-      setInputValue('');
+      setAwaitingNameInput(false); setInputValue('');
 
       setTimeout(() => {
         const responseText =
           `Great to meet you, **${name}**! ` +
-          (trade
-            ? `I see you're in the **${trade}** business. That's fantastic — the ${trade} industry has huge opportunities for growth right now. `
-            : `Thanks for being here! `) +
+          (trade ? `I see you're in the **${trade}** business. ` : `Thanks for being here! `) +
           `Let's dive into some quick questions to identify where your ${trade || 'contracting'} business might be leaving money on the table.`;
-
         setMessages(prev => [...prev, { type: 'ai', content: responseText, timestamp: new Date() }]);
-
-        setTimeout(() => {
-          setCurrentCategoryIndex(0);
-          showNextQuestion(0);
-        }, 1000);
+        setTimeout(() => { setCurrentCategoryIndex(0); showNextQuestion(0); }, 1000);
       }, 500);
-
       return;
     }
 
-    // Otherwise treat typed text as a custom answer to the current prompt
     if (currentCategoryIndex >= 0 && currentCategoryIndex < categories.length) {
       const currentCategory = categories[currentCategoryIndex];
       const answerKey = showFollowUp ? `${currentCategory.category}_followup` : currentCategory.category;
-
-      // Neutral score/tags for custom text
       setAnswers(prev => ({ ...prev, [answerKey]: { answer: typed, score: 0, tags: [] } }));
-
-      // If on screener and a follow-up exists with letter-based conditions,
-      // we can't infer letter from free text -> skip follow-up and continue.
       goNextOrComplete();
     }
-
     setInputValue('');
   };
 
@@ -261,23 +212,18 @@ It only takes a few minutes, so let's get started.
     setAwaitingNameInput(false);
   };
 
-  const handleRestart = () => {
-    // Open custom modal (no native URL header)
-    setShowRestartConfirm(true);
-  };
+  const handleRestart = () => { setShowRestartConfirm(true); };
 
   const completeQuiz = () => {
     setIsComplete(true);
     const totalScore = Object.values(answers).reduce((sum, a) => sum + (a.score || 0), 0);
     const maxScore = categories.length * 4;
     const scorePercentage = Math.round((totalScore / maxScore) * 100);
-
     let resultMessage = '';
-    if (scorePercentage >= 75) resultMessage = `🎯 **Outstanding, ${userName}!** Your ${userTrade || 'contracting'} business is in the top 10% of contractors.`;
-    else if (scorePercentage >= 50) resultMessage = `💪 **Good foundation, ${userName}!** Your ${userTrade || 'contracting'} business has solid systems but significant profit opportunities.`;
+    if (scorePercentage >= 75) resultMessage = `🎯 **Outstanding, ${userName}!** Your ${userTrade || 'contracting'} business is in the top 10%.`;
+    else if (scorePercentage >= 50) resultMessage = `💪 **Good foundation, ${userName}!** Your ${userTrade || 'contracting'} business has solid systems but big opportunities.`;
     else if (scorePercentage >= 25) resultMessage = `🔧 **Major potential, ${userName}!** Your ${userTrade || 'contracting'} business is leaving money on the table.`;
     else resultMessage = `🚀 **Huge opportunity, ${userName}!** Your ${userTrade || 'contracting'} business has the most to gain.`;
-
     const completionMessage = {
       type: 'ai',
       content: `🎉 **Assessment Complete!**
@@ -290,40 +236,23 @@ Generating your personalized **Contractor Growth Map**...`,
       timestamp: new Date()
     };
     setMessages(prev => [...prev, completionMessage]);
-
     setTimeout(() => {
       onQuizComplete({ userName, userTrade, answers, score: totalScore, maxScore, percentage: scorePercentage });
     }, 2000);
   };
 
-  const progress = currentCategoryIndex >= 0
-    ? ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100
-    : 0;
-  const displayNumberRaw = currentCategoryIndex >= 0
-    ? (currentCategoryIndex + 1 + (showFollowUp ? 0.5 : 0))
-    : 0;
+  const progress = currentCategoryIndex >= 0 ? ((currentCategoryIndex + (showFollowUp ? 0.5 : 0)) / totalQuestions) * 100 : 0;
+  const displayNumberRaw = currentCategoryIndex >= 0 ? (currentCategoryIndex + 1 + (showFollowUp ? 0.5 : 0)) : 0;
   const displayNumber = Number.isInteger(displayNumberRaw) ? String(displayNumberRaw) : displayNumberRaw.toFixed(1);
 
   return (
     <div ref={chatContainerRef} className="chat-container">
-      {/* Progress row (no sound button) */}
       <div className="progress-row">
         <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
-        <div className="progress-track" aria-hidden="true">
-          <div className="progress-bar" style={{ width: `${progress}%` }} />
-        </div>
-        <button
-          type="button"
-          className="restart-inline"
-          onClick={handleRestart}
-          aria-label="Restart Profit Leak Detector Consultation"
-          title="Restart Profit Leak Detector Consultation"
-        >
-          Restart
-        </button>
+        <div className="progress-track" aria-hidden="true"><div className="progress-bar" style={{ width: `${progress}%` }} /></div>
+        <button type="button" className="restart-inline" onClick={handleRestart} aria-label="Restart Profit Leak Detector Consultation" title="Restart Profit Leak Detector Consultation">Restart</button>
       </div>
 
-      {/* Messages (scrollable pane) */}
       <div className="messages-container" ref={messagesPaneRef}>
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.type}-message`}>
@@ -331,7 +260,6 @@ Generating your personalized **Contractor Growth Map**...`,
               {String(message.content).split('\n').map((line, i) => (
                 <p key={i} dangerouslySetInnerHTML={{ __html: formatLine(line) }} />
               ))}
-              {/* Options inline inside the AI bubble for the CURRENT question only */}
               {message.question && index === messages.length - 1 && !isComplete && (
                 <div className="options-container">
                   {message.question.options.map((option, optIndex) => (
@@ -351,14 +279,12 @@ Generating your personalized **Contractor Growth Map**...`,
         ))}
       </div>
 
-      {/* Custom input hint — ALWAYS show while not complete */}
       {!isComplete && (
         <div className="custom-answer-hint">
           <strong><em>Prefer to type a custom answer? Use the box below to enter your own response for this question.</em></strong>
         </div>
       )}
 
-      {/* Input Bar */}
       {!isComplete && (
         <form onSubmit={handleInputSubmit} className="input-container">
           <input
@@ -373,7 +299,6 @@ Generating your personalized **Contractor Growth Map**...`,
         </form>
       )}
 
-      {/* Confirm modal for Restart (no URL header) */}
       <ConfirmModal
         open={showRestartConfirm}
         title="Profit Leak Detector"
@@ -385,118 +310,30 @@ Generating your personalized **Contractor Growth Map**...`,
       />
 
       <style jsx>{`
-        .chat-container {
-          display: flex;
-          flex-direction: column;
-          flex: 1 1 auto;
-          min-height: 0;        /* allow inner scroll on flex child */
-          overflow: hidden;     /* messages pane handles scroll */
-          background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #d9edff 100%);
-        }
+        .chat-container { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow: hidden; background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 50%, #d9edff 100%); }
 
-        /* Progress row (sticky inside chat) */
-        .progress-row {
-          position: sticky;
-          top: 0;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 8px 12px;
-          background: #f8fafc; /* off-white */
-          border-bottom: 1px solid rgba(0,0,0,0.04);
-        }
-        .progress-count {
-          font-size: 12px;
-          color: #334155;
-          font-family: 'Open Sans', sans-serif;
-          white-space: nowrap;
-        }
-        .progress-track {
-          position: relative;
-          height: 3px;
-          flex: 1 1 auto;
-          background: rgba(0, 104, 255, 0.12);
-          border-radius: 2px;
-          overflow: hidden;
-        }
-        .progress-bar {
-          position: absolute;
-          left: 0; top: 0; bottom: 0;
-          height: 3px;
-          background: linear-gradient(90deg, #0068ff, #2ea3f2);
-          transition: width 0.5s ease;
-          box-shadow: 0 0 10px rgba(0, 104, 255, 0.4);
-        }
-        .restart-inline {
-          padding: 8px 12px;
-          font-size: 13px;
-          border: none;
-          border-radius: 10px;
-          background: #0068ff;
-          color: #fff;
-          font-weight: 700;
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0, 104, 255, 0.25);
-        }
+        .progress-row { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .progress-count { font-size: 12px; color: #334155; font-family: 'Open Sans', sans-serif; white-space: nowrap; }
+        .progress-track { position: relative; height: 3px; flex: 1 1 auto; background: rgba(0, 104, 255, 0.12); border-radius: 2px; overflow: hidden; }
+        .progress-bar { position: absolute; left: 0; top: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, #0068ff, #2ea3f2); transition: width 0.5s ease; box-shadow: 0 0 10px rgba(0, 104, 255, 0.4); }
+        .restart-inline { padding: 8px 12px; font-size: 13px; border: none; border-radius: 10px; background: #0068ff; color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 104, 255, 0.25); }
         .restart-inline:hover { background: #0056d6; }
 
-        .messages-container {
-          flex: 1 1 0%;
-          min-height: 0;
-          overflow-y: auto;     /* visible scrollbar on desktop/mobile */
-          overscroll-behavior: contain;
-          padding: 20px;
-          padding-top: 56px;    /* room for sticky progress row */
-          padding-bottom: 80px; /* room for input bar */
-          scroll-behavior: smooth;
-          -webkit-overflow-scrolling: touch;
-          background: linear-gradient(135deg,
-            rgba(0, 104, 255, 0.03) 0%,
-            rgba(46, 163, 242, 0.03) 100%);
-        }
+        .messages-container { flex: 1 1 0%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px; padding-top: 56px; padding-bottom: 80px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; background: linear-gradient(135deg, rgba(0, 104, 255, 0.03) 0%, rgba(46, 163, 242, 0.03) 100%); }
 
-        .message {
-          margin-bottom: 24px;
-          animation: slideUp 0.35s ease-out;
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+        .message { margin-bottom: 24px; animation: slideUp 0.35s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .ai-message { display: flex; justify-content: flex-start; }
         .user-message { display: flex; justify-content: flex-end; }
 
-        .message-content {
-          max-width: 85%;
-          padding: 16px 20px;
-          border-radius: 16px;
-          font-family: 'Open Sans', sans-serif;
-          line-height: 1.6;
-          word-wrap: break-word;
-          background: white;
-          border: 1px solid rgba(0, 104, 255, 0.1);
-          border-bottom-left-radius: 6px;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        }
-        .message-content.gold-nugget {
-          background: linear-gradient(135deg, #fffbeb, #fef3c7);
-          border: 2px solid #fbbf24;
-          box-shadow: 0 4px 12px rgba(251,191,36,0.2);
-        }
-        .user-message .message-content {
-          background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          border-bottom-left-radius: 16px;
-          border-bottom-right-radius: 6px;
-          box-shadow: 0 2px 12px rgba(0, 104, 255, 0.3);
-        }
+        .message-content { max-width: 85%; padding: 16px 20px; border-radius: 16px; font-family: 'Open Sans', sans-serif; line-height: 1.6; word-wrap: break-word; background: white; border: 1px solid rgba(0, 104, 255, 0.1); border-bottom-left-radius: 6px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); }
+        .message-content.gold-nugget { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #fbbf24; box-shadow: 0 4px 12px rgba(251,191,36,0.2); }
+        .user-message .message-content { background: linear-gradient(135deg, #0068ff, #2ea3f2); border-bottom-left-radius: 16px; border-bottom-right-radius: 6px; box-shadow: 0 2px 12px rgba(0, 104, 255, 0.3); }
         .ai-message .message-content p { color: #002654; }
         .user-message .message-content p { color: white !important; }
 
         .message-content p { margin: 0 0 8px 0; }
-
-        /* Use class so bold always renders brand blue (except gold nuggets which already override strong) */
         .brand-strong { color: #0068ff; font-weight: 700; }
 
         .user-message .message-content strong,
@@ -504,76 +341,43 @@ Generating your personalized **Contractor Growth Map**...`,
         .user-message .message-content strong em,
         .user-message .message-content em strong,
         .user-message .message-content b em {
-          color: white !important;
-          font-weight: 700;
+          color: white !important; font-weight: 700;
         }
 
-        /* ALL bold text in messages uses brand blue — except gold nuggets */
         .message-content:not(.gold-nugget) strong,
         .message-content:not(.gold-nugget) b,
         .message-content:not(.gold-nugget) strong em,
         .message-content:not(.gold-nugget) em strong,
-        .message-content:not(.gold-nugget) b em {
-          font-weight: 700;
-          color: #0068ff !important;
-        }
+        .message-content:not(.gold-nugget) b em { font-weight: 700; color: #0068ff !important; }
         .message-content p:last-child { margin-bottom: 0; }
-
         .gold-nugget strong { color: #92400e; }
 
         /* OPTIONS: one per line, left-aligned (consolidated) */
-        .options-container {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 8px;
-          margin-top: 10px;
-          width: 100%;
-        }
-        .option-button {
-          display: block;
-          width: 100%;
-          text-align: left;
-          padding: 12px 16px;
-          border-radius: 10px;
-          border: none;
-          background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          color: #fff;
-          font-size: 16px;
-          font-weight: 600;
-          line-height: 1.3;
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        @media (min-width: 768px) {
-          .option-button { font-size: 18px; }
-        }
+        .options-container { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 10px; width: 100%; }
+        .option-button { display: block; width: 100%; text-align: left; padding: 12px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #0068ff, #2ea3f2); color: #fff; font-size: 16px; font-weight: 600; line-height: 1.3; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        @media (min-width: 768px) { .option-button { font-size: 18px; } }
         .option-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
         .option-button.selected { outline: 2px solid rgba(48,214,79,0.35); }
-        /* Spacing fallback (in addition to inline marginTop) */
         .option-button + .option-button { margin-top: 8px; }
 
-        /* Global bold handling to beat styled-jsx scoping when content is injected */
-        /* ---- BRAND BOLD COLORS (global + high specificity) ---- */
-        .ai-message .message-content :global(.brand-strong) {
-          color: #0068ff !important;
-          font-weight: 700;
-        }
-        .user-message .message-content :global(.brand-strong) {
-          color: white !important;
-          font-weight: 700;
-        }
-        .gold-nugget :global(.brand-strong) {
-          /* preserve your nugget styling */
-          color: #92400e !important;
-          font-weight: 700;
+        /* INPUT BAR — keep input and SEND on one row */
+        .input-container { position: sticky; bottom: 0; z-index: 15; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px; padding: 16px 20px; background: white; border-top: 1px solid rgba(0, 104, 255, 0.1); box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05); }
+        .message-input { flex: 1 1 auto; min-width: 0; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: 'Open Sans', sans-serif; font-size: 15px; transition: all 0.2s ease; outline: none; }
+        .message-input:focus { border-color: #0068ff; box-shadow: 0 0 0 3px rgba(0,104,255,0.1); }
+        .send-button { flex: 0 0 auto; padding: 12px 24px; background: linear-gradient(135deg, #0068ff, #2ea3f2); color: white; border: none; border-radius: 8px; font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,104,255,0.3); }
+        .send-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,104,255,0.4); }
+
+        @media (max-width: 768px) {
+          .messages-container { padding: 16px; padding-top: 54px; padding-bottom: 72px; }
+          .message-content { max-width: 90%; padding: 14px 16px; font-size: 15px; }
+          .message-input { font-size: 16px; }
         }
 
-        /* Only the actual question sentence uses dark bold if you add question-strong */
-        :global(.question-strong) {
-          color: #002654 !important;
-          font-weight: 700;
-        }
+        /* Global overrides for injected HTML (styled-jsx scope safe) */
+        .ai-message .message-content :global(.brand-strong) { color: #0068ff !important; font-weight: 700; }
+        .user-message .message-content :global(.brand-strong) { color: white !important; font-weight: 700; }
+        .gold-nugget :global(.brand-strong) { color: #92400e !important; font-weight: 700; }
+        :global(.question-strong) { color: #002654 !important; font-weight: 700; }
       `}</style>
     </div>
   );
