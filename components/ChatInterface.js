@@ -337,7 +337,8 @@ Generating your personalized **Contractor Growth Map**...`,
                   {message.question.options.map((option, optIndex) => (
                     <button
                       key={optIndex}
-                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} style={{ marginTop: optIndex === 0 ? 0 : 8 }}
+                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`}
+                      style={{ marginTop: optIndex === 0 ? 0 : 8 }}
                       onClick={() => handleOptionSelect(option, option.label)}
                     >
                       {option.label}
@@ -494,34 +495,33 @@ Generating your personalized **Contractor Growth Map**...`,
         .user-message .message-content p { color: white !important; }
 
         .message-content p { margin: 0 0 8px 0; }
-/* Use class so bold always renders brand blue (except gold nuggets which already override strong) */
-.brand-strong { color: #0068ff; font-weight: 700; }
 
+        /* Use class so bold always renders brand blue (except gold nuggets which already override strong) */
+        .brand-strong { color: #0068ff; font-weight: 700; }
 
-.user-message .message-content strong,
-.user-message .message-content b,
-.user-message .message-content strong em,
-.user-message .message-content em strong,
-.user-message .message-content b em {
-  color: white !important;
-  font-weight: 700;
-}
-/* ALL bold text in messages uses brand blue — except gold nuggets */
-.message-content:not(.gold-nugget) strong,
-.message-content:not(.gold-nugget) b,
-.message-content:not(.gold-nugget) strong em,
-.message-content:not(.gold-nugget) em strong,
-.message-content:not(.gold-nugget) b em {
-  font-weight: 700;
-  color: #0068ff !important;
-}
+        .user-message .message-content strong,
+        .user-message .message-content b,
+        .user-message .message-content strong em,
+        .user-message .message-content em strong,
+        .user-message .message-content b em {
+          color: white !important;
+          font-weight: 700;
+        }
+
+        /* ALL bold text in messages uses brand blue — except gold nuggets */
+        .message-content:not(.gold-nugget) strong,
+        .message-content:not(.gold-nugget) b,
+        .message-content:not(.gold-nugget) strong em,
+        .message-content:not(.gold-nugget) em strong,
+        .message-content:not(.gold-nugget) b em {
+          font-weight: 700;
+          color: #0068ff !important;
+        }
         .message-content p:last-child { margin-bottom: 0; }
 
-        
         .gold-nugget strong { color: #92400e; }
-        .user-message 
 
-        /* OPTIONS: one per line, left-aligned */
+        /* OPTIONS: one per line, left-aligned (consolidated) */
         .options-container {
           display: flex;
           flex-direction: column;
@@ -534,98 +534,47 @@ Generating your personalized **Contractor Growth Map**...`,
           display: block;
           width: 100%;
           text-align: left;
-          padding: 10px 14px;
+          padding: 12px 16px;
           border-radius: 10px;
           border: none;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: #fff;
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 600;
           line-height: 1.3;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
+        @media (min-width: 768px) {
+          .option-button { font-size: 18px; }
+        }
         .option-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
         .option-button.selected { outline: 2px solid rgba(48,214,79,0.35); }
+        /* Spacing fallback (in addition to inline marginTop) */
+        .option-button + .option-button { margin-top: 8px; }
 
-        /* Input */
-        .custom-answer-hint { padding: 6px 16px 0; font-size: 13px; color: #334155; }
-        @media (min-width: 769px) { .custom-answer-hint { font-size: 14px; } }
-
-        .input-container {
-          position: sticky;
-          bottom: 0;
-          z-index: 15;
-          display: flex;
-          gap: 12px;
-          padding: 16px 20px;
-          background: white;
-          border-top: 1px solid rgba(0, 104, 255, 0.1);
-          box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
-        }
-        .message-input {
-          flex: 1;
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-family: 'Open Sans', sans-serif;
-          font-size: 15px;
-          transition: all 0.2s ease;
-          outline: none;
-        }
-        .message-input:focus { border-color: #0068ff; box-shadow: 0 0 0 3px rgba(0,104,255,0.1); }
-        .send-button {
-          padding: 12px 24px;
-          background: linear-gradient(135deg, #0068ff, #2ea3f2);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-family: 'Roboto', sans-serif;
+        /* Global bold handling to beat styled-jsx scoping when content is injected */
+        /* ---- BRAND BOLD COLORS (global + high specificity) ---- */
+        .ai-message .message-content :global(.brand-strong) {
+          color: #0068ff !important;
           font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 2px 8px rgba(0,104,255,0.3);
         }
-        .send-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,104,255,0.4); }
-
-        @media (max-width: 768px) {
-          .messages-container { padding: 16px; padding-top: 54px; padding-bottom: 72px; }
-          .message-content { max-width: 90%; padding: 14px 16px; font-size: 15px; }
-          .message-input { font-size: 16px; }
+        .user-message .message-content :global(.brand-strong) {
+          color: white !important;
+          font-weight: 700;
         }
-      
-/* Readability: larger option buttons */
-.option-button {
-  font-size: 16px;
-  line-height: 1.3;
-  padding: 12px 16px;
-}
-@media (min-width: 768px) {
-  .option-button { font-size: 18px; }
-}
-/* Spacing fallback (in addition to inline marginTop) */
-.option-button + .option-button { margin-top: 8px; }
-/* ---- BRAND BOLD COLORS (global + high specificity) ---- */
-.ai-message .message-content :global(.brand-strong) {
-  color: #0068ff !important;
-  font-weight: 700;
-}
-.user-message .message-content :global(.brand-strong) {
-  color: white !important;
-  font-weight: 700;
-}
-.gold-nugget :global(.brand-strong) {
-  /* preserve your nugget styling */
-  color: #92400e !important;
-  font-weight: 700;
-}
+        .gold-nugget :global(.brand-strong) {
+          /* preserve your nugget styling */
+          color: #92400e !important;
+          font-weight: 700;
+        }
 
-/* Only the actual question sentence uses dark bold */
-:global(.question-strong) {
-  color: #002654 !important;
-  font-weight: 700;
-}`}</style>
+        /* Only the actual question sentence uses dark bold if you add question-strong */
+        :global(.question-strong) {
+          color: #002654 !important;
+          font-weight: 700;
+        }
+      `}</style>
     </div>
   );
 };
