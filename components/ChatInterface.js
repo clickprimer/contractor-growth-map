@@ -100,7 +100,9 @@ It only takes a few minutes, so let's get started.
 
     const questionMessage = {
       type: 'ai',
-      content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**\n\n${category.screener.question}`,
+      content: `**Question ${questionNum} of ${totalQuestions}: ${category.category}**
+
+<strong class="question-strong">${category.screener.question}</strong>`,
       question: category.screener,
       isScreener: true,
       categoryName: category.category,
@@ -150,7 +152,7 @@ It only takes a few minutes, so let's get started.
         setTimeout(() => {
           setMessages(prev => [...prev, {
             type: 'ai',
-            content: `**Follow-up:** ${currentCategory.followUp.question}`,
+            content: `**Follow-up:** <strong class="question-strong">${currentCategory.followUp.question}</strong>`,
             question: currentCategory.followUp,
             isFollowUp: true,
             timestamp: new Date()
