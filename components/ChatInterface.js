@@ -78,15 +78,13 @@ It only takes a few minutes, and you're free to add your own details as you go. 
     const last = messages[messages.length - 1];
     const prev = messages[messages.length - 2];
 
-    // NEW behavior:
-    // - If AI sends multiple messages back-to-back, stay anchored on the FIRST of that sequence.
-    //   So when the second (or later) AI bubble appears, do NOT auto-scroll.
+    // If AI sends multiple messages back-to-back, stay anchored on the FIRST of that sequence.
     if (last?.type === 'ai' && prev?.type === 'ai') {
       return; // keep current position (anchored at the first AI bubble)
     }
 
-    // - AI messages: scroll to TOP of the new AI bubble
-    // - User messages: scroll to BOTTOM (show what they just sent)
+    // AI messages: scroll to TOP of the new AI bubble
+    // User messages: scroll to BOTTOM (show what they just sent)
     const fn = last.type === 'ai' && !last.isNugget ? scrollToTopOfLastMessage : scrollToBottom;
     const id = setTimeout(fn, 80);
     return () => clearTimeout(id);
@@ -292,7 +290,7 @@ Generating your personalized **Contractor Growth Map**...`,
 
   return (
     <div ref={chatContainerRef} className="chat-container">
-      {/* Progress row (NO sound button) */}
+      {/* Progress row (no sound button) */}
       <div className="progress-row">
         <span className="progress-count">{displayNumber} of {totalQuestions} questions</span>
         <div className="progress-track" aria-hidden="true">
@@ -314,7 +312,7 @@ Generating your personalized **Contractor Growth Map**...`,
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.type}-message`}>
             <div className={`message-content ${message.isNugget ? 'gold-nugget' : ''}`}>
-              {String(message.content).split('\\n').map((line, i) => (
+              {String(message.content).split('\n').map((line, i) => (
                 <p key={i} dangerouslySetInnerHTML={{ __html: formatLine(line) }} />
               ))}
               {/* Options inline inside the AI bubble for the CURRENT question only */}
@@ -376,9 +374,9 @@ Generating your personalized **Contractor Growth Map**...`,
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 6px 12px;
-          background: transparent;
-          backdrop-filter: saturate(120%);
+          padding: 8px 12px;
+          background: #f8fafc; /* off-white */
+          border-bottom: 1px solid rgba(0,0,0,0.04);
         }
         .progress-count {
           font-size: 12px;
@@ -486,12 +484,21 @@ Generating your personalized **Contractor Growth Map**...`,
         .message-content em strong,
         .message-content b em { color: #0068ff !important; }
 
+        /* OPTIONS: one per line, left-aligned */
         .options-container {
-          display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          margin-top: 10px;
+          width: 100%;
         }
         .option-button {
+          display: block;
+          width: 100%;
+          text-align: left;
           padding: 10px 14px;
-          border-radius: 999px;
+          border-radius: 10px;
           border: none;
           background: linear-gradient(135deg, #0068ff, #2ea3f2);
           color: #fff;
