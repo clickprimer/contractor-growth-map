@@ -6,7 +6,7 @@ import ConfirmModal from './ConfirmModal';
 function formatLine(line) {
   if (!line) return '';
   // Bold
-  line = line.replace(/(\*\*)([^*\n][^*]*?)\1/g, '<strong>$2</strong>');
+  line = line.replace(/(\*\*)([^*\n][^*]*?)\1/g, '<strong class="brand-strong">$2</strong>');
   // Italic (won't eat **bold**)
   line = line.replace(/(^|[^*])\*([^*\n][^*]*?)\*/g, '$1<em>$2</em>');
   return line;
@@ -337,7 +337,7 @@ Generating your personalized **Contractor Growth Map**...`,
                   {message.question.options.map((option, optIndex) => (
                     <button
                       key={optIndex}
-                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`}
+                      className={`option-button ${selectedOption?.label === option.label ? 'selected' : ''}`} style={{ marginTop: optIndex === 0 ? 0 : 8 }}
                       onClick={() => handleOptionSelect(option, option.label)}
                     >
                       {option.label}
@@ -494,6 +494,8 @@ Generating your personalized **Contractor Growth Map**...`,
         .user-message .message-content p { color: white !important; }
 
         .message-content p { margin: 0 0 8px 0; }
+/* Use class so bold always renders brand blue (except gold nuggets which already override strong) */
+.brand-strong { color: #0068ff; font-weight: 700; }
 
 
 .user-message .message-content strong,
